@@ -6,12 +6,12 @@ import kotlin.time.Duration.Companion.minutes
 
 
 @Composable
-fun AddTaskDialog(
+fun AddTaskScreen(
     onConfirm: (TaskRequest, Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    TaskDialog(
-        dialogTitle = "Add task",
+    TaskScreen(
+        screenTitle = "Add task",
         data = listOf(""),
         initialIndex = 0,
         initialTitle = "",

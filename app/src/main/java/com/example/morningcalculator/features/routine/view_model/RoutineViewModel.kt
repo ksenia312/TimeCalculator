@@ -3,8 +3,7 @@ package com.example.morningcalculator.features.routine.view_model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineCombined
-import com.example.morningcalculator.core.model.RoutineEntry
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskRequest
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
 
 class RoutineViewModel(
     val id: String, val tasksRepository: TasksRepository, val routineRepository: RoutineRepository
@@ -25,16 +23,14 @@ class RoutineViewModel(
 
     private val _viewState = MutableStateFlow<RoutineViewState>(RoutineViewState.Loading)
     private val _tasksState = MutableStateFlow<List<Task>>(emptyList())
+
     val viewState: StateFlow<RoutineViewState> = _viewState
     val notIncludedTasks: StateFlow<List<Task>> = combine(
         _tasksState, _viewState
     ) { tasks, state ->
 
         val idsInRoutine: Set<String> = when (state) {
-            is RoutineViewState.Success -> {
-                val routineCombined = toCombined(state.routine)
-                routineCombined.taskPairs.map { it.first.id }.toSet()
-            }
+            is RoutineViewState.Success -> state.full.data.map { it.first.id }.toSet()
 
             else -> emptySet()
         }
@@ -63,35 +59,53 @@ class RoutineViewModel(
         }
     }
 
+    fun deleteTask(taskId: String) {
+        viewModelScope.launch {
+            _viewState.asSuccess {
+                val routineCombined = it.full
+                val newRoutineCombined = routineCombined.copy(
+                    data = routineCombined.data.mapNotNull { (t, s) ->
+                        if (t.id == taskId) null else t to s
+                    })
+
+                editRoutine(newRoutineCombined.toLinks())
+            }
+
+        }
+    }
+
     fun reorderTasks(newTaskIds: List<String>) {
         viewModelScope.launch {
-            val routineCombined = toCombined((_viewState.value as RoutineViewState.Success).routine)
-            val newTaskPairs = newTaskIds.mapNotNull { taskId ->
-                routineCombined.taskPairs.firstOrNull { it.first.id == taskId }
+            _viewState.asSuccess {
+                val routineCombined = it.full
+                val newTaskPairs = newTaskIds.mapNotNull { taskId ->
+                    routineCombined.data.firstOrNull { it.first.id == taskId }
+                }
+                val newRoutine = routineCombined.copy(data = newTaskPairs)
+                editRoutine(newRoutine.toLinks())
             }
-            val newRoutine = routineCombined.copy(taskPairs = newTaskPairs)
-            editRoutine(newRoutine.toRoutine())
         }
     }
 
     fun addOrEditTaskInRoutine(task: Task, subData: SubData) {
         viewModelScope.launch {
-            val routineCombined = toCombined((_viewState.value as RoutineViewState.Success).routine)
-
-            var newRoutineCombined = routineCombined.copy(
-                taskPairs = routineCombined.taskPairs.map { (t, s) ->
-                    if (t.id == task.id) (task to subData) else t to s
-                })
-            if (!newRoutineCombined.taskPairs.map { it.first.id }.contains(task.id)) {
-                newRoutineCombined = newRoutineCombined.copy(
-                    taskPairs = newRoutineCombined.taskPairs + (task to subData)
-                )
+            _viewState.asSuccess {
+                val routineCombined = it.full
+                var newRoutineCombined = routineCombined.copy(
+                    data = routineCombined.data.map { (t, s) ->
+                        if (t.id == task.id) (task to subData) else t to s
+                    })
+                if (!newRoutineCombined.data.map { it.first.id }.contains(task.id)) {
+                    newRoutineCombined = newRoutineCombined.copy(
+                        data = newRoutineCombined.data + (task to subData)
+                    )
+                }
+                editRoutine(newRoutineCombined.toLinks())
             }
-            editRoutine(newRoutineCombined.toRoutine())
         }
     }
 
-    fun editRoutine(routine: Routine) {
+    fun editRoutine(routine: Routine.Links) {
         viewModelScope.launch {
             routineRepository.updateRoutine(routine)
         }
@@ -106,7 +120,7 @@ class RoutineViewModel(
                 val viewState = _viewState.value
                 if (viewState is RoutineViewState.Success) {
                     _viewState.value = RoutineViewState.Success(
-                        viewState.routine
+                        viewState.links.toFull(), viewState.links
                     )
                 }
             }
@@ -115,38 +129,43 @@ class RoutineViewModel(
         viewModelScope.launch {
             routineRepository.routineFlow().collect { routine ->
                 _viewState.value = if (routine == null) RoutineViewState.Error("Routine not found")
-                else RoutineViewState.Success(routine)
+                else RoutineViewState.Success(routine.toFull(), routine)
             }
         }
     }
 
-    fun toCombined(routine: Routine): RoutineCombined {
-        val routineTasks = routine.entries.mapNotNull { entry ->
+    fun Routine.Links.toFull(): Routine.Full {
+        val routineTasks = links.mapNotNull { entry ->
             val task = _tasksState.value.firstOrNull { task -> task.id == entry.taskId }
             val subData = task?.data?.firstOrNull { subData -> subData.id == entry.subDataId }
             if (task != null && subData != null) task to subData else null
         }
-        return routine.run {
-            RoutineCombined(
-                routineId = id,
-                title = title,
-                taskPairs = routineTasks,
-                time = time
-            )
-        }
+        return Routine.Full(
+            id = id, title = title, data = routineTasks, time = time, modifiedAt = modifiedAt
+        )
+
     }
 
-    private fun RoutineCombined.toRoutine(): Routine {
-        val entries = taskPairs.map { (task, subData) ->
-            RoutineEntry(taskId = task.id, subDataId = subData.id)
+    private fun Routine.Full.toLinks(): Routine.Links {
+        val entries = data.map { (task, subData) ->
+            RoutineLink(taskId = task.id, subDataId = subData.id)
         }
-        return Routine(id = routineId, title = title, entries = entries, time = time)
+        return Routine.Links(
+            id = id, title = title, links = entries, time = time, modifiedAt = modifiedAt
+        )
+    }
+}
+
+fun MutableStateFlow<RoutineViewState>.asSuccess(action: (RoutineViewState.Success) -> Unit): Unit {
+    (this.value as? RoutineViewState.Success)?.let {
+        action(it)
     }
 }
 
 
 sealed interface RoutineViewState {
     object Loading : RoutineViewState
-    data class Success(/*val combined: RoutineCombined,*/ val routine: Routine) : RoutineViewState
+    data class Success(val full: Routine.Full, val links: Routine.Links) : RoutineViewState
+
     data class Error(val error: String) : RoutineViewState
 }

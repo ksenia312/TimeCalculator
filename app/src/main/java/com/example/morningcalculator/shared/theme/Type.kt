@@ -5,30 +5,30 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.morningcalculator.shared.theme.font.OnestFamily
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+private val defaultTypography = Typography()
+
+val AppTypography = Typography(
+    displayLarge  = defaultTypography.displayLarge.withOnest(),
+    displayMedium = defaultTypography.displayMedium.withOnest(),
+    displaySmall  = defaultTypography.displaySmall.withOnest(),
+
+    headlineLarge = defaultTypography.headlineLarge.withOnest(),
+    headlineMedium = defaultTypography.headlineMedium.withOnest(),
+    headlineSmall = defaultTypography.headlineSmall.withOnest(),
+
+    titleLarge  = defaultTypography.titleLarge.withOnest(),
+    titleMedium = defaultTypography.titleMedium.withOnest(),
+    titleSmall  = defaultTypography.titleSmall.withOnest(),
+
+    bodyLarge  = defaultTypography.bodyLarge.withOnest(),
+    bodyMedium = defaultTypography.bodyMedium.withOnest(),
+    bodySmall  = defaultTypography.bodySmall.withOnest(),
+
+    labelLarge  = defaultTypography.labelLarge.withOnest(),
+    labelMedium = defaultTypography.labelMedium.withOnest(),
+    labelSmall  = defaultTypography.labelSmall.withOnest()
 )
+
+private fun TextStyle.withOnest() = copy(fontFamily = OnestFamily)

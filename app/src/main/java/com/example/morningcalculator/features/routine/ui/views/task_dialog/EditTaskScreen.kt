@@ -1,5 +1,9 @@
 package com.example.morningcalculator.features.routine.ui.views.task_dialog
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
@@ -8,14 +12,15 @@ import kotlin.time.Duration.Companion.minutes
 
 
 @Composable
-fun EditTaskDialog(
+fun EditTaskScreen(
     onConfirm: (TaskUpdateRequest, Int) -> Unit,
+    onDelete: () -> Unit,
     onDismiss: () -> Unit,
     initialTask: Task,
     initialSubDataId: String,
 ) {
-    TaskDialog(
-        dialogTitle = "Update task",
+    TaskScreen(
+        screenTitle = "Update task",
         data = initialTask.data as List<SubData?>,
         initialIndex = initialTask.data.indexOfFirst { it.id == initialSubDataId },
         initialTitle = initialTask.title,
@@ -35,7 +40,6 @@ fun EditTaskDialog(
         },
         confirmEnabled = { data -> data.all { it != null } && data.isNotEmpty() },
         onConfirm = { title, data, selectedIndex ->
-            println("on confirm update $title $data")
             onConfirm(
                 TaskUpdateRequest(
                     taskId = initialTask.id,
@@ -44,6 +48,14 @@ fun EditTaskDialog(
                     subData = data.filterNotNull(),
                 ), selectedIndex
             )
+        },
+        headerActions = {
+            IconButton(onClick = {
+                onDelete()
+                onDismiss()
+            }) {
+                Icon(Icons.Outlined.Delete, "Delete")
+            }
         },
         onDismiss = onDismiss
     )

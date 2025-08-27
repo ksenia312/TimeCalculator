@@ -1,22 +1,22 @@
 package com.example.morningcalculator.shared.extensions
 
-import com.example.morningcalculator.core.model.RoutineCombined
+import com.example.morningcalculator.core.model.Routine
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toJavaLocalTime
 import kotlinx.datetime.toKotlinLocalTime
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
-fun RoutineCombined.whenToGetUp(): LocalTime {
-    val total: Duration = taskPairs.fold(Duration.ZERO) { acc, (_, task) ->
+fun Routine.Full.whenToGetUp(): LocalTime {
+    val total: Duration = data.fold(Duration.ZERO) { acc, (_, task) ->
         acc + task.duration
     }
 
     return time.toJavaLocalTime().minus(total.toJavaDuration()).toKotlinLocalTime()
 }
 
-fun RoutineCombined.timeOnMoment(index: Int): LocalTime {
-    val total: Duration = taskPairs.foldIndexed(Duration.ZERO) { currentIndex, acc, (_, task) ->
+fun Routine.Full.timeOnMoment(index: Int): LocalTime {
+    val total: Duration = data.foldIndexed(Duration.ZERO) { currentIndex, acc, (_, task) ->
         if (currentIndex <= index) return@foldIndexed acc
         acc + task.duration
     }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
+import java.util.UUID
 
 class RoutineRepositoryImpl(
     context: Context, private val prefs: SharedPreferences = context.getSharedPreferences(
@@ -21,7 +22,7 @@ class RoutineRepositoryImpl(
         private const val KEY_ROUTINE = "routine_json"
     }
 
-    var id: String? = null
+    var selectedRoutineId: String? = null
 
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == KEY_ROUTINE) {
@@ -37,52 +38,62 @@ class RoutineRepositoryImpl(
     }
 
     override fun initializeId(id: String) {
-        this.id = id
+        this.selectedRoutineId = id
         refresh()
     }
 
     override fun clearId() {
-        id = null
+        selectedRoutineId = null
         refresh()
     }
 
-    override fun routineFlow(): StateFlow<Routine?> = _routineFlow.asStateFlow()
+    override fun routineFlow(): StateFlow<Routine.Links?> = _routineFlow.asStateFlow()
 
-    override fun routinesFlow(): StateFlow<List<Routine>> = _routinesFlow.asStateFlow()
+    override fun routinesFlow(): StateFlow<List<Routine.Links>> = _routinesFlow.asStateFlow()
 
     override fun addRoutine(request: RoutineRequest) {
-        val routine = Routine(title = request.title, entries = emptyList(), time = request.time)
+        val routine = Routine.Links(
+            id = UUID.randomUUID().toString(),
+            title = request.title,
+            links = emptyList(),
+            time = request.time,
+            modifiedAt = System.currentTimeMillis()
+        )
         addOrChangeRoutine(routine)
     }
 
-    override fun updateRoutine(routine: Routine) {
+    override fun updateRoutine(routine: Routine.Links) {
         addOrChangeRoutine(routine)
     }
 
-    private fun addOrChangeRoutine(routine: Routine) {
+    private fun addOrChangeRoutine(initialRoutine: Routine.Links) {
+        val newRoutine = initialRoutine.copy(modifiedAt = System.currentTimeMillis())
         val routines = _routinesFlow.value
-        var updatedRoutines = routines.map { if (it.id == routine.id) routine else it }.toList()
-        if (!updatedRoutines.map { it.id }.contains(id)) {
-            updatedRoutines = updatedRoutines + (routine)
+        var updatedRoutines =
+            routines.map { r -> if (r.id == newRoutine.id) newRoutine else r }.toList()
+
+        val ids = updatedRoutines.map { it.id }
+        if (!ids.contains(newRoutine.id)) {
+            updatedRoutines = updatedRoutines + (newRoutine)
         }
         prefs.edit() {
             putString(KEY_ROUTINE, Json.encodeToString(updatedRoutines))
         }
-        _routinesFlow.value = updatedRoutines
-        _routineFlow.value = routine
+//        _routinesFlow.value = updatedRoutines
+//        _routineFlow.value = routine
 
         refresh()
     }
 
-    private fun loadRoutinesFromPrefs(): List<Routine> {
+    private fun loadRoutinesFromPrefs(): List<Routine.Links> {
         val json = prefs.getString(KEY_ROUTINE, "[]") ?: "[]"
-        return runCatching { Json.decodeFromString<List<Routine>>(json) }.getOrDefault(
+        return runCatching { Json.decodeFromString<List<Routine.Links>>(json) }.getOrDefault(
             emptyList()
         )
     }
 
-    private fun loadRoutineFromPrefs(): Routine? {
-        return loadRoutinesFromPrefs().firstOrNull { it.id == id }
+    private fun loadRoutineFromPrefs(): Routine.Links? {
+        return loadRoutinesFromPrefs().firstOrNull { it.id == selectedRoutineId }
     }
 
     private fun refresh() {

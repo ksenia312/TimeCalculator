@@ -23,8 +23,7 @@ import kotlinx.datetime.LocalTime
 
 @Composable
 fun RoutineDialog(
-    onConfirm: (RoutineRequest) -> Unit, onDismiss: () -> Unit,
-    initialRoutine: Routine? = null
+    onConfirm: (RoutineRequest) -> Unit, onDismiss: () -> Unit, initialRoutine: Routine? = null
 ) {
     var title by remember { mutableStateOf(initialRoutine?.title ?: "") }
     var time by remember { mutableStateOf(initialRoutine?.time ?: LocalTime(7, 0)) }
@@ -40,7 +39,7 @@ fun RoutineDialog(
             }) { Text("Ok") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-        title = { Text("Add new routine") },
+        title = { Text(if (initialRoutine == null) "Add new routine" else "Edit routine") },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(

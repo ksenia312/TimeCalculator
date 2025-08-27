@@ -9,11 +9,11 @@ interface RoutineRepository {
 
     fun clearId()
 
-    fun routineFlow(): StateFlow<Routine?>
+    fun routineFlow(): StateFlow<Routine.Links?>
 
-    fun routinesFlow(): StateFlow<List<Routine>>
+    fun routinesFlow(): StateFlow<List<Routine.Links>>
 
     fun addRoutine(request: RoutineRequest)
 
-    fun updateRoutine(routine: Routine)
+    fun updateRoutine(routine: Routine.Links)
 }

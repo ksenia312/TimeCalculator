@@ -28,7 +28,6 @@ fun CurrentTimeRow(time: String, isTitle: Boolean = false) {
         Text(
             time,
             style = style,
-//            modifier = Modifier.weight(4f)
         )
         Spacer(Modifier.width(8.dp))
         Separator(weight = 8f)

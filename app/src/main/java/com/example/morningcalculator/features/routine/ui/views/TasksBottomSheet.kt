@@ -38,7 +38,8 @@ fun TasksBottomSheet(
     )
     var openedTaskId by remember { mutableStateOf<String?>(null) }
     ModalBottomSheet(
-        onDismissRequest = { onDismiss() }, sheetState = sheetState,
+        onDismissRequest = { onDismiss() },
+        sheetState = sheetState,
     ) {
         Column(Modifier.padding(16.dp)) {
             Text("Select task")
