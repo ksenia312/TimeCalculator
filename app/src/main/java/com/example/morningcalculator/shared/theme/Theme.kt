@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.example.morningcalculator.shared.theme.custom.CustomColorScheme
 
@@ -20,7 +21,9 @@ fun MorningCalculatorTheme(
         else -> LightAppColorScheme
     }
 
-    CompositionLocalProvider(LocalCustomColorScheme provides appColorScheme) {
+    CompositionLocalProvider(
+        LocalCustomColorScheme provides appColorScheme, LocalIsDarkTheme provides darkTheme
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = AppTypography,
@@ -33,6 +36,8 @@ fun MorningCalculatorTheme(
 val LocalCustomColorScheme = staticCompositionLocalOf<CustomColorScheme> {
     error("No CustomColorScheme provided. Did you forget add it?")
 }
+
+val LocalIsDarkTheme = compositionLocalOf { false }
 
 //        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 //            val context = LocalContext.current

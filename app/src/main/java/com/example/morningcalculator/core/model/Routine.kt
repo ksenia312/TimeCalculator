@@ -16,11 +16,13 @@ interface Routine {
     val title: String
     val time: LocalTime
     val modifiedAt: Long
+    val color: String
 
     @Serializable
     data class Links(
         override val id: String,
         override val title: String,
+        override val color: String,
         @Serializable(with = LocalTimeIsoSerializer::class) override val time: LocalTime,
         override val modifiedAt: Long,
         val links: List<RoutineLink>,
@@ -30,6 +32,7 @@ interface Routine {
     data class Full(
         override val id: String,
         override val title: String,
+        override val color: String,
         @Serializable(with = LocalTimeIsoSerializer::class) override val time: LocalTime,
         override val modifiedAt: Long,
         val data: List<Pair<Task, SubData>>,
@@ -38,7 +41,9 @@ interface Routine {
 
 @OptIn(ExperimentalTime::class)
 data class RoutineRequest(
-    val title: String, val time: LocalTime
+    val title: String,
+    val time: LocalTime,
+    val color: String
 )
 
 object LocalTimeIsoSerializer : KSerializer<LocalTime> {

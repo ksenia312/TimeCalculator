@@ -1,6 +1,5 @@
 package com.example.morningcalculator.features.home.ui.views
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.shared.components.TimePickerField
+import com.example.morningcalculator.shared.extensions.toHexString
+import com.example.morningcalculator.shared.utils.RoutineColorPicker
 import kotlinx.datetime.LocalTime
 
 @Composable
@@ -31,12 +32,18 @@ fun RoutineDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(enabled = title.isNotBlank(), onClick = {
-                onConfirm(
-                    RoutineRequest(title = title, time = time)
-                )
-                onDismiss()
-            }) { Text("Ok") }
+            TextButton(
+                enabled = title.isNotBlank(),
+                onClick = {
+                    onConfirm(
+                        RoutineRequest(
+                            title = title,
+                            time = time,
+                            color = RoutineColorPicker.pick().toHexString()
+                        )
+                    )
+                    onDismiss()
+                }) { Text("Ok") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
         title = { Text(if (initialRoutine == null) "Add new routine" else "Edit routine") },

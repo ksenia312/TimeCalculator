@@ -141,7 +141,12 @@ class RoutineViewModel(
             if (task != null && subData != null) task to subData else null
         }
         return Routine.Full(
-            id = id, title = title, data = routineTasks, time = time, modifiedAt = modifiedAt
+            id = id,
+            title = title,
+            data = routineTasks,
+            time = time,
+            modifiedAt = modifiedAt,
+            color = color
         )
 
     }
@@ -151,7 +156,12 @@ class RoutineViewModel(
             RoutineLink(taskId = task.id, subDataId = subData.id)
         }
         return Routine.Links(
-            id = id, title = title, links = entries, time = time, modifiedAt = modifiedAt
+            id = id,
+            title = title,
+            links = entries,
+            time = time,
+            modifiedAt = modifiedAt,
+            color = color
         )
     }
 }

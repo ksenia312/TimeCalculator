@@ -38,7 +38,7 @@ fun CustomTopBar(
     subtitle: String? = null,
     actions: @Composable RowScope.() -> Unit = {},
     showNavigationIcon: Boolean = false,
-    sideWidget: @Composable () -> Unit = {}
+    bottomRightWidget: @Composable () -> Unit = {}
 ) {
     val navigator = LocalNavHostController.current
     val activity = LocalActivity.current as? ComponentActivity
@@ -74,7 +74,7 @@ fun CustomTopBar(
                         maxLines = 3
                     )
                 }
-                sideWidget()
+                bottomRightWidget()
             }
         }, colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,

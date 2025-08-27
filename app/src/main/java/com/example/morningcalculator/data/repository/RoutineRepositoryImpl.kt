@@ -57,7 +57,8 @@ class RoutineRepositoryImpl(
             title = request.title,
             links = emptyList(),
             time = request.time,
-            modifiedAt = System.currentTimeMillis()
+            color = request.color,
+            modifiedAt = System.currentTimeMillis(),
         )
         addOrChangeRoutine(routine)
     }
