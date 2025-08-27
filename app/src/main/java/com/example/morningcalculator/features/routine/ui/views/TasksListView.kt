@@ -14,7 +14,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine.Full
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.features.routine.ui.views.task_dialog.EditTaskScreen
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
 import com.example.morningcalculator.shared.extensions.whenToGetUp
@@ -26,25 +26,25 @@ fun ColumnScope.TasksListView(
     full: Full, viewModel: RoutineViewModel
 ) {
     val whenToGetUp = full.whenToGetUp()
-    val taskPairs = remember(full) { full.data.toMutableStateList() }
+    val fullLinks = remember(full) { full.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
-    val editingTask = remember { mutableStateOf<Pair<Task, String>?>(null) }
+    val editingLink = remember { mutableStateOf<RoutineFullLink?>(null) }
 
-    if (editingTask.value != null) {
-        val task = editingTask.value!!
-        EditTaskScreen(
-            initialTask = task.first,
-            initialSubDataId = task.second,
-            onDismiss = { editingTask.value = null },
-            onDelete = { viewModel.deleteTask(task.first.id) },
-            onConfirm = { request, selectedIndex ->
-                viewModel.editTask(
-                    request, selectedIndex
-                )
-            },
-        )
-    }
+//    if (editingLink.value != null) {
+//        val link = editingLink.value!!
+//        EditTaskScreen(
+//            initialTask = link.task,
+//            initialSubDataId = link.subData.id,
+//            onDismiss = { editingLink.value = null },
+//            onDelete = { viewModel.deleteTask(link.id) },
+//            onConfirm = { request, selectedIndex ->
+//                viewModel.editTask(
+//                    request, selectedIndex
+//                )
+//            },
+//        )
+//    }
 
     LazyColumn(modifier = Modifier.weight(1f)) {
         item { Spacer(Modifier.height(16.dp)) }
@@ -52,18 +52,17 @@ fun ColumnScope.TasksListView(
             CurrentTimeRow(whenToGetUp.toString(), isTitle = true)
         }
         itemsIndexed(
-            items = taskPairs,
-            key = { _, (task, _) -> task.id }) { index, (task, selectedSubData) ->
+            items = fullLinks,
+            key = { _, link -> link.id }) { index, link ->
             RoutineTaskItem(
-                task = task,
-                selectedSubData = selectedSubData,
+                routineFullLinks = fullLinks,
                 index = index,
                 full = full,
                 viewModel = viewModel,
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,
-                taskPairs = taskPairs,
-                editingTask = editingTask
+                editingLink = editingLink,
+                linkFull = link
             )
         }
         item { Spacer(Modifier.height(16.dp)) }

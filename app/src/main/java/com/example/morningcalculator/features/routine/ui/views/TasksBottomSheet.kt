@@ -3,9 +3,11 @@ package com.example.morningcalculator.features.routine.ui.views
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -34,17 +36,22 @@ fun TasksBottomSheet(
     val notIncludedTasks by viewModel.notIncludedTasks.collectAsState()
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+        skipPartiallyExpanded = true,
     )
     var openedTaskId by remember { mutableStateOf<String?>(null) }
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = sheetState,
+        modifier = Modifier.padding(top = 32.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(
+            Modifier
+                .padding(16.dp)
+                .fillMaxHeight()
+        ) {
             Text("Select task")
             Spacer(Modifier.height(12.dp))
-            LazyColumn {
+            LazyColumn(Modifier.weight(1f)) {
                 notIncludedTasks.forEach { task ->
                     item(key = task.id) {
                         Column {
@@ -55,29 +62,38 @@ fun TasksBottomSheet(
                                         openedTaskId = task.id
                                     })
                             )
-                            if (openedTaskId == task.id) {
-                                Column {
-                                    task.data.forEach { subData ->
-                                        ListItem(
-                                            colors = ListItemDefaults.colors(
-                                                containerColor = Color.LightGray.copy(alpha = 0.3f)
-                                            ),
-                                            headlineContent = { Text(text = subData.duration.inWholeMinutes.toString() + " min") },
-                                            modifier = Modifier.clickable(
-                                                onClick = {
-                                                    scope.launch {
-                                                        viewModel.addOrEditTaskInRoutine(task, subData)
-                                                        sheetState.hide()
-                                                        onDismiss()
-                                                    }
-                                                })
-                                        )
-                                    }
-                                }
-                            }
+//                            if (openedTaskId == task.id) {
+//                                Column {
+//                                    task.data.forEach { subData ->
+//                                        ListItem(
+//                                            colors = ListItemDefaults.colors(
+//                                                containerColor = Color.LightGray.copy(alpha = 0.3f)
+//                                            ),
+//                                            headlineContent = { Text(text = subData.duration.inWholeMinutes.toString() + " min") },
+//                                            modifier = Modifier.clickable(
+//                                                onClick = {
+//                                                    scope.launch {
+//                                                        viewModel.addOrEditTaskInRoutine(
+//                                                            task, subData
+//                                                        )
+//                                                        sheetState.hide()
+//                                                        onDismiss()
+//                                                    }
+//                                                })
+//                                        )
+//                                    }
+//                                }
+//                            }
                         }
                     }
                 }
+            }
+            ElevatedButton(onClick = {
+                viewModel.addOrEditTaskInRoutine(
+                    task, subData
+                )
+            }) {
+                Text("Submit")
             }
         }
     }

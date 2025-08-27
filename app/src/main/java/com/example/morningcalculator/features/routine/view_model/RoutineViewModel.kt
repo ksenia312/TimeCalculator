@@ -3,8 +3,8 @@ package com.example.morningcalculator.features.routine.view_model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskRequest
 import com.example.morningcalculator.core.model.TaskUpdateRequest
@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class RoutineViewModel(
     val id: String, val tasksRepository: TasksRepository, val routineRepository: RoutineRepository
@@ -25,19 +26,13 @@ class RoutineViewModel(
     private val _tasksState = MutableStateFlow<List<Task>>(emptyList())
 
     val viewState: StateFlow<RoutineViewState> = _viewState
-    val notIncludedTasks: StateFlow<List<Task>> = combine(
+    val tasks: StateFlow<List<Task>> = combine(
         _tasksState, _viewState
-    ) { tasks, state ->
-
-        val idsInRoutine: Set<String> = when (state) {
-            is RoutineViewState.Success -> state.full.data.map { it.first.id }.toSet()
-
-            else -> emptySet()
-        }
-        tasks.filter { it.id !in idsInRoutine }
+    ) { tasks, _ ->
+        tasks
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
@@ -48,56 +43,73 @@ class RoutineViewModel(
     fun addNewTask(request: TaskRequest, selectedDurationIndex: Int) {
         viewModelScope.launch {
             val task = tasksRepository.addTask(request)
-            addOrEditTaskInRoutine(task, task.data[selectedDurationIndex])
+            val subData = task.data[selectedDurationIndex]
+            addOrEditTaskInRoutine(
+                RoutineFullLink(
+                    id = UUID.randomUUID().toString(), task = task, subData = subData
+                )
+            )
         }
     }
 
-    fun editTask(request: TaskUpdateRequest, selectedDurationIndex: Int) {
-        viewModelScope.launch {
-            val task = tasksRepository.updateTask(request)
-            addOrEditTaskInRoutine(task, task.data[selectedDurationIndex])
-        }
-    }
+//    fun editTask(request: TaskUpdateRequest, selectedDurationIndex: Int) {
+//        viewModelScope.launch {
+//            val task = tasksRepository.updateTask(request)
+//            val subData = task.data[selectedDurationIndex]
+//            addOrEditTaskInRoutine(
+//                RoutineFullLink(
+//                    id = request.taskId, task = task, subData = subData
+//                )
+//            )
+//        }
+//    }
 
-    fun deleteTask(taskId: String) {
+    fun deleteTask(linkId: String) {
         viewModelScope.launch {
             _viewState.asSuccess {
                 val routineCombined = it.full
                 val newRoutineCombined = routineCombined.copy(
-                    data = routineCombined.data.mapNotNull { (t, s) ->
-                        if (t.id == taskId) null else t to s
+                    data = routineCombined.data.mapNotNull { e ->
+                        if (e.id == linkId) null else e
                     })
 
                 editRoutine(newRoutineCombined.toLinks())
             }
-
         }
     }
 
-    fun reorderTasks(newTaskIds: List<String>) {
+    fun reorderTasks(newLinksIds: List<String>) {
         viewModelScope.launch {
             _viewState.asSuccess {
-                val routineCombined = it.full
-                val newTaskPairs = newTaskIds.mapNotNull { taskId ->
-                    routineCombined.data.firstOrNull { it.first.id == taskId }
+                val fullRoutine = it.full
+                val newTaskPairs = newLinksIds.mapNotNull { id ->
+                    fullRoutine.data.firstOrNull { r -> r.id == id }
                 }
-                val newRoutine = routineCombined.copy(data = newTaskPairs)
+                val newRoutine = fullRoutine.copy(data = newTaskPairs)
                 editRoutine(newRoutine.toLinks())
             }
         }
     }
 
-    fun addOrEditTaskInRoutine(task: Task, subData: SubData) {
+    fun addOrEditTasksInRoutine(tasks: List<Pair<Int, Task>>) {
         viewModelScope.launch {
-            _viewState.asSuccess {
-                val routineCombined = it.full
+
+        }
+    }
+
+    fun addOrEditTaskInRoutine(entryFullData: RoutineFullLink) {
+        viewModelScope.launch {
+            _viewState.asSuccess { r ->
+                val routineCombined = r.full
                 var newRoutineCombined = routineCombined.copy(
-                    data = routineCombined.data.map { (t, s) ->
-                        if (t.id == task.id) (task to subData) else t to s
+                    data = routineCombined.data.map { entry ->
+                        if (entry.id == entryFullData.id) entry.copy(
+                            subData = entryFullData.subData, task = entryFullData.task
+                        ) else entry
                     })
-                if (!newRoutineCombined.data.map { it.first.id }.contains(task.id)) {
+                if (!newRoutineCombined.data.map { it.id }.contains(entryFullData.id)) {
                     newRoutineCombined = newRoutineCombined.copy(
-                        data = newRoutineCombined.data + (task to subData)
+                        data = newRoutineCombined.data + entryFullData
                     )
                 }
                 editRoutine(newRoutineCombined.toLinks())
@@ -138,7 +150,10 @@ class RoutineViewModel(
         val routineTasks = links.mapNotNull { entry ->
             val task = _tasksState.value.firstOrNull { task -> task.id == entry.taskId }
             val subData = task?.data?.firstOrNull { subData -> subData.id == entry.subDataId }
-            if (task != null && subData != null) task to subData else null
+            if (task != null && subData != null) RoutineFullLink(
+                id = entry.id, task = task, subData = subData
+            )
+            else null
         }
         return Routine.Full(
             id = id,
@@ -152,8 +167,10 @@ class RoutineViewModel(
     }
 
     private fun Routine.Full.toLinks(): Routine.Links {
-        val entries = data.map { (task, subData) ->
-            RoutineLink(taskId = task.id, subDataId = subData.id)
+        val entries = data.map { entry ->
+            RoutineLink(
+                id = entry.id, taskId = entry.task.id, subDataId = entry.subData.id
+            )
         }
         return Routine.Links(
             id = id,

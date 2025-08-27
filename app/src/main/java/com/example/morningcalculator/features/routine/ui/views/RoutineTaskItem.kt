@@ -29,30 +29,27 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.morningcalculator.core.model.Routine.Full
-import com.example.morningcalculator.core.model.SubData
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
 import com.example.morningcalculator.shared.extensions.timeOnMoment
 import kotlin.math.roundToInt
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutineTaskItem(
-    task: Task,
-    selectedSubData: SubData,
+    linkFull: RoutineFullLink,
     index: Int,
     draggingIndex: MutableState<Int?>,
     full: Full,
     dragOffsetY: MutableState<Float>,
-    taskPairs: SnapshotStateList<Pair<Task, SubData>>,
+    routineFullLinks: SnapshotStateList<RoutineFullLink>,
     viewModel: RoutineViewModel,
-    editingTask: MutableState<Pair<Task, String>?>
+    editingLink: MutableState<RoutineFullLink?>
 ) {
     val density = LocalDensity.current
     var menuExpanded by remember { mutableStateOf(false) }
-    var current by remember(selectedSubData) {
-        mutableStateOf(selectedSubData)
+    var current by remember(linkFull.subData) {
+        mutableStateOf(linkFull.subData)
     }
     val isDragging = draggingIndex.value == index
     val itemHeightPx = with(density) { 72.dp.toPx() }
@@ -63,7 +60,7 @@ fun RoutineTaskItem(
             .fillMaxWidth()
             .offset { IntOffset(0, if (isDragging) dragOffsetY.value.roundToInt() else 0) }
             .zIndex(if (isDragging) 1f else 0f)
-            .pointerInput(taskPairs) {
+            .pointerInput(routineFullLinks) {
                 detectDragGesturesAfterLongPress(onDragStart = {
                     draggingIndex.value = index
                     dragOffsetY.value = 0f
@@ -72,16 +69,16 @@ fun RoutineTaskItem(
                     val current = draggingIndex.value ?: return@detectDragGesturesAfterLongPress
                     val newOffset = dragOffsetY.value + dragAmount.y
                     val delta = (newOffset / itemHeightPx).roundToInt()
-                    val target = (current + delta).coerceIn(0, taskPairs.lastIndex)
+                    val target = (current + delta).coerceIn(0, routineFullLinks.lastIndex)
                     if (target != current) {
-                        taskPairs.move(current, target)
+                        routineFullLinks.move(current, target)
                         draggingIndex.value = target
                         dragOffsetY.value = newOffset - delta * itemHeightPx
                     } else {
                         dragOffsetY.value = newOffset
                     }
                 }, onDragEnd = {
-                    viewModel.reorderTasks(taskPairs.map { it.first.id })
+                    viewModel.reorderTasks(routineFullLinks.map { it.id })
                     draggingIndex.value = null
                     dragOffsetY.value = 0f
                 }, onDragCancel = {
@@ -91,10 +88,10 @@ fun RoutineTaskItem(
             }) {
         Column {
             ListItem(modifier = Modifier.clickable {
-                editingTask.value = (task to current.id)
+                editingLink.value = linkFull
             }, headlineContent = {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(task.title)
+                    Text(linkFull.task.title)
                 }
             }, trailingContent = {
                 ExposedDropdownMenuBox(
@@ -114,13 +111,17 @@ fun RoutineTaskItem(
 
                     ExposedDropdownMenu(
                         expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                        task.data.sortedBy { it.duration }.forEach { sub ->
+                        linkFull.task.data.sortedBy { it.duration }.forEach { sub ->
                             DropdownMenuItem(text = {
                                 Text("${sub.duration}")
                             }, onClick = {
                                 current = sub
                                 menuExpanded = false
-                                viewModel.addOrEditTaskInRoutine(task, sub)
+                                viewModel.addOrEditTaskInRoutine(
+                                    linkFull.copy(
+                                        subData = sub
+                                    )
+                                )
                             })
                         }
                     }

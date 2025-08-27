@@ -35,7 +35,7 @@ interface Routine {
         override val color: String,
         @Serializable(with = LocalTimeIsoSerializer::class) override val time: LocalTime,
         override val modifiedAt: Long,
-        val data: List<Pair<Task, SubData>>,
+        val data: List<RoutineFullLink>,
     ) : Routine
 }
 

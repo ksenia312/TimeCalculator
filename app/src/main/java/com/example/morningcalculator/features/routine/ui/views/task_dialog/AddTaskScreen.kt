@@ -19,7 +19,6 @@ fun AddTaskScreen(
         newElement = "",
         onValueChange = { current, new -> new },
         confirmEnabled = { data ->
-            println("data $data")
             data.all { it.isNotBlank() } && data.isNotEmpty() },
         onConfirm = { title, data, selectedIndex ->
             onConfirm(

@@ -18,15 +18,12 @@ import com.example.morningcalculator.features.home.ui.views.CustomTopBar
 import com.example.morningcalculator.features.routine.ui.views.LocalRoutineColor
 import com.example.morningcalculator.features.routine.view_model.RoutineViewState
 import com.example.morningcalculator.shared.extensions.formatAsDateTime
-import com.example.morningcalculator.shared.theme.LocalIsDarkTheme
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuccessTopAppBar(
     viewState: RoutineViewState.Success,
     showEditRoutineDialog: MutableState<Routine.Links?>,
-    showTasksSheet: MutableState<Boolean>
 ) {
     val routine = viewState.full
     val routineColor = LocalRoutineColor.current

@@ -3,6 +3,7 @@ package com.example.morningcalculator.core.model
 import kotlinx.serialization.Serializable
 import java.util.UUID
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @Serializable
 data class Task(
@@ -13,4 +14,8 @@ data class Task(
 )
 
 @Serializable
-data class SubData(val id: String = UUID.randomUUID().toString(), val duration: Duration)
+data class SubData(val id: String = UUID.randomUUID().toString(), val duration: Duration) {
+    companion object {
+        val tenMins = SubData(duration = 10.minutes)
+    }
+}
