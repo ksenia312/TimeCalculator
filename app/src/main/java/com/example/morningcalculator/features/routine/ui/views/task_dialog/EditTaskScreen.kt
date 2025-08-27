@@ -5,25 +5,23 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskUpdateRequest
 import kotlin.time.Duration.Companion.minutes
 
-
 @Composable
 fun EditTaskScreen(
-    onConfirm: (TaskUpdateRequest, Int) -> Unit,
+    onConfirm: (TaskUpdateRequest, Int?) -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
     initialTask: Task,
-    initialSubDataId: String,
+    initialSubDataId: String?,
 ) {
     TaskScreen(
         screenTitle = "Update task",
         data = initialTask.data as List<SubData?>,
-        initialIndex = initialTask.data.indexOfFirst { it.id == initialSubDataId },
+        initialIndex = if (initialSubDataId != null) initialTask.data.indexOfFirst { it.id == initialSubDataId } else null,
         initialTitle = initialTask.title,
         newElement = null,
         toInputValues = {

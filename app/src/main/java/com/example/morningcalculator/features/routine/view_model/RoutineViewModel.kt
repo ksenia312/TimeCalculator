@@ -52,17 +52,21 @@ class RoutineViewModel(
         }
     }
 
-//    fun editTask(request: TaskUpdateRequest, selectedDurationIndex: Int) {
-//        viewModelScope.launch {
-//            val task = tasksRepository.updateTask(request)
-//            val subData = task.data[selectedDurationIndex]
-//            addOrEditTaskInRoutine(
-//                RoutineFullLink(
-//                    id = request.taskId, task = task, subData = subData
-//                )
-//            )
-//        }
-//    }
+    fun editTask(
+        request: TaskUpdateRequest,
+        selectedDurationIndex: Int,
+        linkId: String
+    ) {
+        viewModelScope.launch {
+            val task = tasksRepository.updateTask(request)
+            val subData = task.data[selectedDurationIndex]
+            addOrEditTaskInRoutine(
+                RoutineFullLink(
+                    id = linkId, task = task, subData = subData
+                )
+            )
+        }
+    }
 
     fun deleteTask(linkId: String) {
         viewModelScope.launch {
@@ -91,9 +95,14 @@ class RoutineViewModel(
         }
     }
 
-    fun addOrEditTasksInRoutine(tasks: List<Pair<Int, Task>>) {
+    fun editLinksInRoutine(links: List<RoutineFullLink>) {
         viewModelScope.launch {
-
+            _viewState.asSuccess { r ->
+                val modifiedFull = r.full.copy(
+                    data = links
+                )
+                editRoutine(modifiedFull.toLinks())
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.routine.ui.views.task_dialog.AddTaskScreen
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
 import com.example.morningcalculator.shared.components.FabItem
@@ -14,6 +15,7 @@ import com.example.morningcalculator.shared.components.FabMenu
 
 @Composable
 fun EditRoutineFloatingButton(
+    routine: Routine.Full,
     viewModel: RoutineViewModel,
 ) {
     val showTasksSheet = remember { mutableStateOf(false) }
@@ -21,19 +23,20 @@ fun EditRoutineFloatingButton(
 
     if (showTasksSheet.value) {
         TasksBottomSheet(
-            onDismiss = { showTasksSheet.value = false }, viewModel = viewModel
+            routine = routine,
+            onDismiss = { showTasksSheet.value = false },
+            viewModel = viewModel
         )
     }
     if (showAddTaskDialog.value) {
         AddTaskScreen(onConfirm = { request, selectedIndex ->
-            viewModel.addNewTask(request, selectedIndex)
+            viewModel.addNewTask(request, selectedIndex ?: 0)
             showAddTaskDialog.value = false
         }, onDismiss = { showAddTaskDialog.value = false })
     }
 
     FabMenu(
-        mainImageVector = Icons.Default.Edit,
-        fabItems = listOf(
+        mainImageVector = Icons.Default.Edit, fabItems = listOf(
             FabItem(
                 title = "Add Task",
                 icon = Icons.Default.Add,

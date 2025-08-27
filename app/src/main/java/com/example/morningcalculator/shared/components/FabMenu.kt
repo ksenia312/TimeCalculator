@@ -96,7 +96,10 @@ fun FabMenu(
                 ) {
                     ElevatedButtonWithIconM3(
                         colors = colors,
-                        onClick = item.onClick,
+                        onClick = {
+                            item.onClick()
+                            expanded = false
+                        },
                         text = item.title,
                         imageVector = item.icon,
                         contentDescription = item.contentDescription,

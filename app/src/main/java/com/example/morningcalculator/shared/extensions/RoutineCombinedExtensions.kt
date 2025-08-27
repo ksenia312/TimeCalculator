@@ -8,17 +8,17 @@ import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
 fun Routine.Full.whenToGetUp(): LocalTime {
-    val total: Duration = data.fold(Duration.ZERO) { acc, (_, task) ->
-        acc + task.duration
+    val total: Duration = data.fold(Duration.ZERO) { acc, link ->
+        acc + link.subData.duration
     }
 
     return time.toJavaLocalTime().minus(total.toJavaDuration()).toKotlinLocalTime()
 }
 
 fun Routine.Full.timeOnMoment(index: Int): LocalTime {
-    val total: Duration = data.foldIndexed(Duration.ZERO) { currentIndex, acc, (_, task) ->
+    val total: Duration = data.foldIndexed(Duration.ZERO) { currentIndex, acc, link ->
         if (currentIndex <= index) return@foldIndexed acc
-        acc + task.duration
+        acc + link.subData.duration
     }
 
     return time.toJavaLocalTime().minus(total.toJavaDuration()).toKotlinLocalTime()

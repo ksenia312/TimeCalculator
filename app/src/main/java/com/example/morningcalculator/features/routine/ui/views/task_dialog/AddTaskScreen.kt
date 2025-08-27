@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun AddTaskScreen(
-    onConfirm: (TaskRequest, Int) -> Unit,
+    onConfirm: (TaskRequest, Int?) -> Unit,
     onDismiss: () -> Unit,
 ) {
     TaskScreen(
@@ -19,7 +19,8 @@ fun AddTaskScreen(
         newElement = "",
         onValueChange = { current, new -> new },
         confirmEnabled = { data ->
-            data.all { it.isNotBlank() } && data.isNotEmpty() },
+            data.all { it.isNotBlank() } && data.isNotEmpty()
+        },
         onConfirm = { title, data, selectedIndex ->
             onConfirm(
                 TaskRequest(title, "", data.map { it.toInt().minutes }), selectedIndex

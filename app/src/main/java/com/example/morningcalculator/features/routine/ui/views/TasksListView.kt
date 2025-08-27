@@ -31,20 +31,20 @@ fun ColumnScope.TasksListView(
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
     val editingLink = remember { mutableStateOf<RoutineFullLink?>(null) }
 
-//    if (editingLink.value != null) {
-//        val link = editingLink.value!!
-//        EditTaskScreen(
-//            initialTask = link.task,
-//            initialSubDataId = link.subData.id,
-//            onDismiss = { editingLink.value = null },
-//            onDelete = { viewModel.deleteTask(link.id) },
-//            onConfirm = { request, selectedIndex ->
-//                viewModel.editTask(
-//                    request, selectedIndex
-//                )
-//            },
-//        )
-//    }
+    if (editingLink.value != null) {
+        val link = editingLink.value!!
+        EditTaskScreen(
+            initialTask = link.task,
+            initialSubDataId = link.subData.id,
+            onDismiss = { editingLink.value = null },
+            onDelete = { viewModel.deleteTask(link.id) },
+            onConfirm = { request, selectedIndex ->
+                viewModel.editTask(
+                    request, selectedIndex ?: 0, linkId = link.id
+                )
+            },
+        )
+    }
 
     LazyColumn(modifier = Modifier.weight(1f)) {
         item { Spacer(Modifier.height(16.dp)) }
@@ -52,8 +52,7 @@ fun ColumnScope.TasksListView(
             CurrentTimeRow(whenToGetUp.toString(), isTitle = true)
         }
         itemsIndexed(
-            items = fullLinks,
-            key = { _, link -> link.id }) { index, link ->
+            items = fullLinks, key = { _, link -> link.id }) { index, link ->
             RoutineTaskItem(
                 routineFullLinks = fullLinks,
                 index = index,

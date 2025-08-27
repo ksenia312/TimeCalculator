@@ -52,12 +52,12 @@ import androidx.compose.ui.window.DialogProperties
 fun <T> TaskScreen(
     screenTitle: String,
     data: List<T>,
-    initialIndex: Int,
+    initialIndex: Int?,
     initialTitle: String,
     toInputValues: (List<T>) -> List<String>,
     onValueChange: (T, String) -> T,
     confirmEnabled: (List<T>) -> Boolean,
-    onConfirm: (String, List<T>, Int) -> Unit,
+    onConfirm: (String, List<T>, Int?) -> Unit,
     onDismiss: () -> Unit,
     headerActions: @Composable () -> Unit = {},
     newElement: T
@@ -65,19 +65,14 @@ fun <T> TaskScreen(
     FullScreenDialog(onDismiss) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(Icons.Default.Close, "Close")
-                        }
-                    },
-                    title = { Text(screenTitle) },
-                    actions = { headerActions() }
-                )
-            }
-        ) { it ->
+                TopAppBar(navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, "Close")
+                    }
+                }, title = { Text(screenTitle) }, actions = { headerActions() })
+            }) { it ->
             var title by remember { mutableStateOf(initialTitle) }
-            var selectedIndex by remember { mutableIntStateOf(initialIndex) }
+            var selectedIndex by remember { mutableStateOf(initialIndex) }
             val scrollState = rememberScrollState()
             val mutableData = remember { data.toMutableStateList() }
             Column(
@@ -90,8 +85,7 @@ fun <T> TaskScreen(
                 NameEditor(title, onValueChange = { title = it })
                 Spacer(Modifier.height(12.dp))
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val numbers = toInputValues(mutableData)
                     items(numbers.size) { index ->
@@ -100,7 +94,7 @@ fun <T> TaskScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            RadioButton(
+                            if (selectedIndex != null) RadioButton(
                                 selected = selectedIndex == index,
                                 onClick = { selectedIndex = index })
                             NumberField(
@@ -125,7 +119,9 @@ fun <T> TaskScreen(
                             OutlinedButton(
                                 onClick = {
                                     mutableData.add(newElement)
-                                    selectedIndex = mutableData.lastIndex
+                                    if (selectedIndex != null) {
+                                        selectedIndex = mutableData.lastIndex
+                                    }
                                 }, modifier = Modifier.fillMaxWidth()
                             ) { Text("Add more durations") }
                         }
@@ -136,8 +132,7 @@ fun <T> TaskScreen(
                         onConfirm(
                             title, mutableData, selectedIndex
                         )
-                    }, onDismiss = onDismiss,
-                    modifier = Modifier.fillMaxWidth()
+                    }, onDismiss = onDismiss, modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -146,22 +141,16 @@ fun <T> TaskScreen(
 
 @Composable
 private fun ConfirmButton(
-    modifier: Modifier,
-    onConfirm: () -> Unit,
-    enabled: Boolean,
-    onDismiss: () -> Unit
-) =
-    ElevatedButton(
-        modifier = modifier, enabled = enabled,
-        onClick = {
-            onConfirm()
-            onDismiss()
-        },
-        colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    ) { Text("Confirm") }
+    modifier: Modifier, onConfirm: () -> Unit, enabled: Boolean, onDismiss: () -> Unit
+) = ElevatedButton(
+    modifier = modifier, enabled = enabled, onClick = {
+        onConfirm()
+        onDismiss()
+    }, colors = ButtonDefaults.elevatedButtonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    )
+) { Text("Confirm") }
 
 @Composable
 private fun NameEditor(
@@ -192,8 +181,7 @@ private fun RowScope.NumberField(
 @Composable
 fun FullScreenDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
     Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
+        onDismissRequest = onDismiss, properties = DialogProperties(
             usePlatformDefaultWidth = false, // allow full width
             decorFitsSystemWindows = false
         )

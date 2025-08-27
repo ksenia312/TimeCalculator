@@ -33,8 +33,10 @@ fun RoutineScreen(
     RoutineColorWrapper(viewState) {
         Scaffold(
             topBar = { RoutineTopBar(viewModel) },
-            floatingActionButton = { EditRoutineFloatingButton(viewModel)
-        }) {
+            floatingActionButton = {
+                val routine = (viewState as? RoutineViewState.Success)?.full
+                if (routine != null) EditRoutineFloatingButton(routine, viewModel)
+            }) {
             Box(modifier = Modifier.padding(it)) {
                 when (val viewState = viewState) {
                     is RoutineViewState.Loading -> {
