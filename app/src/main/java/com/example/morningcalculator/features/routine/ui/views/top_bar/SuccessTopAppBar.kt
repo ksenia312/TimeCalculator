@@ -15,9 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.views.CustomTopBar
+import com.example.morningcalculator.features.home.ui.views.CustomTopBarHeading
 import com.example.morningcalculator.features.routine.ui.views.LocalRoutineColor
 import com.example.morningcalculator.features.routine.view_model.RoutineViewState
 import com.example.morningcalculator.shared.extensions.formatAsDateTime
+import com.example.morningcalculator.shared.extensions.whenToGetUp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +31,16 @@ fun SuccessTopAppBar(
     val routineColor = LocalRoutineColor.current
 
     CustomTopBar(
-        subtitle = routine.title,
+        headings = listOf(
+            CustomTopBarHeading(
+                title = routine.whenToGetUp().toString(),
+                subtitle = "Wake up at",
+            ),
+            CustomTopBarHeading(
+                title = routine.time.toString(),
+                subtitle = "Leave at",
+            )
+        ),
         accentColor = LocalRoutineColor.current,
         onAccentColor = if (routineColor.luminance() < 0.5f) Color.White else Color.Black,
         actions = {
@@ -48,9 +59,6 @@ fun SuccessTopAppBar(
                     textAlign = TextAlign.End
                 )
             }
-//            IconButton(onClick = { showTasksSheet.value = true }) {
-//                Icon(Icons.Default.Search, "search")
-//            }
         },
         modifier = Modifier.clickable(
             onClick = {

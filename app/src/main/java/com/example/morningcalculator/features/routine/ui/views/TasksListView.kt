@@ -1,11 +1,15 @@
 package com.example.morningcalculator.features.routine.ui.views
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,14 +23,13 @@ import com.example.morningcalculator.features.routine.ui.views.task_dialog.EditT
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
 import com.example.morningcalculator.shared.extensions.whenToGetUp
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ColumnScope.TasksListView(
-    full: Full, viewModel: RoutineViewModel
+fun TasksListView(
+    routineFull: Full, viewModel: RoutineViewModel
 ) {
-    val whenToGetUp = full.whenToGetUp()
-    val fullLinks = remember(full) { full.data.toMutableStateList() }
+    val whenToGetUp = routineFull.whenToGetUp()
+    val fullLinks = remember(routineFull) { routineFull.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
     val editingLink = remember { mutableStateOf<RoutineFullLink?>(null) }
@@ -46,22 +49,32 @@ fun ColumnScope.TasksListView(
         )
     }
 
-    LazyColumn(modifier = Modifier.weight(1f)) {
-        item { Spacer(Modifier.height(16.dp)) }
-        item(key = "wakeUp") {
-            CurrentTimeRow(whenToGetUp.toString(), isTitle = true)
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        item { Spacer(Modifier.height(12.dp)) }
+        item(key = "title") {
+            Text(
+                routineFull.title,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+        item { Spacer(Modifier.height(12.dp)) }
+        if (fullLinks.isNotEmpty()) item(key = "wakeUp") {
+            TimeSegment(whenToGetUp.toString(), isTitle = true, useSeparator = false)
         }
         itemsIndexed(
             items = fullLinks, key = { _, link -> link.id }) { index, link ->
             RoutineTaskItem(
                 routineFullLinks = fullLinks,
                 index = index,
-                full = full,
+                linkFull = link,
+                routineFull = routineFull,
                 viewModel = viewModel,
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,
                 editingLink = editingLink,
-                linkFull = link
             )
         }
         item { Spacer(Modifier.height(16.dp)) }

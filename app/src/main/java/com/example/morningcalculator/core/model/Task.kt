@@ -11,7 +11,9 @@ data class Task(
     val title: String,
     val description: String,
     val data: List<SubData>
-)
+) {
+    val dataSortedByDuration = data.sortedBy { it.duration }
+}
 
 @Serializable
 data class SubData(val id: String = UUID.randomUUID().toString(), val duration: Duration) {

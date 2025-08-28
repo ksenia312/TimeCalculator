@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.routine.ui.views.task_dialog.AddTaskScreen
+import com.example.morningcalculator.features.routine.ui.views.tasks_bottom_sheet.TasksBottomSheet
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
 import com.example.morningcalculator.shared.components.FabItem
 import com.example.morningcalculator.shared.components.FabMenu
@@ -25,6 +26,7 @@ fun EditRoutineFloatingButton(
         TasksBottomSheet(
             routine = routine,
             onDismiss = { showTasksSheet.value = false },
+            onShowAddTasksDialog = { showAddTaskDialog.value = true },
             viewModel = viewModel
         )
     }

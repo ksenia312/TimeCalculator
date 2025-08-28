@@ -15,8 +15,12 @@ fun HomeAppBar(viewState: HomeViewState) {
     CustomTopBar(
         accentColor = accentColor,
         onAccentColor = MaterialTheme.colorScheme.onPrimary,
-        title = "${routinesCount ?: 0}",
-        subtitle = "Scheduled Routines",
+        headings = listOf(
+            CustomTopBarHeading(
+                title = "${routinesCount ?: 0}",
+                subtitle = "Scheduled Routines",
+            )
+        ),
         actions = {}
     )
 }

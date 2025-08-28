@@ -44,22 +44,8 @@ fun RoutineScreen(
                     }
 
                     is RoutineViewState.Success -> {
-                        Column {
-                            val combined = viewState.full
-                            TasksListView(combined, viewModel)
-                            Box(modifier = Modifier.padding(8.dp)) {
-                                Column {
-                                    Text(
-                                        "Wake up at ${combined.whenToGetUp()}",
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                    Text(
-                                        "Leave at ${combined.time}",
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                }
-                            }
-                        }
+                        val combined = viewState.full
+                        TasksListView(combined, viewModel)
                     }
 
                     is RoutineViewState.Error -> {

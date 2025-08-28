@@ -6,7 +6,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.shared.navigator.LocalNavHostController
 import com.example.morningcalculator.shared.theme.ChangeSystemTopBarTheme
+import com.example.morningcalculator.shared.theme.Purple
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,11 +39,9 @@ fun CustomTopBar(
     accentColor: Color,
     onAccentColor: Color,
     shape: Shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
-    title: String? = null,
-    subtitle: String? = null,
+    headings: List<CustomTopBarHeading> = listOf(),
     actions: @Composable RowScope.() -> Unit = {},
     showNavigationIcon: Boolean = false,
-    bottomRightWidget: @Composable () -> Unit = {}
 ) {
     val navigator = LocalNavHostController.current
     val activity = LocalActivity.current as? ComponentActivity
@@ -46,35 +49,43 @@ fun CustomTopBar(
     activity?.ChangeSystemTopBarTheme(onAccentColor)
 
     LargeTopAppBar(
-        expandedHeight = 186.dp,
-        modifier = Modifier
+        expandedHeight = 186.dp, modifier = Modifier
             .background(
-                color = accentColor,
-                shape = shape
+                color = accentColor, shape = shape
             )
             .then(modifier), actions = actions, title = {
             Row(
-                Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
-                Column(
-                    Modifier
-                        .weight(1f)
-                ) {
-                    if (title != null) Text(
-                        text = title,
-                        style = MaterialTheme.typography.headlineLarge,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 3
-                    )
-                    if (subtitle != null) Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodyLarge,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 3
-                    )
+                headings.forEachIndexed { index, it ->
+                    Column(
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = it.title,
+                            style = MaterialTheme.typography.headlineLarge,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 3
+                        )
+                        Text(
+                            text = it.subtitle,
+                            style = MaterialTheme.typography.bodyLarge,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 3
+                        )
+                    }
+                    if (index != headings.lastIndex) {
+                        Spacer(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                                .width(3.dp)
+                                .height(60.dp)
+                                .background(onAccentColor)
+                        )
+                    }
                 }
-                bottomRightWidget()
+
             }
         }, colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
@@ -89,3 +100,5 @@ fun CustomTopBar(
             }
         })
 }
+
+data class CustomTopBarHeading(val title: String, val subtitle: String)
