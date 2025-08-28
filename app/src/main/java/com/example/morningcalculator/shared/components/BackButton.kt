@@ -1,0 +1,26 @@
+package com.example.morningcalculator.shared.components
+
+import androidx.compose.foundation.Image
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import com.example.morningcalculator.R
+import com.example.morningcalculator.shared.navigator.LocalNavHostController
+
+@Composable
+fun BackButton(
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    overrideOnBack: (() -> Unit)? = null,
+) {
+    val navigator = LocalNavHostController.current
+    IconButton(onClick = { if (overrideOnBack != null) overrideOnBack() else navigator.popBackStack() }) {
+        Image(
+            painterResource(R.drawable.back_arrow),
+            contentDescription = "back",
+            colorFilter = ColorFilter.tint(color)
+        )
+    }
+}

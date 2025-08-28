@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.morningcalculator.features.home.ui.HomeScreen
 import com.example.morningcalculator.features.routine.ui.RoutineScreen
-import com.example.morningcalculator.features.routine.ui.views.task_dialog.AddTaskScreen
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")

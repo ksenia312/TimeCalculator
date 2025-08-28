@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.shared.components.SmallIconButton
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 @Composable
@@ -57,23 +58,3 @@ fun TasksBottomSheetItemTrailing(links: MutableList<RoutineFullLink>, task: Task
     }
 }
 
-
-@Composable
-fun SmallIconButton(
-    onClick: () -> Unit,
-    size: Dp = 32.dp,
-    padding: Dp = 4.dp,
-    content: @Composable BoxScope.() -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(size)
-            .clip(CircleShape)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(modifier = Modifier.padding(padding)) {
-            content()
-        }
-    }
-}

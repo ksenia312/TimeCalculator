@@ -6,12 +6,12 @@ import kotlin.time.Duration.Companion.minutes
 
 
 @Composable
-fun AddTaskScreen(
+fun CreateTaskScreen(
     onConfirm: (TaskRequest, Int?) -> Unit,
     onDismiss: () -> Unit,
 ) {
     TaskScreen(
-        screenTitle = "Add task",
+        screenTitle = "Create task",
         data = listOf(""),
         initialIndex = 0,
         initialTitle = "",

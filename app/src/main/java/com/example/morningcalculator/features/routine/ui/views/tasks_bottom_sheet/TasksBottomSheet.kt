@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -22,17 +23,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.SecureFlagPolicy
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
+import com.example.morningcalculator.shared.components.AddNewButton
+import kotlinx.coroutines.flow.drop
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,14 +55,22 @@ fun TasksBottomSheet(
         skipPartiallyExpanded = true,
     )
 
-    LaunchedEffect(links) {
-        viewModel.editLinksInRoutine(links)
+    LaunchedEffect(Unit) {
+        snapshotFlow { links.toList() }
+            .drop(1)
+            .collect { latestLinks ->
+                viewModel.editLinksInRoutine(latestLinks)
+            }
     }
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = sheetState,
-        modifier = Modifier.padding(top = 32.dp)
+        modifier = Modifier.padding(top = 32.dp),
+        properties = ModalBottomSheetProperties(
+            securePolicy = SecureFlagPolicy.SecureOn,
+            shouldDismissOnBackPress = true,
+        )
     ) {
         Column(
             Modifier
@@ -88,19 +102,11 @@ fun TasksBottomSheet(
                     }
                 }
             }
-            TextButton(
-                modifier = Modifier.fillMaxWidth(), onClick = {
-                    onShowAddTasksDialog()
-                    onDismiss()
-                }) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Image(
-                        painterResource(R.drawable.add_circle),
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-                    )
-                    Text("Create a new task")
-                }
+            AddNewButton(
+                text = "Create a new task",
+            ) {
+                onShowAddTasksDialog()
+                onDismiss()
             }
         }
     }

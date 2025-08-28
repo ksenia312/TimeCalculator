@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 
@@ -32,32 +33,20 @@ fun TasksBottomSheetItemHeading(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    if (hasTask) LocalCustomColorScheme.current.accent
-                    else LocalCustomColorScheme.current.accentLight,
-                    shape = RoundedCornerShape(100.dp)
-                )
-                .size(40.dp), contentAlignment = Alignment.Center
-        ) {
-            if (hasTask) {
-                Text(
-                    links.filter { it.task.id == task.id }.size.toString(),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        color = MaterialTheme.colorScheme.onPrimary, lineHeight = 1.sp
-                    ),
-                    fontWeight = FontWeight.Bold
-                )
-            } else {
-                Icon(
-                    Icons.Default.Done,
-                    contentDescription = "",
-                    tint = LocalCustomColorScheme.current.accent,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
+        val textForeground = @Composable {
+            Text(
+                links.filter { it.task.id == task.id }.size.toString(),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onPrimary, lineHeight = 1.sp
+                ),
+                fontWeight = FontWeight.Bold
+            )
         }
+        AppCircleIndicator(
+            backgroundColor = if (hasTask) LocalCustomColorScheme.current.accent else LocalCustomColorScheme.current.accentLight,
+            foregroundColor = LocalCustomColorScheme.current.accent,
+            overrideForeground = if (hasTask) textForeground else null
+        )
         Text(text = task.title)
     }
 }

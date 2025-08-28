@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -47,7 +48,9 @@ import androidx.compose.ui.zIndex
 import com.example.morningcalculator.core.model.Routine.Full
 import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
+import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.extensions.timeOnMoment
+import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +81,7 @@ fun RoutineTaskItem(
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .weight(1f)
                 .draggableItem(
@@ -95,6 +99,11 @@ fun RoutineTaskItem(
                     editingLink.value = linkFull
                 }
                 .padding(24.dp, 12.dp, 8.dp, 12.dp)) {
+
+            AppCircleIndicator(
+                backgroundColor = LocalRoutineColor.current.copy(alpha = 0.05f),
+                foregroundColor = LocalRoutineColor.current,
+            )
             Box(
                 modifier = Modifier
                     .weight(1f)

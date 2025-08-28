@@ -1,5 +1,6 @@
 package com.example.morningcalculator.features.routine.ui.views.task_dialog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -12,13 +13,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,10 +46,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.morningcalculator.R
+import com.example.morningcalculator.shared.components.AddNewButton
+import com.example.morningcalculator.shared.components.AppTextField
+import com.example.morningcalculator.shared.components.BackButton
+import com.example.morningcalculator.shared.components.SmallIconButton
+import com.example.morningcalculator.shared.navigator.LocalNavHostController
+import com.example.morningcalculator.shared.theme.LightGray
+import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
+import com.example.morningcalculator.shared.theme.Pink1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,14 +78,19 @@ fun <T> TaskScreen(
     headerActions: @Composable () -> Unit = {},
     newElement: T
 ) {
+
     FullScreenDialog(onDismiss) {
         Scaffold(
             topBar = {
                 TopAppBar(navigationIcon = {
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, "Close")
-                    }
-                }, title = { Text(screenTitle) }, actions = { headerActions() })
+                    BackButton(
+                        overrideOnBack = onDismiss
+                    )
+                }, title = {
+                    Text(
+                        screenTitle, style = MaterialTheme.typography.titleLarge
+                    )
+                }, actions = { headerActions() })
             }) { it ->
             var title by remember { mutableStateOf(initialTitle) }
             var selectedIndex by remember { mutableStateOf(initialIndex) }
@@ -82,19 +103,29 @@ fun <T> TaskScreen(
                     .fillMaxWidth()
                     .scrollable(scrollState, orientation = Orientation.Vertical),
             ) {
-                NameEditor(title, onValueChange = { title = it })
+                NameEditor(
+                    title,
+                    autofocus = initialTitle.isEmpty(),
+                    onValueChange = { title = it })
                 Spacer(Modifier.height(12.dp))
                 LazyColumn(
-                    modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .graphicsLayer { clip = false },
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val numbers = toInputValues(mutableData)
+                    item { Spacer(Modifier.height(4.dp)) }
                     items(numbers.size) { index ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .graphicsLayer { clip = false },
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             if (selectedIndex != null) RadioButton(
+                                modifier = Modifier.size(32.dp),
                                 selected = selectedIndex == index,
                                 onClick = { selectedIndex = index })
                             NumberField(
@@ -106,24 +137,28 @@ fun <T> TaskScreen(
                                     }
                                 }, label = "Duration №${index + 1}"
                             )
-                            IconButton(onClick = {
+                            SmallIconButton(onClick = {
                                 mutableData.removeAt(index)
                                 selectedIndex = mutableData.lastIndex
                             }) {
-                                Icon(Icons.Default.Close, "Remove")
+                                Image(
+                                    painterResource(R.drawable.close),
+                                    contentDescription = "close",
+                                )
                             }
                         }
                     }
                     item {
                         Box(modifier = Modifier.padding(top = 8.dp)) {
-                            OutlinedButton(
-                                onClick = {
-                                    mutableData.add(newElement)
-                                    if (selectedIndex != null) {
-                                        selectedIndex = mutableData.lastIndex
-                                    }
-                                }, modifier = Modifier.fillMaxWidth()
-                            ) { Text("Add more durations") }
+                            AddNewButton(
+                                text = "Add more durations",
+                                foregroundColor = LocalCustomColorScheme.current.accent
+                            ) {
+                                mutableData.add(newElement)
+                                if (selectedIndex != null) {
+                                    selectedIndex = mutableData.lastIndex
+                                }
+                            }
                         }
                     }
                 }
@@ -132,7 +167,9 @@ fun <T> TaskScreen(
                         onConfirm(
                             title, mutableData, selectedIndex
                         )
-                    }, onDismiss = onDismiss, modifier = Modifier.fillMaxWidth()
+                    }, onDismiss = onDismiss, modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
                 )
             }
         }
@@ -150,14 +187,16 @@ private fun ConfirmButton(
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary
     )
-) { Text("Confirm") }
+) { Text("Save") }
 
 @Composable
 private fun NameEditor(
     title: String,
+    autofocus: Boolean,
     onValueChange: (String) -> Unit,
 ) {
-    OutlinedTextField(
+    AppTextField(
+        autofocus = autofocus,
         value = title,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
@@ -168,11 +207,13 @@ private fun NameEditor(
 private fun RowScope.NumberField(
     value: String, onValueChange: (String) -> Unit, label: String, enabled: Boolean = true
 ) {
-    OutlinedTextField(
+    AppTextField(
         value = value,
         enabled = enabled,
         onValueChange = onValueChange,
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+            .weight(1f)
+            .offset(y = (-4).dp),
         label = { Text(label) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )

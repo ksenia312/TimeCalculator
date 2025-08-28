@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.features.routine.ui.views.task_dialog.AddTaskScreen
+import com.example.morningcalculator.features.routine.ui.views.task_dialog.CreateTaskScreen
 import com.example.morningcalculator.features.routine.ui.views.tasks_bottom_sheet.TasksBottomSheet
 import com.example.morningcalculator.features.routine.view_model.RoutineViewModel
 import com.example.morningcalculator.shared.components.FabItem
@@ -31,7 +31,7 @@ fun EditRoutineFloatingButton(
         )
     }
     if (showAddTaskDialog.value) {
-        AddTaskScreen(onConfirm = { request, selectedIndex ->
+        CreateTaskScreen(onConfirm = { request, selectedIndex ->
             viewModel.addNewTask(request, selectedIndex ?: 0)
             showAddTaskDialog.value = false
         }, onDismiss = { showAddTaskDialog.value = false })
