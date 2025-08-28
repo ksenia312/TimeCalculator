@@ -19,7 +19,7 @@ fun AppCircleIndicator(
     backgroundColor: Color,
     foregroundColor: Color,
     overrideForeground: (@Composable () -> Unit)? = null,
-    size: Dp = 40.dp
+    size: Dp = 32.dp
 ) {
     Box(
         modifier = Modifier

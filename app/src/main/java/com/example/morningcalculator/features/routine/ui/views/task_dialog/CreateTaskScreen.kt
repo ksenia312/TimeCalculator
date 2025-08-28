@@ -4,16 +4,16 @@ import androidx.compose.runtime.Composable
 import com.example.morningcalculator.core.model.TaskRequest
 import kotlin.time.Duration.Companion.minutes
 
-
 @Composable
 fun CreateTaskScreen(
+    linkedToRoutine: Boolean,
     onConfirm: (TaskRequest, Int?) -> Unit,
     onDismiss: () -> Unit,
 ) {
     TaskScreen(
         screenTitle = "Create task",
         data = listOf(""),
-        initialIndex = 0,
+        initialIndex = if (linkedToRoutine) 0 else null,
         initialTitle = "",
         toInputValues = { it },
         newElement = "",

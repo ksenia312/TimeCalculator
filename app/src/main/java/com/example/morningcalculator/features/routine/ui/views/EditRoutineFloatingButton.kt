@@ -31,10 +31,13 @@ fun EditRoutineFloatingButton(
         )
     }
     if (showAddTaskDialog.value) {
-        CreateTaskScreen(onConfirm = { request, selectedIndex ->
+        CreateTaskScreen(
+            linkedToRoutine = true,
+            onConfirm = { request, selectedIndex ->
             viewModel.addNewTask(request, selectedIndex ?: 0)
             showAddTaskDialog.value = false
-        }, onDismiss = { showAddTaskDialog.value = false })
+        }, onDismiss = { showAddTaskDialog.value = false }
+        )
     }
 
     FabMenu(

@@ -1,7 +1,7 @@
 package com.example.morningcalculator.features.routine.ui.views
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,7 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine.Full
 import com.example.morningcalculator.core.model.RoutineFullLink
 import com.example.morningcalculator.features.routine.ui.views.task_dialog.EditTaskScreen
@@ -41,6 +44,13 @@ fun TasksListView(
             initialSubDataId = link.subData.id,
             onDismiss = { editingLink.value = null },
             onDelete = { viewModel.deleteTask(link.id) },
+            deleteIcon = {
+                Image(
+                    painterResource(R.drawable.unlink),
+                    contentDescription = "delete",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.error)
+                )
+            },
             onConfirm = { request, selectedIndex ->
                 viewModel.editTask(
                     request, selectedIndex ?: 0, linkId = link.id

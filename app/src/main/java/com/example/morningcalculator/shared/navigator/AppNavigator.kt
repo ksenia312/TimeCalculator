@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.morningcalculator.features.home.ui.HomeScreen
+import com.example.morningcalculator.features.home.ui.RoutineListScreen
 import com.example.morningcalculator.features.routine.ui.RoutineScreen
 
 sealed class Screen(val route: String) {
@@ -42,7 +42,7 @@ fun AppNavigator() {
                 )
             }
         ) {
-            composable(Screen.Home.route) { HomeScreen() }
+            composable(Screen.Home.route) { RoutineListScreen() }
             composable(Screen.Routine.route) {
                 val result =
                     navController.currentBackStackEntry?.savedStateHandle?.get<String>("routineId")

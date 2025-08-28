@@ -31,7 +31,7 @@ fun TasksBottomSheetItemHeading(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         val textForeground = @Composable {
             Text(

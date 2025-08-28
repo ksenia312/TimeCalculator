@@ -60,7 +60,8 @@ fun FabMenu(
     itemContainerColor: Color = MaterialTheme.colorScheme.primary,
     itemContentColor: Color = MaterialTheme.colorScheme.onPrimary,
     mainImageVector: ImageVector = Icons.Default.Add,
-    horizontalAlignment: Alignment.Horizontal = Alignment.End
+    horizontalAlignment: Alignment.Horizontal = Alignment.End,
+    mainButtonAlignment: Alignment = Alignment.BottomEnd
 ) {
     var expanded by remember { mutableStateOf(false) }
     val rotation: Float by animateFloatAsState(if (expanded) 225f else 0f)
@@ -72,26 +73,26 @@ fun FabMenu(
     val spec: TweenSpec<IntSize> = tween(150)
     Box(
         modifier = modifier.wrapContentSize(),
-        contentAlignment = Alignment.BottomEnd
+        contentAlignment = mainButtonAlignment
     ) {
-        if (expanded) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { expanded = false }
-            )
-        }
+//        if (expanded) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.Transparent)
+//                    .clickable(
+//                        interactionSource = remember { MutableInteractionSource() },
+//                        indication = null
+//                    ) { expanded = false }
+//            )
+//        }
         Column(horizontalAlignment = horizontalAlignment) {
             fabItems.forEachIndexed { index, item ->
                 AnimatedVisibility(
                     visible = expanded, enter = fadeIn(animationSpec = specFloat) + expandIn(
-                        expandFrom = Alignment.BottomEnd, animationSpec = spec
+                        expandFrom = mainButtonAlignment, animationSpec = spec
                     ), exit = fadeOut(animationSpec = specFloat) + shrinkOut(
-                        shrinkTowards = Alignment.BottomEnd, animationSpec = spec
+                        shrinkTowards = mainButtonAlignment, animationSpec = spec
                     )
                 ) {
                     ElevatedButtonWithIconM3(

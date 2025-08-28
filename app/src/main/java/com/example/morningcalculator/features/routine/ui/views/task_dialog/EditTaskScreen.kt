@@ -17,6 +17,7 @@ fun EditTaskScreen(
     onDismiss: () -> Unit,
     initialTask: Task,
     initialSubDataId: String?,
+    deleteIcon: @Composable () -> Unit
 ) {
     TaskScreen(
         screenTitle = "Update task",
@@ -53,7 +54,7 @@ fun EditTaskScreen(
                 onDelete()
                 onDismiss()
             }) {
-                Icon(Icons.Outlined.Delete, "Delete")
+                deleteIcon()
             }
         },
         onDismiss = onDismiss

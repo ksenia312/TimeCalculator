@@ -21,7 +21,7 @@ fun TasksBottomSheetItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .heightIn(min = 50.dp)
+            .heightIn(min = 60.dp)
             .clickable { links.addTask(task) }) {
         TasksBottomSheetItemHeading(
             modifier = Modifier
