@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.routine.ui.views.task_dialog.CreateTaskScreen
 import com.example.morningcalculator.features.routine.ui.views.tasks_bottom_sheet.TasksBottomSheet
@@ -19,6 +20,7 @@ fun EditRoutineFloatingButton(
     routine: Routine.Full,
     viewModel: RoutineViewModel,
 ) {
+    val isBarExpanded = rememberSaveable { mutableStateOf(false) }
     val showTasksSheet = remember { mutableStateOf(false) }
     val showAddTaskDialog = remember { mutableStateOf(false) }
 
@@ -41,7 +43,10 @@ fun EditRoutineFloatingButton(
     }
 
     FabMenu(
-        mainImageVector = Icons.Default.Edit, fabItems = listOf(
+        isExpanded = isBarExpanded.value,
+        onChangeExpanded = { isBarExpanded.value = it },
+        mainImageVector = Icons.Default.Edit,
+        fabItems = listOf(
             FabItem(
                 title = "Add Task",
                 icon = Icons.Default.Add,

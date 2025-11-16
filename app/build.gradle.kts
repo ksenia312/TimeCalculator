@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.morningcalculator"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.morningcalculator"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.material.icons.extended)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.kotlinx.datetime)
 
