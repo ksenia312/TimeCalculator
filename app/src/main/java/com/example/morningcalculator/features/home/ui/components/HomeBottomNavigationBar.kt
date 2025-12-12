@@ -3,6 +3,8 @@ package com.example.morningcalculator.features.home.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -53,13 +55,9 @@ fun HomeBottomNavigationBar(
 
         Surface(
             modifier = Modifier
-                .constrainAs(barRef) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                }
                 .padding(horizontal = 20.dp, /*vertical = 40.dp*/)
                 .fillMaxWidth()
+                .navigationBarsPadding()
                 .shadow(
                     elevation = 4.dp,
                     shape = RoundedCornerShape(50.dp),
@@ -68,7 +66,6 @@ fun HomeBottomNavigationBar(
                 .clip(RoundedCornerShape(50.dp))
         ) {
             NavigationBar(
-                tonalElevation = 10.dp,
                 containerColor = MaterialTheme.colorScheme.surface,
             ) {
                 HomeTab.entries.forEach { tab ->

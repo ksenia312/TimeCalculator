@@ -43,6 +43,7 @@ fun HomeContent(
             HomeBottomNavigationBar(
                 selectedTab = current,
                 onTabSelected = onTabSelected,
+                modifier = Modifier.align(Alignment.BottomCenter),
                 centerButton = {
                     FabMenu(
                         isExpanded = isBarExpanded.value,
@@ -71,7 +72,6 @@ fun HomeContent(
                         )
                     )
                 },
-                modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
     }
