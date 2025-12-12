@@ -1,12 +1,9 @@
 package com.example.morningcalculator.shared.components
 
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,9 +42,7 @@ fun CustomTopBar(
     actions: @Composable RowScope.() -> Unit = {},
     showNavigationIcon: Boolean = false,
 ) {
-    val activity = LocalActivity.current as? ComponentActivity
-
-    activity?.ChangeSystemTopBarTheme(onAccentColor)
+    ChangeSystemTopBarTheme(onAccentColor)
 
     LargeTopAppBar(
         expandedHeight = 186.dp,

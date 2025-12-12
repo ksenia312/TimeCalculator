@@ -6,7 +6,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +16,7 @@ import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.features.tasks.presentation.TasksListViewModel
 import com.example.morningcalculator.features.tasks.ui.components.TasksListAppBar
+import com.example.morningcalculator.shared.components.AppScaffold
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +44,7 @@ fun TasksListScreen(viewModel: TasksListViewModel = koinViewModel()) {
         )
     }
 
-    Scaffold(
+    AppScaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TasksListAppBar(viewState.value)

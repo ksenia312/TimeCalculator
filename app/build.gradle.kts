@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.haze)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

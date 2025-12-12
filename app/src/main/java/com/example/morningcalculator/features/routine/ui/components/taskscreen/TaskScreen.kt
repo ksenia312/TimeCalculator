@@ -24,7 +24,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,6 +44,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.components.AddNewButton
+import com.example.morningcalculator.shared.components.AppScaffold
 import com.example.morningcalculator.shared.components.AppTextField
 import com.example.morningcalculator.shared.components.BackButton
 import com.example.morningcalculator.shared.components.SmallIconButton
@@ -66,7 +66,7 @@ fun <T> TaskScreen(
     newElement: T,
 ) {
     FullScreenDialog(onDismiss) {
-        Scaffold(
+        AppScaffold(
             modifier = Modifier.imePadding(),
             containerColor = MaterialTheme.colorScheme.surface,
             topBar = {
