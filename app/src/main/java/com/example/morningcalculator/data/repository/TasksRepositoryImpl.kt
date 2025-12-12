@@ -25,7 +25,7 @@ class TasksRepositoryImpl(
 
     private val _tasksFlow = MutableStateFlow(loadTasksFromPrefs())
 
-    override fun tasksFlow(): StateFlow<List<Task>> = _tasksFlow.asStateFlow()
+    override val tasksFlow: StateFlow<List<Task>> = _tasksFlow.asStateFlow()
 
     override fun updateTask(request: TaskUpdateRequest): Task {
         println("task update $request")

@@ -7,7 +7,7 @@ import kotlinx.datetime.toKotlinLocalTime
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
-fun Routine.Full.whenToGetUp(): LocalTime {
+fun Routine.Full.whenToStart(): LocalTime {
     val total: Duration = data.fold(Duration.ZERO) { acc, link ->
         acc + link.subData.duration
     }

@@ -47,7 +47,7 @@ fun TimePickerField(
         )
     }
 
-    OutlinedTextField(
+    AppTextField(
         value = displayText.value,
         onValueChange = {},
         readOnly = true,

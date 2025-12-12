@@ -47,9 +47,9 @@ class RoutineRepositoryImpl(
         refresh()
     }
 
-    override fun routineFlow(): StateFlow<Routine.Links?> = _routineFlow.asStateFlow()
+    override val routineFlow: StateFlow<Routine.Links?> = _routineFlow.asStateFlow()
 
-    override fun routinesFlow(): StateFlow<List<Routine.Links>> = _routinesFlow.asStateFlow()
+    override val routinesFlow: StateFlow<List<Routine.Links>> = _routinesFlow.asStateFlow()
 
     override fun addRoutine(request: RoutineRequest) {
         val routine = Routine.Links(

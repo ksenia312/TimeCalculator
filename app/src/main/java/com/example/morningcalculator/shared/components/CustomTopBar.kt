@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.home.ui.views
+package com.example.morningcalculator.shared.components
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
@@ -6,10 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
@@ -24,8 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.shared.components.BackButton
-import com.example.morningcalculator.shared.navigator.LocalNavHostController
 import com.example.morningcalculator.shared.theme.ChangeSystemTopBarTheme
 
 @Composable
@@ -35,7 +30,7 @@ fun CustomTopBar(
     accentColor: Color,
     onAccentColor: Color,
     shape: Shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp),
-    headings: List<CustomTopBarHeading> = listOf(),
+    titleItems: @Composable RowScope.() -> Unit,
     actions: @Composable RowScope.() -> Unit = {},
     showNavigationIcon: Boolean = false,
 ) {
@@ -44,55 +39,57 @@ fun CustomTopBar(
     activity?.ChangeSystemTopBarTheme(onAccentColor)
 
     LargeTopAppBar(
-        expandedHeight = 186.dp, modifier = Modifier
+        expandedHeight = 186.dp,
+        modifier = Modifier
             .clip(shape)
             .background(
-                color = accentColor, shape = shape
+                color = accentColor,
+                shape = shape
             )
-            .then(modifier), actions = actions, title = {
+            .then(modifier),
+        actions = actions,
+        title = {
             Row(
-                verticalAlignment = Alignment.Bottom,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp, end = 12.dp),
+                verticalAlignment = Alignment.Bottom
             ) {
-                headings.forEachIndexed { index, it ->
-                    Column(
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = it.title,
-                            style = MaterialTheme.typography.headlineLarge,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 3
-                        )
-                        Text(
-                            text = it.subtitle,
-                            style = MaterialTheme.typography.bodyLarge,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 3
-                        )
-                    }
-                    if (index != headings.lastIndex) {
-                        Spacer(
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp, vertical = 4.dp)
-                                .width(3.dp)
-                                .height(60.dp)
-                                .background(onAccentColor)
-                        )
-                    }
-                }
-
+                titleItems()
             }
-        }, colors = TopAppBarDefaults.topAppBarColors(
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
             titleContentColor = onAccentColor,
             navigationIconContentColor = onAccentColor,
             actionIconContentColor = onAccentColor,
-        ), navigationIcon = {
+        ),
+        navigationIcon = {
             if (showNavigationIcon) BackButton(
                 color = onAccentColor
             )
         })
 }
 
-data class CustomTopBarHeading(val title: String, val subtitle: String)
+@Composable
+fun CustomTopBarHeadingItem(
+    modifier: Modifier = Modifier,
+    title: String,
+    subtitle: String,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.Start,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineLarge,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 3
+        )
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodySmall,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 3
+        )
+    }
+}

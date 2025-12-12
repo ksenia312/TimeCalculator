@@ -5,7 +5,9 @@ import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
-import com.example.morningcalculator.features.home.view_model.HomeViewModel
+import com.example.morningcalculator.features.home.presentation.HomeViewModel
+import com.example.morningcalculator.features.routineslist.presentation.RoutinesListViewModel
+import com.example.morningcalculator.features.tasks.presentation.TasksListViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -22,8 +24,20 @@ object AppModule {
         // ViewModels
         single {
             HomeViewModel(
+                routineRepository = get(),
+                tasksRepository = get()
+            )
+        }
+        single {
+            RoutinesListViewModel(
                 repository = get(),
                 routineRepository = get(),
+            )
+        }
+
+        single {
+            TasksListViewModel(
+                repository = get()
             )
         }
     }

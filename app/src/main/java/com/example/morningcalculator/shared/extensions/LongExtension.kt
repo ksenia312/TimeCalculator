@@ -4,28 +4,31 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-fun Long.formatAsDateTime(overridePattern: String? = null): String {
+fun Long.formatAsDateTime(
+    overridePattern: String? = null,
+    locale: Locale = Locale.getDefault()
+): String {
     val zone = ZoneId.systemDefault()
     val instant = Instant.ofEpochMilli(this)
     val zonedDT = instant.atZone(zone)
-
     val now = ZonedDateTime.now(zone)
 
-    val formatter = DateTimeFormatter.ofPattern(
-        overridePattern ?: when {
-            zonedDT.toLocalDate().isEqual(now.toLocalDate()) -> {
-                "HH:mm"
-            }
-
-            zonedDT.year == now.year -> {
-                "dd.MM HH:mm"
-            }
-
-            else -> {
-                "dd.MM.yyyy HH:mm"
-            }
+    val pattern = overridePattern ?: when {
+        zonedDT.toLocalDate().isEqual(now.toLocalDate()) -> {
+            "d MMM"
         }
-    )
+
+        zonedDT.year == now.year -> {
+            "d MMM"
+        }
+
+        else -> {
+            "d MMMM yyyy"
+        }
+    }
+
+    val formatter = DateTimeFormatter.ofPattern(pattern, locale)
     return zonedDT.format(formatter)
 }
