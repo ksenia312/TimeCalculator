@@ -9,8 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.features.routine.ui.components.task_dialog.CreateTaskScreen
-import com.example.morningcalculator.features.routine.ui.components.tasks_bottom_sheet.TasksBottomSheet
+import com.example.morningcalculator.features.routine.ui.components.taskscreen.CreateTaskScreen
+import com.example.morningcalculator.features.routine.ui.components.tasksselection.TasksBottomSheet
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.components.FabItem
 import com.example.morningcalculator.shared.components.FabMenu

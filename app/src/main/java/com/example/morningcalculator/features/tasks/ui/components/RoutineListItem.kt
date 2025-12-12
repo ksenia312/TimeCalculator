@@ -1,6 +1,7 @@
 package com.example.morningcalculator.features.tasks.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ListItem
@@ -17,12 +18,16 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 
 @Composable
 fun TaskListItem(
-    task: Task
+    task: Task,
+    onClick: () -> Unit = {},
 ) {
     ListItem(
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable {
+                onClick()
+            },
         headlineContent = {
             Column {
                 Text(

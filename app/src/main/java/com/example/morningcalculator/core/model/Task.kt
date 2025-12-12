@@ -10,7 +10,8 @@ data class Task(
     val id: String = UUID.randomUUID().toString(),
     val title: String,
     val description: String,
-    val data: List<SubData>
+    val data: List<SubData>,
+    val modifiedAt: Long? = null
 ) {
     val dataSortedByDuration = data.sortedBy { it.duration }
 }

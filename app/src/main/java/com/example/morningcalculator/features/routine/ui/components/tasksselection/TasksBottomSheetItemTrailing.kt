@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.routine.ui.components.tasks_bottom_sheet
+package com.example.morningcalculator.features.routine.ui.components.tasksselection
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

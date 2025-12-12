@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.routine.ui.components.task_dialog
+package com.example.morningcalculator.features.routine.ui.components.taskscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.Orientation

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine.Full
 import com.example.morningcalculator.core.model.RoutineFullLink
-import com.example.morningcalculator.features.routine.ui.components.task_dialog.EditTaskScreen
+import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.extensions.whenToStart
 
@@ -87,6 +87,6 @@ fun TasksListView(
                 editingLink = editingLink,
             )
         }
-        item { Spacer(Modifier.height(16.dp)) }
+        item { Spacer(Modifier.height(100.dp)) }
     }
 }

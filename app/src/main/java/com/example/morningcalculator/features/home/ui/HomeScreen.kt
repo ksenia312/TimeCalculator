@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
-import com.example.morningcalculator.features.routine.ui.components.task_dialog.CreateTaskScreen
+import com.example.morningcalculator.features.routine.ui.components.taskscreen.CreateTaskScreen
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

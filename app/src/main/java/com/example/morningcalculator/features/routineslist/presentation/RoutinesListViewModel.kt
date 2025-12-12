@@ -3,15 +3,12 @@ package com.example.morningcalculator.features.routineslist.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.repository.RoutineRepository
-import com.example.morningcalculator.core.repository.TasksRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RoutinesListViewModel(
-    val repository: TasksRepository,
     val routineRepository: RoutineRepository,
 ) : ViewModel() {
 
@@ -22,30 +19,9 @@ class RoutinesListViewModel(
         loadRoutines()
     }
 
-    fun addRoutine(request: RoutineRequest) {
-        viewModelScope.launch {
-            routineRepository.addRoutine(request)
-            loadRoutines()
-        }
-    }
-
     fun editRoutine(request: Routine.Links) {
         viewModelScope.launch {
             routineRepository.updateRoutine(request)
-            loadRoutines()
-        }
-    }
-
-    fun deleteTask(id: String) {
-        viewModelScope.launch {
-            repository.deleteTask(id)
-            loadRoutines()
-        }
-    }
-
-    fun clearTasks() {
-        viewModelScope.launch {
-            repository.clearTasks()
             loadRoutines()
         }
     }

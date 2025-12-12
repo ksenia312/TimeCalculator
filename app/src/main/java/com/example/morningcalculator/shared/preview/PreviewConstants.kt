@@ -18,6 +18,17 @@ object PreviewConstants {
         )
     }
 
+    val routinesFull = List(10) {
+        Routine.Full(
+            id = it.toString(),
+            title = "Morning Routine",
+            color = "0xFFE57373",
+            time = LocalTime(7, 0),
+            modifiedAt = System.currentTimeMillis(),
+            data = listOf()
+        )
+    }
+
     val tasks = List(10) {
         Task(
             id = it.toString(),

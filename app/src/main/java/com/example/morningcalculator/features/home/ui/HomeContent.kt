@@ -77,9 +77,7 @@ fun HomeContent(
     }
 }
 
-
 fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 24.dp + BOTTOM_BAR_MAX_HEIGHT.dp)
-
 
 @PreviewAll
 @Composable

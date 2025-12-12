@@ -30,7 +30,6 @@ object AppModule {
         }
         single {
             RoutinesListViewModel(
-                repository = get(),
                 routineRepository = get(),
             )
         }

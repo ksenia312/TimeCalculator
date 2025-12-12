@@ -1,23 +1,69 @@
 package com.example.morningcalculator.features.tasks.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.features.home.ui.bottomIndent
 import com.example.morningcalculator.features.tasks.presentation.TasksListViewState
-
+import com.example.morningcalculator.features.tasks.ui.components.TaskListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksListContent(
     innerPadding: PaddingValues = PaddingValues(),
     viewState: TasksListViewState,
+    onEditTask: (Task) -> Unit = {},
 ) {
     Box(Modifier.padding(innerPadding)) {
+        when (viewState) {
+            is TasksListViewState.Loading -> {
+                CircularProgressIndicator(
+                    Modifier
+                        .align(Alignment.Center)
+                        .bottomIndent()
+                )
+            }
 
+            is TasksListViewState.Success -> {
+                val routines = viewState.sorted
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                ) {
+                    item { Spacer(Modifier.height(16.dp)) }
+                    routines.forEach { task ->
+                        item(key = task.id) {
+                            TaskListItem(task) {
+                                onEditTask(task)
+                            }
+                        }
+                    }
+                    item { Box(Modifier.bottomIndent()) }
+                }
+            }
+
+            is TasksListViewState.Error -> {
+                val viewState = viewState
+                Text(
+                    text = viewState.error,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .bottomIndent()
+                )
+            }
+        }
 
     }
 }
-

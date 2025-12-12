@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.routine.ui.components.top_bar
+package com.example.morningcalculator.features.routine.ui.components.topbar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

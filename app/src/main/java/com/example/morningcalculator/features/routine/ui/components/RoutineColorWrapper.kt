@@ -26,5 +26,5 @@ fun RoutineColorWrapper(viewState: RoutineViewState, content: @Composable () -> 
 }
 
 val LocalRoutineColor = compositionLocalOf {
-    Color.Black
+    Color.Blue
 }

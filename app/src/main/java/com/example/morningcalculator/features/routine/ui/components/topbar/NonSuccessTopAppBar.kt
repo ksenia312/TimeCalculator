@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.routine.ui.components.top_bar
+package com.example.morningcalculator.features.routine.ui.components.topbar
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable

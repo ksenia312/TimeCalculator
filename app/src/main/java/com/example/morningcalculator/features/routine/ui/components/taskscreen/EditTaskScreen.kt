@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.routine.ui.components.task_dialog
+package com.example.morningcalculator.features.routine.ui.components.taskscreen
 
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable

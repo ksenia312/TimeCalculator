@@ -28,13 +28,13 @@ class TasksRepositoryImpl(
     override val tasksFlow: StateFlow<List<Task>> = _tasksFlow.asStateFlow()
 
     override fun updateTask(request: TaskUpdateRequest): Task {
-        println("task update $request")
         val task = _tasksFlow.value.first { it.id == request.taskId }
         val updatedTask =
             task.copy(
                 title = request.title,
                 description = request.description,
-                data = request.subData
+                data = request.subData,
+                modifiedAt = System.currentTimeMillis()
             )
         val updated = _tasksFlow.value.map { if (it.id == updatedTask.id) updatedTask else it }
         saveTasksToPrefs(updated)
@@ -53,7 +53,8 @@ class TasksRepositoryImpl(
         val newTask = Task(
             title = request.title,
             description = request.description,
-            data = request.durations.map { SubData(duration = it) }
+            data = request.durations.map { SubData(duration = it) },
+            modifiedAt = System.currentTimeMillis()
         )
 
         val updated = _tasksFlow.value + newTask
