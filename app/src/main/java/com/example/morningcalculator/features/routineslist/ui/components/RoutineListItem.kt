@@ -16,6 +16,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
@@ -74,8 +77,21 @@ private fun RoutineListItem(
             .clickable(onClick = onNavigate),
         headlineContent = {
             Column {
+                val text = buildAnnotatedString {
+                    append("${links.title} (")
+                    pushStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = LocalCustomColorScheme.current.accent
+                        )
+                    )
+                    append(links.modifiedAt.formatAsDateTime())
+                    pop()
+                    append(")")
+                }
+
                 Text(
-                    text = "${links.title} (${links.modifiedAt.formatAsDateTime()})",
+                    text = text,
                     style = MaterialTheme.typography.titleSmall
                 )
                 Text(
@@ -92,7 +108,6 @@ private fun RoutineListItem(
                 Icon(
                     imageVector = Icons.Filled.EditCalendar,
                     contentDescription = null,
-                    tint = LocalCustomColorScheme.current.accent
                 )
             }
         },

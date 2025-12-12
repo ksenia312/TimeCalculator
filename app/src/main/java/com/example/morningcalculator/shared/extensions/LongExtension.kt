@@ -15,11 +15,15 @@ fun Long.formatAsDateTime(
     val zonedDT = instant.atZone(zone)
     val now = ZonedDateTime.now(zone)
 
-    val pattern = overridePattern ?: when {
-        zonedDT.toLocalDate().isEqual(now.toLocalDate()) -> {
-            "d MMM"
-        }
+    if (zonedDT.toLocalDate().isEqual(now.toLocalDate())) {
+        return "Today"
+    }
 
+    if (zonedDT.toLocalDate().isEqual(now.toLocalDate().minusDays(1))) {
+        return "Yesterday"
+    }
+
+    val pattern = overridePattern ?: when {
         zonedDT.year == now.year -> {
             "d MMM"
         }
