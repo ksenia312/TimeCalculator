@@ -1,55 +1,52 @@
 package com.example.morningcalculator.data.repository
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.data.db.RoutinesDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class RoutineRepositoryImpl(
-    context: Context, private val prefs: SharedPreferences = context.getSharedPreferences(
-        "tasks", Context.MODE_PRIVATE
-    )
+    private val dao: RoutinesDao
 ) : RoutineRepository {
 
-    companion object {
-        private const val KEY_ROUTINE = "routine_json"
-    }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val _selectedRoutineId = MutableStateFlow<String?>(null)
 
-    var selectedRoutineId: String? = null
+    override val routinesFlow: StateFlow<List<Routine.Links>> = dao.getRoutines()
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key == KEY_ROUTINE) {
-            refresh()
-        }
-    }
-
-    private val _routineFlow = MutableStateFlow(loadRoutineFromPrefs())
-    private val _routinesFlow = MutableStateFlow(loadRoutinesFromPrefs())
-
-    init {
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-    }
+    override val routineFlow: StateFlow<Routine.Links?> = combine(
+        routinesFlow,
+        _selectedRoutineId
+    ) { routines, selectedId ->
+        routines.firstOrNull { it.id == selectedId }
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     override fun initializeId(id: String) {
-        this.selectedRoutineId = id
-        refresh()
+        _selectedRoutineId.value = id
     }
 
     override fun clearId() {
-        selectedRoutineId = null
-        refresh()
+        _selectedRoutineId.value = null
     }
-
-    override val routineFlow: StateFlow<Routine.Links?> = _routineFlow.asStateFlow()
-
-    override val routinesFlow: StateFlow<List<Routine.Links>> = _routinesFlow.asStateFlow()
 
     override fun addRoutine(request: RoutineRequest) {
         val routine = Routine.Links(
@@ -69,36 +66,8 @@ class RoutineRepositoryImpl(
 
     private fun addOrChangeRoutine(initialRoutine: Routine.Links) {
         val newRoutine = initialRoutine.copy(modifiedAt = System.currentTimeMillis())
-        val routines = _routinesFlow.value
-        var updatedRoutines =
-            routines.map { r -> if (r.id == newRoutine.id) newRoutine else r }.toList()
-
-        val ids = updatedRoutines.map { it.id }
-        if (!ids.contains(newRoutine.id)) {
-            updatedRoutines = updatedRoutines + (newRoutine)
+        scope.launch {
+            dao.insertRoutine(newRoutine)
         }
-        prefs.edit() {
-            putString(KEY_ROUTINE, Json.encodeToString(updatedRoutines))
-        }
-//        _routinesFlow.value = updatedRoutines
-//        _routineFlow.value = routine
-
-        refresh()
-    }
-
-    private fun loadRoutinesFromPrefs(): List<Routine.Links> {
-        val json = prefs.getString(KEY_ROUTINE, "[]") ?: "[]"
-        return runCatching { Json.decodeFromString<List<Routine.Links>>(json) }.getOrDefault(
-            emptyList()
-        )
-    }
-
-    private fun loadRoutineFromPrefs(): Routine.Links? {
-        return loadRoutinesFromPrefs().firstOrNull { it.id == selectedRoutineId }
-    }
-
-    private fun refresh() {
-        _routineFlow.value = loadRoutineFromPrefs()
-        _routinesFlow.value = loadRoutinesFromPrefs()
     }
 }

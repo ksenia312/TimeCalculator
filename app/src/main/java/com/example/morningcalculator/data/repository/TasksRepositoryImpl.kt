@@ -1,87 +1,72 @@
 package com.example.morningcalculator.data.repository
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskRequest
 import com.example.morningcalculator.core.model.TaskUpdateRequest
 import com.example.morningcalculator.core.repository.TasksRepository
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.morningcalculator.data.db.TasksDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 class TasksRepositoryImpl(
-    context: Context, private val prefs: SharedPreferences = context.getSharedPreferences(
-        "tasks", Context.MODE_PRIVATE
-    )
+    private val dao: TasksDao
 ) : TasksRepository {
 
-    companion object {
-        private const val KEY_TASKS = "tasks_json"
-    }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val _tasksFlow = MutableStateFlow(loadTasksFromPrefs())
-
-    override val tasksFlow: StateFlow<List<Task>> = _tasksFlow.asStateFlow()
+    override val tasksFlow: StateFlow<List<Task>> = dao.getTasks()
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     override fun updateTask(request: TaskUpdateRequest): Task {
-        val task = _tasksFlow.value.first { it.id == request.taskId }
-        val updatedTask =
-            task.copy(
-                title = request.title,
-                description = request.description,
-                data = request.subData,
-                modifiedAt = System.currentTimeMillis()
-            )
-        val updated = _tasksFlow.value.map { if (it.id == updatedTask.id) updatedTask else it }
-        saveTasksToPrefs(updated)
+        val updatedTask = Task(
+            id = request.taskId,
+            title = request.title,
+            description = request.description,
+            data = request.subData,
+            modifiedAt = System.currentTimeMillis()
+        )
+
+        scope.launch {
+            dao.insertTask(updatedTask)
+        }
         return updatedTask
-    }
-
-    private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key == KEY_TASKS) _tasksFlow.value = loadTasksFromPrefs()
-    }
-
-    init {
-        prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
     override fun addTask(request: TaskRequest): Task {
         val newTask = Task(
+            id = UUID.randomUUID().toString(),
             title = request.title,
             description = request.description,
             data = request.durations.map { SubData(duration = it) },
             modifiedAt = System.currentTimeMillis()
         )
 
-        val updated = _tasksFlow.value + newTask
-        saveTasksToPrefs(updated)
+        scope.launch {
+            dao.insertTask(newTask)
+        }
         return newTask
     }
 
     override fun deleteTask(id: String) {
-        val updated = _tasksFlow.value.filterNot { it.id == id }
-        saveTasksToPrefs(updated)
+        scope.launch {
+            dao.deleteTask(id)
+        }
     }
 
     override fun clearTasks() {
-        saveTasksToPrefs(emptyList())
-    }
-
-    private fun saveTasksToPrefs(tasks: List<Task>) {
-        prefs.edit(commit = false) {
-            putString(KEY_TASKS, Json.encodeToString(tasks))
+        scope.launch {
+            dao.clearTasks()
         }
-        _tasksFlow.value = tasks
-    }
-
-    private fun loadTasksFromPrefs(): List<Task> {
-        val json = prefs.getString(KEY_TASKS, "[]") ?: "[]"
-        return runCatching { Json.decodeFromString<List<Task>>(json) }.getOrDefault(
-            emptyList()
-        )
     }
 }

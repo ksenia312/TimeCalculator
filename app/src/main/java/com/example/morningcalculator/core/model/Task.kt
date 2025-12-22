@@ -1,18 +1,22 @@
 package com.example.morningcalculator.core.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+@Entity(tableName = "tasks")
 @Serializable
 data class Task(
-    val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val title: String,
     val description: String,
     val data: List<SubData>,
     val modifiedAt: Long? = null
 ) {
+    @androidx.room.Ignore
     val dataSortedByDuration = data.sortedBy { it.duration }
 }
 

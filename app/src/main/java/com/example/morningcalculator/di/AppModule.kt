@@ -1,8 +1,10 @@
 package com.example.morningcalculator.di
 
 import android.content.Context
+import androidx.room.Room
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.data.db.AppDatabase
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
@@ -13,12 +15,15 @@ import org.koin.dsl.module
 
 object AppModule {
     fun registerModules(context: Context): Module = module {
+
+        val db = Room.databaseBuilder(context, AppDatabase::class.java, "morning-db").build()
+
         // Repositories
         single<TasksRepository> {
-            TasksRepositoryImpl(context)
+            TasksRepositoryImpl(db.tasksDao())
         }
         single<RoutineRepository> {
-            RoutineRepositoryImpl(context)
+            RoutineRepositoryImpl(db.routinesDao())
         }
 
         // ViewModels
