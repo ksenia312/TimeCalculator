@@ -38,6 +38,6 @@ fun RoutineTopBar(
         }
 
         is RoutineViewState.Error -> NonSuccessTopAppBar("Error")
-        is RoutineViewState.Loading -> NonSuccessTopAppBar("Loading")
+        is RoutineViewState.Loading -> LoadingTopAppBar("Loading")
     }
 }

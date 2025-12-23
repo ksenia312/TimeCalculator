@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -150,10 +151,13 @@ class RoutineViewModel(
         }
 
         viewModelScope.launch {
-            routineRepository.routineFlow.collect { routine ->
-                _viewState.value = if (routine == null) RoutineViewState.Error("Routine not found")
-                else RoutineViewState.Success(routine)
-            }
+            routineRepository.routineFlow
+                .dropWhile { it == null }
+                .collect { routine ->
+                    _viewState.value =
+                        if (routine == null) RoutineViewState.Error("Routine not found")
+                        else RoutineViewState.Success(routine)
+                }
         }
     }
 }
