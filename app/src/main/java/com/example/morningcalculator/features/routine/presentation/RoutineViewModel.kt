@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineFullLink
-import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskRequest
 import com.example.morningcalculator.core.model.TaskUpdateRequest
@@ -79,7 +78,7 @@ class RoutineViewModel(
                         if (e.id == linkId) null else e
                     })
 
-                editRoutine(newRoutineCombined.toLinks())
+                editRoutine(newRoutineCombined)
             }
         }
     }
@@ -92,7 +91,7 @@ class RoutineViewModel(
                     fullRoutine.data.firstOrNull { r -> r.id == id }
                 }
                 val newRoutine = fullRoutine.copy(data = newTaskPairs)
-                editRoutine(newRoutine.toLinks())
+                editRoutine(newRoutine)
             }
         }
     }
@@ -103,7 +102,7 @@ class RoutineViewModel(
                 val modifiedFull = r.full.copy(
                     data = links
                 )
-                editRoutine(modifiedFull.toLinks())
+                editRoutine(modifiedFull)
             }
         }
     }
@@ -124,12 +123,12 @@ class RoutineViewModel(
                         data = newRoutineCombined.data + entryFullData
                     )
                 }
-                editRoutine(newRoutineCombined.toLinks())
+                editRoutine(newRoutineCombined)
             }
         }
     }
 
-    fun editRoutine(routine: Routine.Links) {
+    fun editRoutine(routine: Routine.Full) {
         viewModelScope.launch {
             routineRepository.updateRoutine(routine)
         }
@@ -144,7 +143,7 @@ class RoutineViewModel(
                 val viewState = _viewState.value
                 if (viewState is RoutineViewState.Success) {
                     _viewState.value = RoutineViewState.Success(
-                        viewState.links.toFull(), viewState.links
+                        viewState.full
                     )
                 }
             }
@@ -153,49 +152,13 @@ class RoutineViewModel(
         viewModelScope.launch {
             routineRepository.routineFlow.collect { routine ->
                 _viewState.value = if (routine == null) RoutineViewState.Error("Routine not found")
-                else RoutineViewState.Success(routine.toFull(), routine)
+                else RoutineViewState.Success(routine)
             }
         }
     }
-
-    fun Routine.Links.toFull(): Routine.Full {
-        val routineTasks = links.mapNotNull { entry ->
-            val task = _tasksState.value.firstOrNull { task -> task.id == entry.taskId }
-            val subData = task?.data?.firstOrNull { subData -> subData.id == entry.subDataId }
-            if (task != null && subData != null) RoutineFullLink(
-                id = entry.id, task = task, subData = subData
-            )
-            else null
-        }
-        return Routine.Full(
-            id = id,
-            title = title,
-            data = routineTasks,
-            time = time,
-            modifiedAt = modifiedAt,
-            color = color
-        )
-
-    }
-
-    private fun Routine.Full.toLinks(): Routine.Links {
-        val entries = data.map { entry ->
-            RoutineLink(
-                id = entry.id, taskId = entry.task.id, subDataId = entry.subData.id
-            )
-        }
-        return Routine.Links(
-            id = id,
-            title = title,
-            links = entries,
-            time = time,
-            modifiedAt = modifiedAt,
-            color = color
-        )
-    }
 }
 
-fun MutableStateFlow<RoutineViewState>.asSuccess(action: (RoutineViewState.Success) -> Unit): Unit {
+fun MutableStateFlow<RoutineViewState>.asSuccess(action: (RoutineViewState.Success) -> Unit) {
     (this.value as? RoutineViewState.Success)?.let {
         action(it)
     }
@@ -204,7 +167,7 @@ fun MutableStateFlow<RoutineViewState>.asSuccess(action: (RoutineViewState.Succe
 
 sealed interface RoutineViewState {
     object Loading : RoutineViewState
-    data class Success(val full: Routine.Full, val links: Routine.Links) : RoutineViewState
+    data class Success(val full: Routine.Full) : RoutineViewState
 
     data class Error(val error: String) : RoutineViewState
 }

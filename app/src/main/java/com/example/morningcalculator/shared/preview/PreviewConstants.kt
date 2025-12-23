@@ -7,17 +7,6 @@ import kotlinx.datetime.LocalTime
 import kotlin.time.Duration.Companion.minutes
 
 object PreviewConstants {
-    val routines = List(10) {
-        Routine.Links(
-            id = it.toString(),
-            title = "Morning Routine",
-            color = "0xFFE57373",
-            time = LocalTime(7, 0),
-            modifiedAt = System.currentTimeMillis(),
-            links = listOf()
-        )
-    }
-
     val routinesFull = List(10) {
         Routine.Full(
             id = it.toString(),

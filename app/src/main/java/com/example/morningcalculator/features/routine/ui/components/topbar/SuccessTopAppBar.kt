@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.features.routine.ui.components.LocalRoutineColor
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
+import com.example.morningcalculator.features.routine.ui.components.LocalRoutineColor
 import com.example.morningcalculator.shared.components.CustomTopBar
 import com.example.morningcalculator.shared.components.CustomTopBarHeadingItem
 import com.example.morningcalculator.shared.extensions.formatAsDateTime
@@ -93,14 +93,6 @@ fun SuccessTopAppBarPreview() {
         data = listOf()
     )
     val viewState = RoutineViewState.Success(
-        links = Routine.Links(
-            id = routine.id,
-            title = routine.title,
-            color = routine.color,
-            time = routine.time,
-            modifiedAt = routine.modifiedAt,
-            links = listOf()
-        ),
         full = routine,
     )
     PreviewTheme {

@@ -9,11 +9,11 @@ interface RoutineRepository {
 
     fun clearId()
 
-    val routineFlow: StateFlow<Routine.Links?>
+    val routineFlow: StateFlow<Routine.Full?>
 
-    val routinesFlow: StateFlow<List<Routine.Links>>
+    val routinesFlow: StateFlow<List<Routine.Full>>
 
     fun addRoutine(request: RoutineRequest)
 
-    fun updateRoutine(routine: Routine.Links)
+    fun updateRoutine(routine: Routine.Full)
 }

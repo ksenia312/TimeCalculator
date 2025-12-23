@@ -36,8 +36,8 @@ private fun HomeAppBarPreview() {
     PreviewTheme {
         RoutinesListAppBar(
             homeViewState = RoutinesListState.Success(
-                routines = PreviewConstants.routines,
-                sorted = PreviewConstants.routines,
+                routines = PreviewConstants.routinesFull,
+                sorted = PreviewConstants.routinesFull,
                 sort = RoutinesListState.Sort.DEFAULT
             )
         )

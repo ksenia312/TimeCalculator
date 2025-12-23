@@ -28,7 +28,7 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 fun RoutinesListContent(
     innerPadding: PaddingValues = PaddingValues(0.dp),
     viewState: RoutinesListState,
-    onEditRoutine: (Routine.Links) -> Unit,
+    onEditRoutine: (Routine.Full) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -81,8 +81,8 @@ fun RoutineListContentPreview() {
     PreviewTheme {
         RoutinesListContent(
             viewState = RoutinesListState.Success(
-                routines = PreviewConstants.routines,
-                sorted = PreviewConstants.routines,
+                routines = PreviewConstants.routinesFull,
+                sorted = PreviewConstants.routinesFull,
                 sort = RoutinesListState.Sort.DEFAULT
             ),
             onEditRoutine = {}
