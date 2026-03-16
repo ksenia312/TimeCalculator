@@ -1,7 +1,7 @@
 package com.example.morningcalculator.data.repository
 
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
@@ -30,7 +30,7 @@ class RoutineRepositoryImpl(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _selectedRoutineId = MutableStateFlow<String?>(null)
 
-    override val routinesFlow: StateFlow<List<Routine.Full>> = populatedFlow
+    override val routinesFlow: StateFlow<List<Routine>> = populatedFlow
         .map { list -> list.map { populated -> mapToDomain(populated) } }
         .stateIn(
             scope = scope,
@@ -38,7 +38,7 @@ class RoutineRepositoryImpl(
             initialValue = emptyList()
         )
 
-    override val routineFlow: StateFlow<Routine.Full?> = combine(
+    override val routineFlow: StateFlow<Routine?> = combine(
         routinesFlow,
         _selectedRoutineId
     ) { routines, selectedId ->
@@ -71,7 +71,7 @@ class RoutineRepositoryImpl(
         }
     }
 
-    override suspend fun updateRoutine(routine: Routine.Full) {
+    override suspend fun updateRoutine(routine: Routine) {
         val routineEntity = RoutineEntity(
             id = routine.id,
             title = routine.title,
@@ -101,7 +101,7 @@ class RoutineRepositoryImpl(
         }
     }
 
-    private fun mapToDomain(populated: RoutinePopulated): Routine.Full {
+    private fun mapToDomain(populated: RoutinePopulated): Routine {
         val sortedItems = populated.items.sortedBy { it.item.orderIndex }
 
         val fullLinks = sortedItems.map { itemPopulated ->
@@ -109,7 +109,7 @@ class RoutineRepositoryImpl(
             val taskEntity = taskWithData.task
             val allSubDataEntities = taskWithData.subDataList
 
-            RoutineFullLink(
+            RoutineLink(
                 id = itemPopulated.item.id,
                 task = Task(
                     id = taskEntity.id,
@@ -125,7 +125,7 @@ class RoutineRepositoryImpl(
             )
         }
 
-        return Routine.Full(
+        return Routine(
             id = populated.routine.id,
             title = populated.routine.title,
             color = populated.routine.color,

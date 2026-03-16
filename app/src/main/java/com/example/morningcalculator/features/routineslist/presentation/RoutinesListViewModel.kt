@@ -19,7 +19,7 @@ class RoutinesListViewModel(
         loadRoutines()
     }
 
-    fun editRoutine(request: Routine.Full) {
+    fun editRoutine(request: Routine) {
         viewModelScope.launch {
             routineRepository.updateRoutine(request)
             loadRoutines()
@@ -28,8 +28,8 @@ class RoutinesListViewModel(
 
     private fun sortRoutines(
         sort: RoutinesListState.Sort,
-        routines: List<Routine.Full>
-    ): List<Routine.Full> {
+        routines: List<Routine>
+    ): List<Routine> {
         fun selector(routine: Routine): Long {
             return when (sort.sortType) {
                 RoutinesListState.Sort.SortType.DATE -> routine.modifiedAt
@@ -59,8 +59,8 @@ class RoutinesListViewModel(
 sealed interface RoutinesListState {
     object Loading : RoutinesListState
     data class Success(
-        val routines: List<Routine.Full>,
-        val sorted: List<Routine.Full>,
+        val routines: List<Routine>,
+        val sorted: List<Routine>,
         val sort: Sort = Sort.DEFAULT,
     ) : RoutinesListState
 

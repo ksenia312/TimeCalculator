@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object PreviewConstants {
     val routinesFull = List(10) {
-        Routine.Full(
+        Routine(
             id = it.toString(),
             title = "Morning Routine",
             color = "0xFFE57373",

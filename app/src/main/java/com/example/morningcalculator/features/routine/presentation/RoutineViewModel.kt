@@ -3,7 +3,7 @@ package com.example.morningcalculator.features.routine.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskRequest
 import com.example.morningcalculator.core.model.TaskUpdateRequest
@@ -47,7 +47,7 @@ class RoutineViewModel(
             val task = tasksRepository.addTask(request)
             val subData = task.data[selectedDurationIndex]
             addOrEditTaskInRoutine(
-                RoutineFullLink(
+                RoutineLink(
                     id = UUID.randomUUID().toString(),
                     task = task,
                     subData = subData
@@ -65,7 +65,7 @@ class RoutineViewModel(
             val task = tasksRepository.updateTask(request)
             val subData = task.data[selectedDurationIndex]
             addOrEditTaskInRoutine(
-                RoutineFullLink(
+                RoutineLink(
                     id = linkId,
                     task = task,
                     subData = subData
@@ -102,7 +102,7 @@ class RoutineViewModel(
         }
     }
 
-    fun editLinksInRoutine(links: List<RoutineFullLink>) {
+    fun editLinksInRoutine(links: List<RoutineLink>) {
         viewModelScope.launch {
             _viewState.asSuccess { r ->
                 val modifiedFull = r.full.copy(data = links)
@@ -111,25 +111,25 @@ class RoutineViewModel(
         }
     }
 
-    fun addOrEditTaskInRoutine(entryFullData: RoutineFullLink) {
+    fun addOrEditTaskInRoutine(link: RoutineLink) {
         viewModelScope.launch {
             _viewState.asSuccess { r ->
                 val routineCombined = r.full
                 var newRoutineCombined = routineCombined.copy(
                     data = routineCombined.data.map { entry ->
-                        if (entry.id == entryFullData.id) {
+                        if (entry.id == link.id) {
                             entry.copy(
-                                subData = entryFullData.subData,
-                                task = entryFullData.task
+                                subData = link.subData,
+                                task = link.task
                             )
                         } else {
                             entry
                         }
                     }
                 )
-                if (!newRoutineCombined.data.map { it.id }.contains(entryFullData.id)) {
+                if (!newRoutineCombined.data.map { it.id }.contains(link.id)) {
                     newRoutineCombined = newRoutineCombined.copy(
-                        data = newRoutineCombined.data + entryFullData
+                        data = newRoutineCombined.data + link
                     )
                 }
                 editRoutine(newRoutineCombined)
@@ -137,7 +137,7 @@ class RoutineViewModel(
         }
     }
 
-    fun editRoutine(routine: Routine.Full) {
+    fun editRoutine(routine: Routine) {
         viewModelScope.launch {
             routineRepository.updateRoutine(routine)
         }
@@ -176,6 +176,6 @@ fun MutableStateFlow<RoutineViewState>.asSuccess(
 
 sealed interface RoutineViewState {
     object Loading : RoutineViewState
-    data class Success(val full: Routine.Full) : RoutineViewState
+    data class Success(val full: Routine) : RoutineViewState
     data class Error(val error: String) : RoutineViewState
 }

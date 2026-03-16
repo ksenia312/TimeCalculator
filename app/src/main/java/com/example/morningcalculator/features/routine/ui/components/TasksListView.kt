@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine.Full
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.shared.extensions.whenToStart
@@ -29,13 +29,13 @@ import com.example.morningcalculator.shared.extensions.whenToStart
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksListView(
-    routineFull: Full, viewModel: RoutineViewModel
+    routine: Routine, viewModel: RoutineViewModel
 ) {
-    val whenToGetUp = routineFull.whenToStart()
-    val fullLinks = remember(routineFull) { routineFull.data.toMutableStateList() }
+    val whenToGetUp = routine.whenToStart()
+    val fullLinks = remember(routine) { routine.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
-    val editingLink = remember { mutableStateOf<RoutineFullLink?>(null) }
+    val editingLink = remember { mutableStateOf<RoutineLink?>(null) }
 
     if (editingLink.value != null) {
         val link = editingLink.value!!
@@ -65,7 +65,7 @@ fun TasksListView(
         item { Spacer(Modifier.height(12.dp)) }
         item(key = "title") {
             Text(
-                routineFull.title,
+                routine.title,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
@@ -77,10 +77,10 @@ fun TasksListView(
         itemsIndexed(
             items = fullLinks, key = { _, link -> link.id }) { index, link ->
             RoutineTaskItem(
-                routineFullLinks = fullLinks,
+                routineLinks = fullLinks,
                 index = index,
                 linkFull = link,
-                routineFull = routineFull,
+                routine = routine,
                 viewModel = viewModel,
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,

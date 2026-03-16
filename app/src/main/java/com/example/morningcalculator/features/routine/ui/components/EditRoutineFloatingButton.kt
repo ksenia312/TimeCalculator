@@ -17,7 +17,7 @@ import com.example.morningcalculator.shared.components.FabMenu
 
 @Composable
 fun EditRoutineFloatingButton(
-    routine: Routine.Full,
+    routine: Routine,
     viewModel: RoutineViewModel,
 ) {
     val isBarExpanded = rememberSaveable { mutableStateOf(false) }

@@ -36,8 +36,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.morningcalculator.core.model.Routine.Full
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.extensions.timeOnMoment
@@ -46,28 +46,28 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutineTaskItem(
-    linkFull: RoutineFullLink,
-    routineFull: Full,
+    linkFull: RoutineLink,
+    routine: Routine,
     index: Int,
     draggingIndex: MutableState<Int?>,
     dragOffsetY: MutableState<Float>,
-    routineFullLinks: SnapshotStateList<RoutineFullLink>,
+    routineLinks: SnapshotStateList<RoutineLink>,
     viewModel: RoutineViewModel,
-    editingLink: MutableState<RoutineFullLink?>,
+    editingLink: MutableState<RoutineLink?>,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     var current by remember(linkFull.subData) {
         mutableStateOf(linkFull.subData)
     }
 
-    val time = routineFull.timeOnMoment(index)
+    val time = routine.timeOnMoment(index)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
     ) {
         TimeSegment(
-            time.toString(), isTitle = index == routineFull.data.size - 1
+            time.toString(), isTitle = index == routine.data.size - 1
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -78,7 +78,7 @@ fun RoutineTaskItem(
                     index = index,
                     draggingIndex = draggingIndex,
                     dragOffsetY = dragOffsetY,
-                    routineFullLinks = routineFullLinks,
+                    routineLinks = routineLinks,
                     viewModel = viewModel
                 )
                 .clip(RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp))
@@ -154,7 +154,7 @@ fun Modifier.draggableItem(
     index: Int,
     draggingIndex: MutableState<Int?>,
     dragOffsetY: MutableState<Float>,
-    routineFullLinks: SnapshotStateList<RoutineFullLink>,
+    routineLinks: SnapshotStateList<RoutineLink>,
     viewModel: RoutineViewModel
 ): Modifier {
     val isDragging = draggingIndex.value == index
@@ -167,7 +167,7 @@ fun Modifier.draggableItem(
         )
     }
         .zIndex(if (isDragging) 1f else 0f)
-        .pointerInput(routineFullLinks) {
+        .pointerInput(routineLinks) {
             detectDragGesturesAfterLongPress(onDragStart = {
                 draggingIndex.value = index
                 dragOffsetY.value = 0f
@@ -176,16 +176,16 @@ fun Modifier.draggableItem(
                 val current = draggingIndex.value ?: return@detectDragGesturesAfterLongPress
                 val newOffset = dragOffsetY.value + dragAmount.y
                 val delta = (newOffset / itemHeightPx).roundToInt()
-                val target = (current + delta).coerceIn(0, routineFullLinks.lastIndex)
+                val target = (current + delta).coerceIn(0, routineLinks.lastIndex)
                 if (target != current) {
-                    routineFullLinks.move(current, target)
+                    routineLinks.move(current, target)
                     draggingIndex.value = target
                     dragOffsetY.value = newOffset - delta * itemHeightPx
                 } else {
                     dragOffsetY.value = newOffset
                 }
             }, onDragEnd = {
-                viewModel.reorderTasks(routineFullLinks.map { it.id })
+                viewModel.reorderTasks(routineLinks.map { it.id })
                 draggingIndex.value = null
                 dragOffsetY.value = 0f
             }, onDragCancel = {

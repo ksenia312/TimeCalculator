@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.SecureFlagPolicy
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
@@ -40,7 +40,7 @@ fun TasksBottomSheet(
     onDismiss: () -> Unit,
     onShowAddTasksDialog: () -> Unit,
     viewModel: RoutineViewModel,
-    routine: Routine.Full
+    routine: Routine
 ) {
     val tasks by viewModel.tasks.collectAsState()
     val links = remember { routine.data.toMutableStateList() }
@@ -106,9 +106,9 @@ fun TasksBottomSheet(
 }
 
 
-fun MutableList<RoutineFullLink>.addTask(task: Task) {
+fun MutableList<RoutineLink>.addTask(task: Task) {
     add(
-        RoutineFullLink(
+        RoutineLink(
             id = UUID.randomUUID().toString(),
             task = task,
             subData = task.dataSortedByDuration.firstOrNull() ?: SubData.tenMins

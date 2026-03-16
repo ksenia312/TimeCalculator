@@ -84,7 +84,7 @@ fun SuccessTopAppBar(
 @PreviewAll
 @Composable
 fun SuccessTopAppBarPreview() {
-    val routine = Routine.Full(
+    val routine = Routine(
         id = "1",
         title = "Morning Routine",
         time = kotlinx.datetime.LocalTime(8, 0),

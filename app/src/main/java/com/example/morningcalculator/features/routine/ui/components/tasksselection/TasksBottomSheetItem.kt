@@ -9,12 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
 
 @Composable
 fun TasksBottomSheetItem(
-    links: MutableList<RoutineFullLink>,
+    links: MutableList<RoutineLink>,
     task: Task
 ) {
     Row(

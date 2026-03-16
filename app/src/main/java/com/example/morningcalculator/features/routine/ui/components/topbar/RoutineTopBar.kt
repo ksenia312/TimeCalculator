@@ -15,7 +15,7 @@ fun RoutineTopBar(
     viewModel: RoutineViewModel
 ) {
     val viewState by viewModel.viewState.collectAsState()
-    val editingRoutine = remember { mutableStateOf<Routine.Full?>(null) }
+    val editingRoutine = remember { mutableStateOf<Routine?>(null) }
     if (editingRoutine.value != null) {
         val routine = editingRoutine.value!!
         RoutineDialog(initialRoutine = routine, onConfirm = { request ->

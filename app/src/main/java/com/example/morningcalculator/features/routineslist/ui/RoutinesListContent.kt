@@ -28,7 +28,7 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 fun RoutinesListContent(
     innerPadding: PaddingValues = PaddingValues(0.dp),
     viewState: RoutinesListState,
-    onEditRoutine: (Routine.Full) -> Unit,
+    onEditRoutine: (Routine) -> Unit,
 ) {
     Box(
         modifier = Modifier

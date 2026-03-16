@@ -11,23 +11,15 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-interface Routine {
-    val id: String
-    val title: String
-    val time: LocalTime
-    val modifiedAt: Long
-    val color: String
-
-    @Serializable
-    data class Full(
-        override val id: String,
-        override val title: String,
-        override val color: String,
-        @Serializable(with = LocalTimeIsoSerializer::class) override val time: LocalTime,
-        override val modifiedAt: Long,
-        val data: List<RoutineFullLink>,
-    ) : Routine
-}
+@Serializable
+data class Routine(
+    val id: String,
+    val title: String,
+    @Serializable(with = LocalTimeIsoSerializer::class) val time: LocalTime,
+    val modifiedAt: Long,
+    val color: String,
+    val data: List<RoutineLink>,
+)
 
 @OptIn(ExperimentalTime::class)
 data class RoutineRequest(

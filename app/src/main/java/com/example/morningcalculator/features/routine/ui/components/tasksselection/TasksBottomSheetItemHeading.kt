@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
@@ -18,7 +18,7 @@ import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 @Composable
 fun TasksBottomSheetItemHeading(
-    modifier: Modifier, links: MutableList<RoutineFullLink>, task: Task
+    modifier: Modifier, links: MutableList<RoutineLink>, task: Task
 ) {
     val hasTask = links.any { it.task.id == task.id }
     Row(

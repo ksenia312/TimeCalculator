@@ -32,8 +32,8 @@ import kotlinx.datetime.LocalTime
 
 @Composable
 fun RoutineListItem(
-    links: Routine.Full,
-    onEdit: (Routine.Full) -> Unit = {}
+    links: Routine,
+    onEdit: (Routine) -> Unit = {}
 ) {
     val navigator = LocalNavHostController.current
     val isEditing = remember { mutableStateOf(false) }
@@ -66,7 +66,7 @@ fun RoutineListItem(
 
 @Composable
 private fun RoutineListItem(
-    links: Routine.Full,
+    links: Routine,
     onNavigate: () -> Unit,
     onEditClick: () -> Unit,
 ) {
@@ -119,7 +119,7 @@ private fun RoutineListItem(
 @Composable
 fun RoutineListItemPreview() {
     PreviewTheme {
-        val routine = Routine.Full(
+        val routine = Routine(
             id = "1",
             title = "Morning Routine",
             color = "0xFFE57373",

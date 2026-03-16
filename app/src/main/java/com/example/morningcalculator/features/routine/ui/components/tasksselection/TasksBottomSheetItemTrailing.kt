@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.RoutineFullLink
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.shared.components.SmallIconButton
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 @Composable
-fun TasksBottomSheetItemTrailing(links: MutableList<RoutineFullLink>, task: Task) {
+fun TasksBottomSheetItemTrailing(links: MutableList<RoutineLink>, task: Task) {
     val hasTask = links.any { it.task.id == task.id }
     Box(Modifier.fillMaxHeight()) {
         AnimatedVisibility(visible = hasTask) {
