@@ -5,15 +5,15 @@ import com.example.morningcalculator.core.model.RoutineRequest
 import kotlinx.coroutines.flow.StateFlow
 
 interface RoutineRepository {
-    fun initializeId(id: String)
-
-    fun clearId()
-
+    val routinesFlow: StateFlow<List<Routine.Full>>
     val routineFlow: StateFlow<Routine.Full?>
 
-    val routinesFlow: StateFlow<List<Routine.Full>>
+    fun initializeId(id: String)
+    fun clearId()
 
-    fun addRoutine(request: RoutineRequest)
+    suspend fun addRoutine(request: RoutineRequest)
 
-    fun updateRoutine(routine: Routine.Full)
+    suspend fun updateRoutine(routine: Routine.Full)
+
+    suspend fun deleteRoutine(id: String)
 }

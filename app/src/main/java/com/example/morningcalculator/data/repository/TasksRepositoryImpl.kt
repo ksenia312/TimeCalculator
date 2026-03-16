@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class TasksRepositoryImpl(
@@ -32,9 +32,7 @@ class TasksRepositoryImpl(
                     title = populated.task.title,
                     description = populated.task.description,
                     modifiedAt = populated.task.modifiedAt,
-                    data = populated.subDataList.map {
-                        SubData(it.id, it.duration)
-                    }
+                    data = populated.subDataList.map { SubData(it.id, it.duration) }
                 )
             }
         }
@@ -44,7 +42,7 @@ class TasksRepositoryImpl(
             initialValue = emptyList()
         )
 
-    override fun updateTask(request: TaskUpdateRequest): Task {
+    override suspend fun updateTask(request: TaskUpdateRequest): Task {
         val taskEntity = TaskEntity(
             id = request.taskId,
             title = request.title,
@@ -56,7 +54,7 @@ class TasksRepositoryImpl(
             SubDataEntity(id = it.id, taskId = request.taskId, duration = it.duration)
         }
 
-        scope.launch {
+        withContext(Dispatchers.IO) {
             dao.updateTaskWithData(taskEntity, subDataEntities)
         }
 
@@ -69,14 +67,15 @@ class TasksRepositoryImpl(
         )
     }
 
-    override fun addTask(request: TaskRequest): Task {
+    override suspend fun addTask(request: TaskRequest): Task {
         val newTaskId = UUID.randomUUID().toString()
         val timestamp = System.currentTimeMillis()
+
         val taskEntity = TaskEntity(
             id = newTaskId,
             title = request.title,
             description = request.description,
-            modifiedAt = timestamp,
+            modifiedAt = timestamp
         )
 
         val subDataEntities = request.durations.map { duration ->
@@ -87,9 +86,8 @@ class TasksRepositoryImpl(
             )
         }
 
-        scope.launch {
-            dao.insertTask(taskEntity)
-            dao.insertSubData(subDataEntities)
+        withContext(Dispatchers.IO) {
+            dao.insertTaskWithData(taskEntity, subDataEntities)
         }
 
         return Task(
@@ -101,14 +99,14 @@ class TasksRepositoryImpl(
         )
     }
 
-    override fun deleteTask(id: String) {
-        scope.launch {
+    override suspend fun deleteTask(id: String) {
+        withContext(Dispatchers.IO) {
             dao.deleteTask(id)
         }
     }
 
-    override fun clearTasks() {
-        scope.launch {
+    override suspend fun clearTasks() {
+        withContext(Dispatchers.IO) {
             dao.clearTasks()
         }
     }

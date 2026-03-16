@@ -29,11 +29,34 @@ interface TasksDao {
     @Query("DELETE FROM sub_data WHERE taskId = :taskId")
     suspend fun clearSubDataForTask(taskId: String)
 
+    @Query(
+        """
+        DELETE FROM sub_data
+        WHERE taskId = :taskId AND id NOT IN (:keepIds)
+        """
+    )
+    suspend fun deleteSubDataNotIn(taskId: String, keepIds: List<String>)
+
+    @Transaction
+    suspend fun insertTaskWithData(task: TaskEntity, subData: List<SubDataEntity>) {
+        insertTask(task)
+        if (subData.isEmpty()) {
+            clearSubDataForTask(task.id)
+        } else {
+            insertSubData(subData)
+            deleteSubDataNotIn(task.id, subData.map { it.id })
+        }
+    }
+
     @Transaction
     suspend fun updateTaskWithData(task: TaskEntity, subData: List<SubDataEntity>) {
         insertTask(task)
-        clearSubDataForTask(task.id)
-        insertSubData(subData)
+        if (subData.isEmpty()) {
+            clearSubDataForTask(task.id)
+        } else {
+            insertSubData(subData)
+            deleteSubDataNotIn(task.id, subData.map { it.id })
+        }
     }
 
     @Query("DELETE FROM tasks WHERE id = :id")
@@ -59,7 +82,10 @@ interface RoutinesDao {
     suspend fun clearItemsForRoutine(routineId: String)
 
     @Transaction
-    suspend fun updateRoutineWithItems(routine: RoutineEntity, items: List<RoutineItemEntity>) {
+    suspend fun updateRoutineWithItems(
+        routine: RoutineEntity,
+        items: List<RoutineItemEntity>
+    ) {
         insertRoutine(routine)
         clearItemsForRoutine(routine.id)
         insertRoutineItems(items)
@@ -70,7 +96,12 @@ interface RoutinesDao {
 }
 
 @Database(
-    entities = [TaskEntity::class, SubDataEntity::class, RoutineEntity::class, RoutineItemEntity::class],
+    entities = [
+        TaskEntity::class,
+        SubDataEntity::class,
+        RoutineEntity::class,
+        RoutineItemEntity::class
+    ],
     version = 2
 )
 @TypeConverters(Converters::class)

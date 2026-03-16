@@ -48,7 +48,9 @@ class RoutineViewModel(
             val subData = task.data[selectedDurationIndex]
             addOrEditTaskInRoutine(
                 RoutineFullLink(
-                    id = UUID.randomUUID().toString(), task = task, subData = subData
+                    id = UUID.randomUUID().toString(),
+                    task = task,
+                    subData = subData
                 )
             )
         }
@@ -64,7 +66,9 @@ class RoutineViewModel(
             val subData = task.data[selectedDurationIndex]
             addOrEditTaskInRoutine(
                 RoutineFullLink(
-                    id = linkId, task = task, subData = subData
+                    id = linkId,
+                    task = task,
+                    subData = subData
                 )
             )
         }
@@ -77,7 +81,8 @@ class RoutineViewModel(
                 val newRoutineCombined = routineCombined.copy(
                     data = routineCombined.data.mapNotNull { e ->
                         if (e.id == linkId) null else e
-                    })
+                    }
+                )
 
                 editRoutine(newRoutineCombined)
             }
@@ -100,9 +105,7 @@ class RoutineViewModel(
     fun editLinksInRoutine(links: List<RoutineFullLink>) {
         viewModelScope.launch {
             _viewState.asSuccess { r ->
-                val modifiedFull = r.full.copy(
-                    data = links
-                )
+                val modifiedFull = r.full.copy(data = links)
                 editRoutine(modifiedFull)
             }
         }
@@ -114,11 +117,16 @@ class RoutineViewModel(
                 val routineCombined = r.full
                 var newRoutineCombined = routineCombined.copy(
                     data = routineCombined.data.map { entry ->
-                        if (entry.id == entryFullData.id) entry.copy(
-                            subData = entryFullData.subData,
-                            task = entryFullData.task
-                        ) else entry
-                    })
+                        if (entry.id == entryFullData.id) {
+                            entry.copy(
+                                subData = entryFullData.subData,
+                                task = entryFullData.task
+                            )
+                        } else {
+                            entry
+                        }
+                    }
+                )
                 if (!newRoutineCombined.data.map { it.id }.contains(entryFullData.id)) {
                     newRoutineCombined = newRoutineCombined.copy(
                         data = newRoutineCombined.data + entryFullData
@@ -143,9 +151,7 @@ class RoutineViewModel(
                 _tasksState.value = it
                 val viewState = _viewState.value
                 if (viewState is RoutineViewState.Success) {
-                    _viewState.value = RoutineViewState.Success(
-                        viewState.full
-                    )
+                    _viewState.value = RoutineViewState.Success(viewState.full)
                 }
             }
         }
@@ -162,16 +168,14 @@ class RoutineViewModel(
     }
 }
 
-fun MutableStateFlow<RoutineViewState>.asSuccess(action: (RoutineViewState.Success) -> Unit) {
-    (this.value as? RoutineViewState.Success)?.let {
-        action(it)
-    }
+fun MutableStateFlow<RoutineViewState>.asSuccess(
+    action: (RoutineViewState.Success) -> Unit
+) {
+    (this.value as? RoutineViewState.Success)?.let { action(it) }
 }
-
 
 sealed interface RoutineViewState {
     object Loading : RoutineViewState
     data class Success(val full: Routine.Full) : RoutineViewState
-
     data class Error(val error: String) : RoutineViewState
 }

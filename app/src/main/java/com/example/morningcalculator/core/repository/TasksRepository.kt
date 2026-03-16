@@ -6,13 +6,13 @@ import com.example.morningcalculator.core.model.TaskUpdateRequest
 import kotlinx.coroutines.flow.StateFlow
 
 interface TasksRepository {
-    fun addTask(request: TaskRequest): Task
-
     val tasksFlow: StateFlow<List<Task>>
 
-    fun updateTask(request: TaskUpdateRequest): Task
+    suspend fun addTask(request: TaskRequest): Task
 
-    fun clearTasks()
+    suspend fun updateTask(request: TaskUpdateRequest): Task
 
-    fun deleteTask(id: String)
+    suspend fun deleteTask(id: String)
+
+    suspend fun clearTasks()
 }

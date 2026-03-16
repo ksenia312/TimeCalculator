@@ -36,7 +36,10 @@ fun EditRoutineFloatingButton(
         CreateTaskScreen(
             linkedToRoutine = true,
             onConfirm = { request, selectedIndex ->
-                viewModel.addNewTask(request, selectedIndex ?: 0)
+                viewModel.addNewTask(
+                    request,
+                    selectedIndex ?: 0
+                )
                 showAddTaskDialog.value = false
             }, onDismiss = { showAddTaskDialog.value = false }
         )

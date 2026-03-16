@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class RoutineRepositoryImpl(
@@ -31,12 +31,12 @@ class RoutineRepositoryImpl(
     private val _selectedRoutineId = MutableStateFlow<String?>(null)
 
     override val routinesFlow: StateFlow<List<Routine.Full>> = populatedFlow
-        .map { list ->
-            list.map { populated ->
-                mapToDomain(populated)
-            }
-        }
-        .stateIn(scope = scope, started = SharingStarted.WhileSubscribed(5000), initialValue = emptyList())
+        .map { list -> list.map { populated -> mapToDomain(populated) } }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     override val routineFlow: StateFlow<Routine.Full?> = combine(
         routinesFlow,
@@ -57,7 +57,7 @@ class RoutineRepositoryImpl(
         _selectedRoutineId.value = null
     }
 
-    override fun addRoutine(request: RoutineRequest) {
+    override suspend fun addRoutine(request: RoutineRequest) {
         val routineEntity = RoutineEntity(
             id = UUID.randomUUID().toString(),
             title = request.title,
@@ -66,12 +66,12 @@ class RoutineRepositoryImpl(
             modifiedAt = System.currentTimeMillis()
         )
 
-        scope.launch {
+        withContext(Dispatchers.IO) {
             dao.insertRoutine(routineEntity)
         }
     }
 
-    override fun updateRoutine(routine: Routine.Full) {
+    override suspend fun updateRoutine(routine: Routine.Full) {
         val routineEntity = RoutineEntity(
             id = routine.id,
             title = routine.title,
@@ -90,8 +90,14 @@ class RoutineRepositoryImpl(
             )
         }
 
-        scope.launch {
+        withContext(Dispatchers.IO) {
             dao.updateRoutineWithItems(routineEntity, itemsEntities)
+        }
+    }
+
+    override suspend fun deleteRoutine(id: String) {
+        withContext(Dispatchers.IO) {
+            dao.deleteRoutine(id)
         }
     }
 
@@ -109,9 +115,7 @@ class RoutineRepositoryImpl(
                     id = taskEntity.id,
                     title = taskEntity.title,
                     description = taskEntity.description,
-                    data = allSubDataEntities.map {
-                        SubData(it.id, it.duration)
-                    },
+                    data = allSubDataEntities.map { SubData(it.id, it.duration) },
                     modifiedAt = taskEntity.modifiedAt
                 ),
                 subData = SubData(

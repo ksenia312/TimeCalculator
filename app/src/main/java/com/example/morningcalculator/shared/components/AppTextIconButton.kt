@@ -22,10 +22,11 @@ fun AppTextIconButton(
     painter: Painter,
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     foregroundColor: Color = MaterialTheme.colorScheme.primary
 ) {
     TextButton(
-        modifier = Modifier.fillMaxWidth(), onClick = onClick
+        modifier = modifier.fillMaxWidth(), onClick = onClick
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -49,6 +50,7 @@ fun AppTextIconButton(
 @Composable
 fun AddNewButton(
     text: String,
+    modifier: Modifier = Modifier,
     foregroundColor: Color = MaterialTheme.colorScheme.primary,
     onClick: () -> Unit,
 ) {
@@ -56,6 +58,7 @@ fun AddNewButton(
         foregroundColor = foregroundColor,
         painter = painterResource(R.drawable.add_circle),
         text = text,
-        onClick = onClick
+        onClick = onClick,
+        modifier = modifier
     )
 }
