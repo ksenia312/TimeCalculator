@@ -24,9 +24,8 @@ fun CreateTaskScreen(
     var title by remember { mutableStateOf("") }
     val durations = remember { mutableStateListOf("") }
 
-    val selectable = linkedToRoutine
     var selectedIndex by remember {
-        mutableStateOf(if (selectable) 0 else null)
+        mutableStateOf(if (linkedToRoutine) 0 else null)
     }
 
     TaskEditorDialogScaffold(
@@ -51,7 +50,7 @@ fun CreateTaskScreen(
                 DurationRow(
                     index = index,
                     value = value,
-                    selectable = selectable,
+                    selectable = linkedToRoutine,
                     selected = selectedIndex == index,
                     onSelect = { selectedIndex = index },
                     onValueChange = { new ->
@@ -61,7 +60,7 @@ fun CreateTaskScreen(
                     },
                     onRemove = {
                         durations.removeAt(index)
-                        if (selectable) {
+                        if (linkedToRoutine) {
                             selectedIndex = selectedIndexAfterRemove(
                                 current = selectedIndex,
                                 removedIndex = index,
@@ -77,7 +76,7 @@ fun CreateTaskScreen(
                     text = "Add more durations",
                     onClick = {
                         durations.add("")
-                        if (selectable) {
+                        if (linkedToRoutine) {
                             selectedIndex = durations.lastIndex
                         }
                     },
