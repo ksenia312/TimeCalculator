@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,12 +31,15 @@ fun EditTaskScreen(
     var title by remember { mutableStateOf(initialTask.title) }
     val initialIndex = remember(initialTask, initialSubDataId) {
         if (initialSubDataId == null) {
-            null
+            0
         } else {
-            initialTask.data.indexOfFirst { it.id == initialSubDataId }.takeIf { it >= 0 }
+            initialTask.data
+                .indexOfFirst { it.id == initialSubDataId }
+                .takeIf { it >= 0 }
+                ?: 0
         }
     }
-    var selectedIndex by remember { mutableStateOf(initialIndex) }
+    var selectedIndex by remember { mutableIntStateOf(initialIndex) }
 
     val subData = remember {
         (initialTask.data as List<SubData?>).toMutableStateList()
@@ -75,7 +79,7 @@ fun EditTaskScreen(
                 DurationRow(
                     index = index,
                     value = value,
-                    selectable = selectedIndex != null,
+                    selectable = true,
                     selected = selectedIndex == index,
                     onSelect = { selectedIndex = index },
                     onValueChange = { new ->
@@ -90,13 +94,11 @@ fun EditTaskScreen(
                     },
                     onRemove = {
                         subData.removeAt(index)
-                        if (selectedIndex != null) {
-                            selectedIndex = selectedIndexAfterRemove(
-                                current = selectedIndex,
-                                removedIndex = index,
-                                newLastIndex = subData.lastIndex,
-                            )
-                        }
+                        selectedIndex = selectedIndexAfterRemove(
+                            current = selectedIndex,
+                            removedIndex = index,
+                            newLastIndex = subData.lastIndex,
+                        ) ?: 0
                     },
                 )
             }
@@ -106,9 +108,7 @@ fun EditTaskScreen(
                     text = "Add more durations",
                     onClick = {
                         subData.add(null)
-                        if (selectedIndex != null) {
-                            selectedIndex = subData.lastIndex
-                        }
+                        selectedIndex = subData.lastIndex
                     },
                 )
             }

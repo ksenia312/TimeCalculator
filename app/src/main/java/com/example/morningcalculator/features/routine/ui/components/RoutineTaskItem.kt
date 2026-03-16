@@ -104,18 +104,20 @@ fun RoutineTaskItem(
             }
 
             ExposedDropdownMenuBox(
-                expanded = menuExpanded,
-                onExpandedChange = { menuExpanded = !menuExpanded }) {
+                expanded = menuExpanded, onExpandedChange = { menuExpanded = !menuExpanded }) {
                 ElevatedButton(
                     onClick = { }, modifier = Modifier.menuAnchor(
                         type = MenuAnchorType.PrimaryEditable, enabled = true
                     )
                 ) {
                     Box {
-                        Text(current?.duration?.toString() ?: "Set duration")
+                        Text(
+                            current?.duration?.toString() ?: "Set duration",
+                            color = if (current != null) MaterialTheme.colorScheme.onBackground
+                            else MaterialTheme.colorScheme.error
+                        )
                         ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = menuExpanded,
-                            modifier = Modifier
+                            expanded = menuExpanded, modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .offset(24.dp)
                         )
