@@ -3,7 +3,6 @@ package com.example.morningcalculator.features.home.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,9 +27,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
+import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 const val BOTTOM_BAR_MAX_HEIGHT = 120
 
@@ -55,7 +54,7 @@ fun HomeBottomNavigationBar(
 
         Surface(
             modifier = Modifier
-                .padding(horizontal = 20.dp, /*vertical = 40.dp*/)
+                .padding(horizontal = 20.dp /*vertical = 40.dp*/)
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .shadow(
