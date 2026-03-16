@@ -45,7 +45,7 @@ fun CustomTopBar(
     ChangeSystemTopBarTheme(onAccentColor)
 
     LargeTopAppBar(
-        expandedHeight = 186.dp,
+        expandedHeight = 140.dp,
         modifier = Modifier
             .clip(shape)
             .background(
