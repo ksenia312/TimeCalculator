@@ -1,7 +1,5 @@
 package com.example.morningcalculator.core.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -19,17 +17,6 @@ interface Routine {
     val time: LocalTime
     val modifiedAt: Long
     val color: String
-
-    @Entity(tableName = "routines")
-    @Serializable
-    data class Links(
-        @PrimaryKey override val id: String,
-        override val title: String,
-        override val color: String,
-        @Serializable(with = LocalTimeIsoSerializer::class) override val time: LocalTime,
-        override val modifiedAt: Long,
-        val links: List<RoutineLink>,
-    ) : Routine
 
     @Serializable
     data class Full(

@@ -6,10 +6,10 @@ import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.data.db.RoutinePopulated
 import com.example.morningcalculator.data.db.RoutinesDao
 import com.example.morningcalculator.data.model.RoutineEntity
 import com.example.morningcalculator.data.model.RoutineItemEntity
-import com.example.morningcalculator.data.db.RoutinePopulated
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -94,6 +94,7 @@ class RoutineRepositoryImpl(
             dao.updateRoutineWithItems(routineEntity, itemsEntities)
         }
     }
+
     private fun mapToDomain(populated: RoutinePopulated): Routine.Full {
         val sortedItems = populated.items.sortedBy { it.item.orderIndex }
 
