@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class RoutineLink(
     val id: String,
     val task: Task,
-    val subData: SubData
+    val subData: SubData?
 )

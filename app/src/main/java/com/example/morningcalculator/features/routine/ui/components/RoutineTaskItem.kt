@@ -112,7 +112,7 @@ fun RoutineTaskItem(
                     )
                 ) {
                     Box {
-                        Text(current.duration.toString())
+                        Text(current?.duration?.toString() ?: "Set duration")
                         ExposedDropdownMenuDefaults.TrailingIcon(
                             expanded = menuExpanded,
                             modifier = Modifier

@@ -25,7 +25,7 @@ import java.util.UUID
             entity = SubDataEntity::class,
             parentColumns = ["id"],
             childColumns = ["subDataId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.SET_NULL
         )
     ],
     indices = [Index("routineId"), Index("taskId"), Index("subDataId")]
@@ -34,6 +34,6 @@ data class RoutineItemEntity(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val routineId: String,
     val taskId: String,
-    val subDataId: String,
+    val subDataId: String?,
     val orderIndex: Int
 )

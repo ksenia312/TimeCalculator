@@ -85,7 +85,7 @@ class RoutineRepositoryImpl(
                 id = link.id,
                 routineId = routine.id,
                 taskId = link.task.id,
-                subDataId = link.subData.id,
+                subDataId = link.subData?.id,
                 orderIndex = index
             )
         }
@@ -118,10 +118,7 @@ class RoutineRepositoryImpl(
                     data = allSubDataEntities.map { SubData(it.id, it.duration) },
                     modifiedAt = taskEntity.modifiedAt
                 ),
-                subData = SubData(
-                    id = itemPopulated.subData.id,
-                    duration = itemPopulated.subData.duration
-                )
+                subData = itemPopulated.subData?.let { SubData(it.id, it.duration) }
             )
         }
 

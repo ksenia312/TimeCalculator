@@ -15,8 +15,11 @@ import org.koin.dsl.module
 
 object AppModule {
     fun registerModules(context: Context): Module = module {
-
-        val db = Room.databaseBuilder(context, AppDatabase::class.java, "morning-db").build()
+        val db = Room.databaseBuilder(
+            context = context,
+            klass = AppDatabase::class.java,
+            name = "morning-db"
+        ).build()
 
         // Repositories
         single<TasksRepository> {

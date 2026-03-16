@@ -9,7 +9,7 @@ import kotlin.time.toJavaDuration
 
 fun Routine.whenToStart(): LocalTime {
     val total: Duration = data.fold(Duration.ZERO) { acc, link ->
-        acc + link.subData.duration
+        acc + (link.subData?.duration ?: Duration.ZERO)
     }
 
     return time.toJavaLocalTime().minus(total.toJavaDuration()).toKotlinLocalTime()
@@ -18,7 +18,7 @@ fun Routine.whenToStart(): LocalTime {
 fun Routine.timeOnMoment(index: Int): LocalTime {
     val total: Duration = data.foldIndexed(Duration.ZERO) { currentIndex, acc, link ->
         if (currentIndex <= index) return@foldIndexed acc
-        acc + link.subData.duration
+        acc + (link.subData?.duration ?: Duration.ZERO)
     }
 
     return time.toJavaLocalTime().minus(total.toJavaDuration()).toKotlinLocalTime()
