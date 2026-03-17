@@ -2,7 +2,6 @@ package com.example.morningcalculator.features.routineslist.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -26,14 +25,11 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutinesListContent(
-    innerPadding: PaddingValues = PaddingValues(0.dp),
     viewState: RoutinesListState,
     onEditRoutine: (Routine) -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        modifier = Modifier.fillMaxSize()
     ) {
         when (viewState) {
             is RoutinesListState.Loading -> {

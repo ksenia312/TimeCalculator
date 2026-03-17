@@ -2,8 +2,8 @@ package com.example.morningcalculator.features.tasks.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,11 +22,10 @@ import com.example.morningcalculator.features.tasks.ui.components.TaskListItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksListContent(
-    innerPadding: PaddingValues = PaddingValues(),
     viewState: TasksListViewState,
     onEditTask: (Task) -> Unit = {},
 ) {
-    Box(Modifier.padding(innerPadding)) {
+    Box(Modifier.fillMaxSize()) {
         when (viewState) {
             is TasksListViewState.Loading -> {
                 CircularProgressIndicator(

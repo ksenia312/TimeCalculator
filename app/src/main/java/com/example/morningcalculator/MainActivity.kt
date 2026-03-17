@@ -12,16 +12,7 @@ import android.graphics.Color as AndroidColor
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
-                AndroidColor.TRANSPARENT,
-                AndroidColor.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.auto(
-                AndroidColor.TRANSPARENT,
-                AndroidColor.TRANSPARENT
-            )
-        )
+        enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
 
         setContent {

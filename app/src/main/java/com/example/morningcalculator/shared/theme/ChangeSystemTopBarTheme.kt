@@ -12,16 +12,16 @@ import androidx.compose.ui.graphics.toArgb
 
 @Composable
 fun ChangeSystemTopBarTheme(
-    color: Color
+    foreground: Color
 ) {
     val activity = LocalActivity.current as? ComponentActivity ?: return
-    LaunchedEffect(color) {
-        val isForegroundDark = color.luminance() < 0.80f
-        val barColor = color.toArgb()
+    LaunchedEffect(foreground) {
+        val isForegroundDark = foreground.luminance() < 0.80f
+        val scrim = foreground.toArgb()
         activity.enableEdgeToEdge(
             statusBarStyle = if (isForegroundDark) SystemBarStyle.light(
-                barColor, barColor
-            ) else SystemBarStyle.dark(barColor),
+                scrim, scrim
+            ) else SystemBarStyle.dark(scrim),
             navigationBarStyle = SystemBarStyle.light(
                 scrim = Color.Transparent.toArgb(),
                 darkScrim = Color.Transparent.toArgb()

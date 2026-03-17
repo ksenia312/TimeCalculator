@@ -1,26 +1,22 @@
 package com.example.morningcalculator.features.home.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.features.home.ui.components.BOTTOM_BAR_MAX_HEIGHT
 import com.example.morningcalculator.features.home.ui.components.HomeBottomNavigationBar
 import com.example.morningcalculator.features.home.ui.components.HomeTab
 import com.example.morningcalculator.features.routineslist.ui.RoutinesListScreen
 import com.example.morningcalculator.features.tasks.ui.TasksListScreen
-import com.example.morningcalculator.shared.components.FabItem
-import com.example.morningcalculator.shared.components.FabMenu
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 
@@ -29,51 +25,29 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 fun HomeContent(
     current: HomeTab,
     onTabSelected: (HomeTab) -> Unit,
-    onAddRoutine: () -> Unit = {},
-    onAddTask: () -> Unit = {},
+    paddingValues: PaddingValues
 ) {
-    val isBarExpanded = rememberSaveable { mutableStateOf(false) }
-    Surface {
-        Box(Modifier.fillMaxSize()) {
-            when (current) {
-                HomeTab.ROUTINES -> RoutinesListScreen()
-                HomeTab.TASKS -> TasksListScreen()
-            }
-
-            HomeBottomNavigationBar(
-                selectedTab = current,
-                onTabSelected = onTabSelected,
-                modifier = Modifier.align(Alignment.BottomCenter),
-                centerButton = {
-                    FabMenu(
-                        isExpanded = isBarExpanded.value,
-                        onChangeExpanded = { isBarExpanded.value = it },
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        mainButtonAlignment = Alignment.BottomCenter,
-                        fabItems = listOf(
-                            FabItem(
-                                icon = Icons.Default.Done,
-                                title = "Task",
-                                onClick = {
-                                    isBarExpanded.value = false
-                                    onAddTask()
-                                },
-                                contentDescription = ""
-                            ),
-                            FabItem(
-                                icon = Icons.Default.Menu,
-                                title = "Routine",
-                                onClick = {
-                                    isBarExpanded.value = false
-                                    onAddRoutine()
-                                },
-                                contentDescription = ""
-                            )
-                        )
-                    )
-                },
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(
+                PaddingValues(
+                    top = paddingValues.calculateTopPadding(),
+                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                )
             )
+    ) {
+        when (current) {
+            HomeTab.ROUTINES -> RoutinesListScreen()
+            HomeTab.TASKS -> TasksListScreen()
         }
+
+        HomeBottomNavigationBar(
+            selectedTab = current,
+            onTabSelected = onTabSelected,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
     }
 }
 
@@ -85,7 +59,8 @@ fun HomeContentPreview() {
     PreviewTheme {
         HomeContent(
             current = HomeTab.ROUTINES,
-            onTabSelected = {}
+            onTabSelected = { },
+            paddingValues = PaddingValues(0.dp)
         )
     }
 }

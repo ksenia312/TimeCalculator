@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
@@ -45,13 +43,10 @@ fun HomeBottomNavigationBar(
     selectedTab: HomeTab,
     onTabSelected: (HomeTab) -> Unit,
     modifier: Modifier = Modifier,
-    centerButton: @Composable () -> Unit = {},
 ) {
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (barRef, fabRef) = createRefs()
-
         Surface(
             modifier = Modifier
                 .padding(horizontal = 20.dp /*vertical = 40.dp*/)
@@ -92,17 +87,6 @@ fun HomeBottomNavigationBar(
                 }
             }
         }
-
-        Box(
-            modifier = Modifier
-                .constrainAs(fabRef) {
-                    bottom.linkTo(barRef.top, margin = -(40).dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        ) {
-            centerButton()
-        }
     }
 }
 
@@ -114,14 +98,6 @@ fun HomeBottomNavigationBarPreview() {
             HomeBottomNavigationBar(
                 selectedTab = HomeTab.ROUTINES,
                 onTabSelected = {},
-                centerButton = {
-                    Box(
-                        Modifier
-                            .size(60.dp)
-                            .clip(CircleShape)
-                            .background(Color.Red)
-                    ) {}
-                }
             )
         }
     }

@@ -1,13 +1,27 @@
 package com.example.morningcalculator.features.home.ui
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
+import com.example.morningcalculator.features.home.ui.components.BOTTOM_BAR_MAX_HEIGHT
+import com.example.morningcalculator.features.home.ui.components.HomeAppBar
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.CreateTaskScreen
+import com.example.morningcalculator.shared.components.AppScaffold
+import com.example.morningcalculator.shared.components.FabItem
+import com.example.morningcalculator.shared.components.FabMenu
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,14 +49,48 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
         )
     }
 
-    HomeContent(
-        current = viewState.value.selectedTab,
-        onTabSelected = homeViewModel::onTabSelected,
-        onAddRoutine = {
-            showAddRoutineDialog.value = true
+    val isBarExpanded = rememberSaveable { mutableStateOf(false) }
+    AppScaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            HomeAppBar(viewState.value.selectedTab)
         },
-        onAddTask = {
-            showAddTaskDialog.value = true
+        floatingActionButtonModifier = Modifier.padding(
+            bottom = 64.dp
+        ),
+        floatingActionButton = {
+            FabMenu(
+                isExpanded = isBarExpanded.value,
+                onChangeExpanded = { isBarExpanded.value = it },
+                horizontalAlignment = Alignment.End,
+                mainButtonAlignment = Alignment.BottomCenter,
+                fabItems = listOf(
+                    FabItem(
+                        icon = Icons.Default.Done,
+                        title = "Task",
+                        onClick = {
+                            isBarExpanded.value = false
+                            showAddTaskDialog.value = true
+                        },
+                        contentDescription = ""
+                    ),
+                    FabItem(
+                        icon = Icons.Default.Menu,
+                        title = "Routine",
+                        onClick = {
+                            isBarExpanded.value = false
+                            showAddRoutineDialog.value = true
+                        },
+                        contentDescription = ""
+                    )
+                )
+            )
         }
-    )
+    ) {
+        HomeContent(
+            paddingValues = it,
+            current = viewState.value.selectedTab,
+            onTabSelected = homeViewModel::onTabSelected,
+        )
+    }
 }
