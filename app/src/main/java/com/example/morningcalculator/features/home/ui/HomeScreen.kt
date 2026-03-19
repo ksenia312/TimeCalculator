@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.morningcalculator.R
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.home.ui.components.BOTTOM_BAR_MAX_HEIGHT
 import com.example.morningcalculator.features.home.ui.components.HomeAppBar
@@ -63,10 +64,9 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
                 isExpanded = isBarExpanded.value,
                 onChangeExpanded = { isBarExpanded.value = it },
                 horizontalAlignment = Alignment.End,
-                mainButtonAlignment = Alignment.BottomCenter,
                 fabItems = listOf(
                     FabItem(
-                        icon = Icons.Default.Done,
+                        iconRes = R.drawable.task,
                         title = "Task",
                         onClick = {
                             isBarExpanded.value = false
@@ -75,7 +75,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
                         contentDescription = ""
                     ),
                     FabItem(
-                        icon = Icons.Default.Menu,
+                        iconRes = R.drawable.routine,
                         title = "Routine",
                         onClick = {
                             isBarExpanded.value = false

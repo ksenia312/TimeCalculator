@@ -24,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 
 data class FabItem(
-    val icon: ImageVector,
+    val iconRes: Int,
     val title: String,
     val contentDescription: String,
     val onClick: () -> Unit
@@ -47,7 +49,6 @@ fun FabMenu(
     itemContentColor: Color = MaterialTheme.colorScheme.onPrimary,
     mainImageVector: ImageVector = Icons.Default.Add,
     horizontalAlignment: Alignment.Horizontal = Alignment.End,
-    mainButtonAlignment: Alignment = Alignment.BottomEnd,
 ) {
     val rotation: Float by animateFloatAsState(if (isExpanded) 225f else 0f)
     val colors = ButtonDefaults.elevatedButtonColors(
@@ -78,13 +79,13 @@ fun FabMenu(
     ) {
         fabItems.forEachIndexed { index, item ->
             ElevatedButtonWithIconM3(
+                iconRes = item.iconRes,
                 colors = colors,
                 onClick = {
                     item.onClick()
                     onChangeExpanded(false)
                 },
                 text = item.title,
-                imageVector = item.icon,
                 contentDescription = item.contentDescription,
             )
         }
@@ -97,7 +98,7 @@ fun FabMenu(
 fun FloatingActionButtonMenuScope.ElevatedButtonWithIconM3(
     onClick: () -> Unit,
     text: String,
-    imageVector: ImageVector,
+    iconRes: Int,
     contentDescription: String,
     colors: ButtonColors = ButtonDefaults.elevatedButtonColors()
 ) {
@@ -107,22 +108,14 @@ fun FloatingActionButtonMenuScope.ElevatedButtonWithIconM3(
         contentColor = colors.contentColor,
         icon = {
             Icon(
-                imageVector = imageVector, contentDescription = contentDescription
+                painter = painterResource(iconRes),
+                contentDescription = contentDescription
             )
         },
         text = {
             Text(text)
         }
     )
-//    ElevatedButton(
-//        onClick = onClick, modifier = Modifier.padding(0.dp), colors = colors
-//    ) {
-//        Icon(
-//            imageVector = imageVector, contentDescription = contentDescription
-//        )
-//        Spacer(modifier = Modifier.width(8.dp))
-//        Text(text)
-//    }
 }
 
 @Preview
@@ -134,13 +127,13 @@ fun FabMenuPreview() {
             onChangeExpanded = {},
             fabItems = listOf(
                 FabItem(
-                    icon = Icons.Default.Add,
+                    iconRes = R.drawable.home,
                     title = "Add Item",
                     contentDescription = "Add Item",
                     onClick = {}
                 ),
                 FabItem(
-                    icon = Icons.Default.Add,
+                    iconRes = R.drawable.home,
                     title = "Add Item",
                     contentDescription = "Add Item",
                     onClick = {}
@@ -161,13 +154,13 @@ fun FabMenuPreviewExpanded() {
             horizontalAlignment = Alignment.CenterHorizontally,
             fabItems = listOf(
                 FabItem(
-                    icon = Icons.Default.Add,
+                    iconRes = R.drawable.home,
                     title = "Add Item",
                     contentDescription = "Add Item",
                     onClick = {}
                 ),
                 FabItem(
-                    icon = Icons.Default.Add,
+                    iconRes = R.drawable.home,
                     title = "Add Item",
                     contentDescription = "Add Item",
                     onClick = {}
