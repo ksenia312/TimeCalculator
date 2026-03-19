@@ -3,8 +3,8 @@ package com.example.morningcalculator.shared.preview
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
-import kotlinx.datetime.LocalTime
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 object PreviewConstants {
     val routinesFull = List(10) {
@@ -12,7 +12,9 @@ object PreviewConstants {
             id = it.toString(),
             title = "Morning Routine",
             color = "0xFFE57373",
-            time = LocalTime(7, 0),
+            scheduledAt = Instant.fromEpochMilliseconds(
+                System.currentTimeMillis() + it * 60L * 60L * 1000L
+            ),
             modifiedAt = System.currentTimeMillis(),
             data = listOf()
         )

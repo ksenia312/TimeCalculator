@@ -25,13 +25,16 @@ import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.shared.extensions.whenToStart
+import kotlinx.datetime.toJavaLocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksListView(
     routine: Routine, viewModel: RoutineViewModel
 ) {
-    val whenToGetUp = routine.whenToStart()
+    val whenToGetUp = routine.whenToStart().toJavaLocalDateTime()
+        .format(DateTimeFormatter.ofPattern("HH:mm"))
     val fullLinks = remember(routine) { routine.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }

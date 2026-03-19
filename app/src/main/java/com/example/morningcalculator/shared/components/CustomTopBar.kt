@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.formatAsDateTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.preview.PreviewAll
@@ -71,7 +72,8 @@ fun CustomTopBar(
             if (showNavigationIcon) BackButton(
                 color = onAccentColor
             )
-        })
+        }
+    )
 }
 
 @Composable
@@ -118,7 +120,7 @@ fun CustomTopBarPreview() {
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
                 CustomTopBarHeadingItem(
-                    title = routine.time.toString(),
+                    title = routine.endAt().toString(),
                     subtitle = "End at",
                 )
             },

@@ -23,12 +23,16 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
 import com.example.morningcalculator.shared.extensions.formatAsDateTime
+import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.navigator.LocalNavHostController
 import com.example.morningcalculator.shared.navigator.Screen
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
-import kotlinx.datetime.LocalTime
+import kotlinx.datetime.toJavaLocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import kotlin.time.Instant
 
 @Composable
 fun RoutineListItem(
@@ -40,14 +44,22 @@ fun RoutineListItem(
     val onNavigate: () -> Unit = {
         navigator.navigate(Screen.Routine.route)
         navigator.currentBackStackEntry?.savedStateHandle?.set(
-            "routineId", links.id
+            "routineId",
+            links.id
         )
     }
+
     if (isEditing.value) {
         RoutineDialog(
             initialRoutine = links,
             onConfirm = { request ->
-                onEdit(links.copy(title = request.title, time = request.time))
+                onEdit(
+                    links.copy(
+                        title = request.title,
+                        scheduledAt = request.scheduledAt
+                    )
+                )
+                isEditing.value = false
             },
             onDismiss = {
                 isEditing.value = false
@@ -70,6 +82,10 @@ private fun RoutineListItem(
     onNavigate: () -> Unit,
     onEditClick: () -> Unit,
 ) {
+    val startText = links.whenToStart()
+        .toJavaLocalDateTime()
+        .format(DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale.ENGLISH))
+
     ListItem(
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
@@ -95,11 +111,11 @@ private fun RoutineListItem(
                     style = MaterialTheme.typography.titleSmall
                 )
                 Text(
-                    text = "Starts at ${links.time}",
-                    style = MaterialTheme.typography.bodySmall
+                    text = "planned for $startText",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = LocalCustomColorScheme.current.accent
                 )
             }
-
         },
         trailingContent = {
             IconButton(
@@ -114,7 +130,6 @@ private fun RoutineListItem(
     )
 }
 
-
 @PreviewAll
 @Composable
 fun RoutineListItemPreview() {
@@ -123,7 +138,7 @@ fun RoutineListItemPreview() {
             id = "1",
             title = "Morning Routine",
             color = "0xFFE57373",
-            time = LocalTime(7, 0),
+            scheduledAt = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
             modifiedAt = System.currentTimeMillis(),
             data = listOf()
         )

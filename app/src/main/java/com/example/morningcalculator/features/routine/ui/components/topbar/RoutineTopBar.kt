@@ -11,30 +11,35 @@ import com.example.morningcalculator.features.routine.presentation.RoutineViewMo
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
 
 @Composable
-fun RoutineTopBar(
-    viewModel: RoutineViewModel
-) {
+fun RoutineTopBar(viewModel: RoutineViewModel) {
     val viewState by viewModel.viewState.collectAsState()
     val editingRoutine = remember { mutableStateOf<Routine?>(null) }
+
     if (editingRoutine.value != null) {
         val routine = editingRoutine.value!!
-        RoutineDialog(initialRoutine = routine, onConfirm = { request ->
-            viewModel.editRoutine(
-                routine.copy(
-                    title = request.title, time = request.time
+        RoutineDialog(
+            initialRoutine = routine,
+            onConfirm = { request ->
+                viewModel.editRoutine(
+                    routine.copy(
+                        title = request.title,
+                        scheduledAt = request.scheduledAt
+                    )
                 )
-            )
-            editingRoutine.value = null
-        }, onDismiss = {
-            editingRoutine.value = null
-        })
+                editingRoutine.value = null
+            },
+            onDismiss = {
+                editingRoutine.value = null
+            }
+        )
     }
 
-    when (val viewState = viewState) {
+    when (val state = viewState) {
         is RoutineViewState.Success -> {
-            SuccessTopAppBar(viewState, onShowEditDialog = {
-                editingRoutine.value = viewState.full
-            })
+            SuccessTopAppBar(
+                state,
+                onShowEditDialog = { editingRoutine.value = state.full }
+            )
         }
 
         is RoutineViewState.Error -> NonSuccessTopAppBar("Error")

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import kotlin.time.Instant
 
 class RoutineRepositoryImpl(
     private val dao: RoutinesDao
@@ -62,7 +63,7 @@ class RoutineRepositoryImpl(
             id = UUID.randomUUID().toString(),
             title = request.title,
             color = request.color,
-            time = request.time,
+            scheduledAtMillis = request.scheduledAt.toEpochMilliseconds(),
             modifiedAt = System.currentTimeMillis()
         )
 
@@ -76,7 +77,7 @@ class RoutineRepositoryImpl(
             id = routine.id,
             title = routine.title,
             color = routine.color,
-            time = routine.time,
+            scheduledAtMillis = routine.scheduledAt.toEpochMilliseconds(),
             modifiedAt = System.currentTimeMillis()
         )
 
@@ -126,7 +127,7 @@ class RoutineRepositoryImpl(
             id = populated.routine.id,
             title = populated.routine.title,
             color = populated.routine.color,
-            time = populated.routine.time,
+            scheduledAt = Instant.fromEpochMilliseconds(populated.routine.scheduledAtMillis),
             modifiedAt = populated.routine.modifiedAt,
             data = fullLinks
         )

@@ -22,10 +22,14 @@ import com.example.morningcalculator.features.routine.presentation.RoutineViewSt
 import com.example.morningcalculator.features.routine.ui.components.LocalRoutineColor
 import com.example.morningcalculator.shared.components.CustomTopBar
 import com.example.morningcalculator.shared.components.CustomTopBarHeadingItem
+import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.formatAsDateTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
+import kotlinx.datetime.toJavaLocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,19 +40,30 @@ fun SuccessTopAppBar(
     val routine = viewState.full
     val routineColor = LocalRoutineColor.current
 
+    val startText = routine.whenToStart()
+        .toJavaLocalDateTime()
+        .format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
+
+    val endText = routine.endAt()
+        .toJavaLocalDateTime()
+        .format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
+
+
     CustomTopBar(
         titleItems = {
             CustomTopBarHeadingItem(
-                title = routine.whenToStart().toString(),
+                title = startText,
                 subtitle = "Start at",
             )
+
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
+
             CustomTopBarHeadingItem(
-                title = routine.time.toString(),
+                title = endText,
                 subtitle = "End at",
             )
         },
@@ -87,9 +102,9 @@ fun SuccessTopAppBarPreview() {
     val routine = Routine(
         id = "1",
         title = "Morning Routine",
-        time = kotlinx.datetime.LocalTime(8, 0),
         modifiedAt = System.currentTimeMillis(),
         color = "0xFF599AC9",
+        scheduledAt = kotlin.time.Instant.fromEpochMilliseconds(System.currentTimeMillis()),
         data = listOf()
     )
     val viewState = RoutineViewState.Success(
