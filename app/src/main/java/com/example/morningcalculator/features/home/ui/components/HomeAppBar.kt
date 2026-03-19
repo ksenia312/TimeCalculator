@@ -21,6 +21,7 @@ fun HomeAppBar(selectedTab: HomeTab) {
                 text = when (selectedTab) {
                     HomeTab.ROUTINES -> "Routines"
                     HomeTab.TASKS -> "Tasks"
+                    HomeTab.HOME -> ""
                 },
                 style = MaterialTheme.typography.titleLarge,
             )

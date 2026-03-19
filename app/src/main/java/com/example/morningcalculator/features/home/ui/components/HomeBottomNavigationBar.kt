@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -21,10 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
@@ -33,9 +31,11 @@ const val BOTTOM_BAR_MAX_HEIGHT = 120
 
 enum class HomeTab(
     val label: String,
-    val icon: ImageVector,
+    val iconRes: Int,
 ) {
-    ROUTINES("Routines", Icons.AutoMirrored.Outlined.List), TASKS("Tasks", Icons.Outlined.Done),
+    HOME("Home", R.drawable.home),
+    ROUTINES("Routines", R.drawable.routine),
+    TASKS("Tasks", R.drawable.task),
 }
 
 @Composable
@@ -67,7 +67,12 @@ fun HomeBottomNavigationBar(
                     NavigationBarItem(
                         selected = selected,
                         onClick = { onTabSelected(tab) },
-                        icon = { Icon(tab.icon, contentDescription = tab.label) },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = tab.iconRes),
+                                contentDescription = tab.label,
+                            )
+                        },
                         label = {
                             Text(
                                 tab.label,
@@ -82,6 +87,8 @@ fun HomeBottomNavigationBar(
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = LocalCustomColorScheme.current.accent,
                             selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         ),
                     )
                 }
