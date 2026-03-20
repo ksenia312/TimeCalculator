@@ -98,7 +98,7 @@ private fun RoutineListItem(
                     pushStyle(
                         SpanStyle(
                             fontWeight = FontWeight.Bold,
-                            color = LocalCustomColorScheme.current.accent
+//                            color = LocalCustomColorScheme.current.accent
                         )
                     )
                     append(links.modifiedAt.formatAsDateTime())
