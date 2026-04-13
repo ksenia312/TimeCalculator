@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.features.home.ui.components.BOTTOM_BAR_MAX_HEIGHT
 import com.example.morningcalculator.features.home.ui.components.HomeBottomNavigationBar
 import com.example.morningcalculator.features.home.ui.components.HomeTab
+import com.example.morningcalculator.features.landing.ui.LandingScreen
 import com.example.morningcalculator.features.routineslist.ui.RoutinesListScreen
 import com.example.morningcalculator.features.tasks.ui.TasksListScreen
 import com.example.morningcalculator.shared.preview.PreviewAll
@@ -39,7 +40,7 @@ fun HomeContent(
             )
     ) {
         when (current) {
-            HomeTab.LANDING -> Box {}
+            HomeTab.LANDING -> LandingScreen()
             HomeTab.ROUTINES -> RoutinesListScreen()
             HomeTab.TASKS -> TasksListScreen()
         }

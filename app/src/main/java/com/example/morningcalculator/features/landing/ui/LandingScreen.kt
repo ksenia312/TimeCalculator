@@ -1,0 +1,18 @@
+package com.example.morningcalculator.features.landing.ui
+
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.morningcalculator.features.landing.presentation.LandingViewModel
+import org.koin.androidx.compose.koinViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LandingScreen(landingViewModel: LandingViewModel = koinViewModel()) {
+    val viewState = landingViewModel.viewState.collectAsStateWithLifecycle()
+
+    LandingContent(
+        viewState = viewState.value,
+        onEditRoutine = { }
+    )
+}

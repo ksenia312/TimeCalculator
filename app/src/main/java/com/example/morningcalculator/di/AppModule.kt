@@ -8,6 +8,7 @@ import com.example.morningcalculator.data.db.AppDatabase
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
+import com.example.morningcalculator.features.landing.presentation.LandingViewModel
 import com.example.morningcalculator.features.routineslist.presentation.RoutinesListViewModel
 import com.example.morningcalculator.features.tasks.presentation.TasksListViewModel
 import org.koin.core.module.Module
@@ -36,6 +37,12 @@ object AppModule {
                 tasksRepository = get()
             )
         }
+        single {
+            LandingViewModel(
+                routineRepository = get(),
+            )
+        }
+
         single {
             RoutinesListViewModel(
                 routineRepository = get(),

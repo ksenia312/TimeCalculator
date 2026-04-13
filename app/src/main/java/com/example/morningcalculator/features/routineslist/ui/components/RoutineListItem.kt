@@ -91,9 +91,9 @@ private fun RoutineListItem(
     }
 
     val color = when {
-        isCompleted -> LocalCustomColorScheme.current.label
-        isOngoing -> LocalCustomColorScheme.current.success
-        else -> LocalCustomColorScheme.current.accent
+        isCompleted -> LocalCustomColorScheme.current.placeholder
+        isOngoing -> LocalCustomColorScheme.current.accent
+        else -> LocalCustomColorScheme.current.label
     }
 
     ListItem(

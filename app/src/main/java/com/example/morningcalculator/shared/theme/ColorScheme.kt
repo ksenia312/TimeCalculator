@@ -51,8 +51,9 @@ val LightColorScheme = lightColorScheme(
 val LightAppColorScheme = CustomColorScheme(
     accent = Purple,
     accentLight = LightPurple,
+    accentDark = DarkPurple,
     label = PalePurple,
-    unselected = Gray,
-    placeholder = LighterGray,
-    success = Green1
+    unselected = LighterGray2,
+    placeholder = LighterGray2,
+    success = Green3
 )
