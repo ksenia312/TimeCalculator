@@ -28,7 +28,7 @@ fun CreateTaskScreen(
         mutableStateOf(if (linkedToRoutine) 0 else null)
     }
 
-    TaskEditorDialogScaffold(
+    EditorDialogScaffold(
         screenTitle = "Create task",
         onDismiss = onDismiss,
     ) { padding ->

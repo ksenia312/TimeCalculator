@@ -41,7 +41,7 @@ import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskEditorDialogScaffold(
+fun EditorDialogScaffold(
     screenTitle: String,
     onDismiss: () -> Unit,
     headerActions: @Composable RowScope.() -> Unit = {},

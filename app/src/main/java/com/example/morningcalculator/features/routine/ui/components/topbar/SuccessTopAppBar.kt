@@ -1,5 +1,6 @@
 package com.example.morningcalculator.features.routine.ui.components.topbar
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,7 +29,11 @@ fun SuccessTopAppBar(
             .routineCard(
                 verticalPadding = 24.dp,
                 horizontalPadding = 0.dp,
-                viewItem = viewItem
+                viewItem = viewItem,
+                shape = RoundedCornerShape(
+                    bottomEnd = 28.dp,
+                    bottomStart = 28.dp
+                )
             ) {
                 onShowEditDialog()
             },

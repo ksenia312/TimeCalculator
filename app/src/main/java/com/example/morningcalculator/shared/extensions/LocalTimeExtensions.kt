@@ -6,13 +6,10 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toJavaLocalDateTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Locale
 
 fun LocalDateTime.stringTime(locale: Locale = Locale.getDefault()): String {
-    return toJavaLocalDateTime().format(
-        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
-    )
+    return toJavaLocalDateTime().format(timeFormatter(locale))
 }
 
 fun LocalDateTime.stringDateTime(locale: Locale = Locale.getDefault()): String {
@@ -31,14 +28,16 @@ fun LocalDateTime.stringDateTime(locale: Locale = Locale.getDefault()): String {
         }
     }
 
-    val timePart = javaLdt.format(
-        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
-    )
+    val timePart = javaLdt.format(timeFormatter(locale))
     val capitalizedDate = datePart.replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(locale) else it.toString()
     }
 
     return "$capitalizedDate, $timePart"
+}
+
+private fun timeFormatter(locale: Locale): DateTimeFormatter {
+    return DateTimeFormatter.ofPattern("HH:mm", locale)
 }
 
 private fun getRelativeDayName(

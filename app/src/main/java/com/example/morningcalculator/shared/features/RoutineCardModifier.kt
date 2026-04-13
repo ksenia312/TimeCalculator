@@ -16,11 +16,12 @@ import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardVie
 fun Modifier.routineCard(
     horizontalPadding: Dp = 24.dp,
     verticalPadding: Dp = 32.dp,
+    shape: RoundedCornerShape = RoundedCornerShape(28.dp),
     viewItem: RoutineCardViewItem,
     onClick: () -> Unit,
 ) =
     fillMaxWidth()
-        .clip(RoundedCornerShape(28.dp))
+        .clip(shape)
         .background(
             routineCardBackground(
                 isOngoing = viewItem.isOngoing,

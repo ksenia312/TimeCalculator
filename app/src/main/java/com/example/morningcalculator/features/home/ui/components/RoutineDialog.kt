@@ -4,13 +4,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.model.RoutineScheduleAnchor
+import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditorDialogScaffold
 import com.example.morningcalculator.shared.components.AppTextField
 import com.example.morningcalculator.shared.components.DatePickerField
 import com.example.morningcalculator.shared.components.TimePickerField
@@ -73,36 +75,14 @@ fun RoutineDialog(
         )
     }
 
-    AlertDialog(
-        modifier = Modifier.imePadding(),
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                enabled = title.isNotBlank(),
-                onClick = {
-                    val scheduledAtMillis = LocalDateTime
-                        .of(date, time.toJavaLocalTime())
-                        .atZone(zoneId)
-                        .toInstant()
-                        .toEpochMilli()
-
-                    onConfirm(
-                        RoutineRequest(
-                            title = title,
-                            scheduledAt = Instant.fromEpochMilliseconds(scheduledAtMillis),
-                            scheduledAtAnchor = anchor,
-                            color = RoutineColorPicker.pick().toHexString()
-                        )
-                    )
-                    onDismiss()
-                }
-            ) { Text("Ok") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-        title = { Text(if (initialRoutine == null) "Add new routine" else "Edit routine") },
-        text = {
+    EditorDialogScaffold(
+        screenTitle = if (initialRoutine == null) "Add new routine" else "Edit routine",
+        onDismiss = onDismiss,
+        content = { paddingValues ->
             Column(
                 modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp)
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
@@ -141,6 +121,34 @@ fun RoutineDialog(
                     initialTime = time,
                     onTimeChange = { time = it }
                 )
+
+                Spacer(Modifier.height(12.dp))
+
+                ElevatedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = title.isNotBlank(),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    onClick = {
+                        val scheduledAtMillis = LocalDateTime
+                            .of(date, time.toJavaLocalTime())
+                            .atZone(zoneId)
+                            .toInstant()
+                            .toEpochMilli()
+
+                        onConfirm(
+                            RoutineRequest(
+                                title = title,
+                                scheduledAt = Instant.fromEpochMilliseconds(scheduledAtMillis),
+                                scheduledAtAnchor = anchor,
+                                color = RoutineColorPicker.pick().toHexString()
+                            )
+                        )
+                        onDismiss()
+                    }
+                ) { Text("Ok") }
             }
         }
     )

@@ -45,7 +45,7 @@ fun EditTaskScreen(
         (initialTask.data as List<SubData?>).toMutableStateList()
     }
 
-    TaskEditorDialogScaffold(
+    EditorDialogScaffold(
         screenTitle = "Update task",
         onDismiss = onDismiss,
         headerActions = {
