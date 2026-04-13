@@ -9,16 +9,15 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-fun LocalDateTime.stringTime(): String {
-    return toJavaLocalDateTime()
-        .format(
-            DateTimeFormatter.ofPattern("HH:mm")
-        )
+fun LocalDateTime.stringTime(locale: Locale = Locale.getDefault()): String {
+    return toJavaLocalDateTime().format(
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
+    )
 }
 
 fun LocalDateTime.stringDateTime(locale: Locale = Locale.getDefault()): String {
     val javaLdt = this.toJavaLocalDateTime()
-    val today = LocalDate.now()
+    val today = LocalDate.now(deviceZoneId())
     val date = javaLdt.toLocalDate()
 
     val datePart = when (date) {

@@ -3,22 +3,20 @@ package com.example.morningcalculator.shared.extensions
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineScheduleAnchor
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.UtcOffset
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toKotlinLocalDateTime
 import java.time.ZoneId
+import java.util.TimeZone
 import kotlin.time.Duration
 import kotlin.time.Instant
-import kotlin.time.toJavaDuration
 
 fun Routine.isOngoing(): Boolean {
     val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-    return now in scheduledAt..endAt().toInstant(UtcOffset.ZERO)
+    return now in startAtInstant()..endAtInstant()
 }
 
 fun Routine.isCompleted(): Boolean {
     val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-    return now > endAt().toInstant(UtcOffset.ZERO)
+    return now > endAtInstant()
 }
 
 fun Routine.startAtInstant(): Instant {
@@ -38,41 +36,44 @@ fun Routine.endAtInstant(): Instant {
 }
 
 fun Routine.whenToStart(): LocalDateTime {
-    val startMillis = startAtInstant().toEpochMilliseconds()
-    return java.time.Instant
-        .ofEpochMilli(startMillis)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime()
-        .toKotlinLocalDateTime()
+    return startAtInstant().toDeviceLocalDateTime()
 }
 
 fun Routine.endAt(): LocalDateTime {
-    val endMillis = endAtInstant().toEpochMilliseconds()
-    return java.time.Instant
-        .ofEpochMilli(endMillis)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime()
-        .toKotlinLocalDateTime()
+    return endAtInstant().toDeviceLocalDateTime()
 }
 
 fun Routine.timeOnMoment(index: Int): LocalDateTime {
     val safeIndex = index.coerceAtLeast(-1)
     val offset: Duration = data.foldIndexed(Duration.ZERO) { currentIndex, acc, link ->
         if (currentIndex > safeIndex) return@foldIndexed acc
-        acc + (link.subData?.duration ?: Duration.ZERO)
+        acc + (link.subData?.duration ?: taskDuration(link.task))
     }
 
-    val startMillis = startAtInstant().toEpochMilliseconds()
-    val start = java.time.Instant
-        .ofEpochMilli(startMillis)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime()
-
-    return start.plus(offset.toJavaDuration()).toKotlinLocalDateTime()
+    return (startAtInstant() + offset).toDeviceLocalDateTime()
 }
 
 private fun Routine.totalDuration(): Duration {
     return data.fold(Duration.ZERO) { acc, link ->
-        acc + (link.subData?.duration ?: Duration.ZERO)
+        acc + (link.subData?.duration ?: taskDuration(link.task))
     }
+}
+
+private fun taskDuration(task: com.example.morningcalculator.core.model.Task): Duration {
+    return task.data.fold(Duration.ZERO) { acc, subData ->
+        acc + subData.duration
+    }
+}
+
+private fun Instant.toDeviceLocalDateTime(): LocalDateTime {
+    val millis = toEpochMilliseconds()
+    return java.time.Instant
+        .ofEpochMilli(millis)
+        .atZone(deviceZoneId())
+        .toLocalDateTime()
+        .toKotlinLocalDateTime()
+}
+
+fun deviceZoneId(): ZoneId {
+    return ZoneId.of(TimeZone.getDefault().id)
 }
