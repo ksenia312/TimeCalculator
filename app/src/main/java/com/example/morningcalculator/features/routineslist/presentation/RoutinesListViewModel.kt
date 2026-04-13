@@ -30,25 +30,6 @@ class RoutinesListViewModel(
         }
     }
 
-    private fun sortRoutines(
-        sort: RoutinesListState.Sort, routines: List<Routine>
-    ): List<Routine> {
-        return when (sort.sortType) {
-            RoutinesListState.Sort.SortType.DATE -> routines.sortedWith(compareBy({ routine ->
-                when {
-                    routine.isOngoing() -> 0
-                    routine.isCompleted() -> 2
-                    else -> 1
-                }
-            }, { routine ->
-                when {
-                    routine.isOngoing() -> routine.endAtInstant().toEpochMilliseconds()
-                    routine.isCompleted() -> -routine.endAtInstant().toEpochMilliseconds()
-                    else -> routine.startAtInstant().toEpochMilliseconds()
-                }
-            }))
-        }
-    }
 
     private fun loadRoutines() {
         viewModelScope.launch {
@@ -59,6 +40,26 @@ class RoutinesListViewModel(
                 )
             }
         }
+    }
+}
+
+fun sortRoutines(
+    sort: RoutinesListState.Sort, routines: List<Routine>
+): List<Routine> {
+    return when (sort.sortType) {
+        RoutinesListState.Sort.SortType.DATE -> routines.sortedWith(compareBy({ routine ->
+            when {
+                routine.isOngoing() -> 0
+                routine.isCompleted() -> 2
+                else -> 1
+            }
+        }, { routine ->
+            when {
+                routine.isOngoing() -> routine.endAtInstant().toEpochMilliseconds()
+                routine.isCompleted() -> -routine.endAtInstant().toEpochMilliseconds()
+                else -> routine.startAtInstant().toEpochMilliseconds()
+            }
+        }))
     }
 }
 

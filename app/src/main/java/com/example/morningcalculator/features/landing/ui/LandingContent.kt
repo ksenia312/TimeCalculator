@@ -35,12 +35,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.features.home.ui.bottomIndent
 import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.shared.extensions.endAt
-import com.example.morningcalculator.shared.extensions.isCompleted
-import com.example.morningcalculator.shared.extensions.isOngoing
+import com.example.morningcalculator.shared.extensions.endAtInstant
 import com.example.morningcalculator.shared.extensions.startAtInstant
 import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.extensions.stringTime
@@ -162,8 +162,12 @@ private fun RoutineHeroCard(
     onEditRoutine: (Routine) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isOngoing = routine.isOngoing()
-    val isCompleted = routine.isCompleted()
+    val now = rememberNow()
+    val startAt = routine.startAtInstant()
+    val endAt = routine.endAtInstant()
+
+    val isOngoing = now in startAt..endAt
+    val isCompleted = now > endAt
 
     val baseGradient = if (isOngoing) {
         LocalCustomColorScheme.current.accentDark
@@ -198,7 +202,6 @@ private fun RoutineHeroCard(
     val startText = routine.whenToStart().stringDateTime()
     val endText = routine.endAt().stringDateTime()
 
-    val now = rememberNow()
     val taskCount = routine.data.size
 
     val currentIndex = when {
@@ -219,15 +222,20 @@ private fun RoutineHeroCard(
             .clip(RoundedCornerShape(28.dp))
             .background(background)
             .clickable { onNavigate(routine) }
-            .padding(24.dp, 32.dp)) {
+            .padding(24.dp, 32.dp)
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = routine.title, style = MaterialTheme.typography.titleLarge.copy(
+                    text = routine.title,
+                    style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold
-                    ), maxLines = 3, color = MaterialTheme.colorScheme.surface
+                    ),
+                    maxLines = 3,
+                    color = MaterialTheme.colorScheme.surface
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -254,9 +262,11 @@ private fun RoutineHeroCard(
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
                 )
                 Text(
-                    text = startText, style = MaterialTheme.typography.titleSmall.copy(
+                    text = startText,
+                    style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.SemiBold
-                    ), color = MaterialTheme.colorScheme.surface
+                    ),
+                    color = MaterialTheme.colorScheme.surface
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -267,9 +277,11 @@ private fun RoutineHeroCard(
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
                 )
                 Text(
-                    text = endText, style = MaterialTheme.typography.titleSmall.copy(
+                    text = endText,
+                    style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.SemiBold
-                    ), color = MaterialTheme.colorScheme.surface
+                    ),
+                    color = MaterialTheme.colorScheme.surface
                 )
             }
         }
@@ -338,31 +350,41 @@ private fun TaskCard(
             .clip(RoundedCornerShape(20.dp))
             .background(cardBg)
             .border(
-                2.dp, cardBorderColor,
+                2.dp,
+                cardBorderColor,
                 RoundedCornerShape(20.dp)
             )
             .padding(14.dp)
     ) {
         Text(
-            text = header, style = MaterialTheme.typography.labelMedium, color = subTextColor
+            text = header,
+            style = MaterialTheme.typography.labelMedium,
+            color = subTextColor
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = title, style = MaterialTheme.typography.titleLarge.copy(
+            text = title,
+            style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.SemiBold
-            ), color = textColor
+            ),
+            color = textColor
         )
 
         Spacer(Modifier.height(10.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = start, style = MaterialTheme.typography.bodyMedium, color = subTextColor
+                text = start,
+                style = MaterialTheme.typography.bodyMedium,
+                color = subTextColor
             )
             Text(
-                text = end, style = MaterialTheme.typography.bodyMedium, color = subTextColor
+                text = end,
+                style = MaterialTheme.typography.bodyMedium,
+                color = subTextColor
             )
         }
 
@@ -396,8 +418,11 @@ private fun routineTaskUI(
     val link = routine.data[index]
     val title = link.task.title
 
-    val startInstant = routine.startAtInstant().plus(durationUntilIndex(routine, index - 1))
-    val endInstant = routine.startAtInstant().plus(durationUntilIndex(routine, index))
+    val startOffset = durationUntilIndex(routine, index - 1)
+    val startInstant = routine.startAtInstant() + startOffset
+
+    val duration = linkDuration(link).coerceAtLeast(Duration.ZERO)
+    val endInstant = startInstant + duration
 
     val progress = when {
         now <= startInstant -> 0f
@@ -407,7 +432,7 @@ private fun routineTaskUI(
             if (total <= 0f) 0f
             else {
                 val current = (now - startInstant).inWholeMilliseconds.toFloat()
-                (current / total)
+                current / total
             }
         }
     }
@@ -421,11 +446,21 @@ private fun routineTaskUI(
 }
 
 private fun durationUntilIndex(routine: Routine, index: Int): Duration {
-    val safe = index.coerceAtLeast(-1)
-    return routine.data.foldIndexed(Duration.ZERO) { currentIndex, acc, link ->
-        if (currentIndex > safe) return@foldIndexed acc
-        acc + taskDuration(link.task)
+    if (index < 0) return Duration.ZERO
+    if (routine.data.isEmpty()) return Duration.ZERO
+
+    val last = index.coerceAtMost(routine.data.lastIndex)
+    var acc = Duration.ZERO
+
+    for (i in 0..last) {
+        acc += linkDuration(routine.data[i]).coerceAtLeast(Duration.ZERO)
     }
+
+    return acc
+}
+
+private fun linkDuration(link: RoutineLink): Duration {
+    return link.subData?.duration ?: taskDuration(link.task)
 }
 
 private fun taskDuration(task: Task): Duration {
@@ -439,19 +474,27 @@ private fun currentTaskIndex(routine: Routine, now: Instant): Int? {
     if (tasks.isEmpty()) return null
 
     val start = routine.startAtInstant()
-    if (now <= start) return 0
+    val end = routine.endAtInstant()
 
-    var acc = Duration.ZERO
-    val elapsed = now - start
+    if (now <= start) return 0
+    if (now >= end) return tasks.lastIndex
+
+    var cursor = start
 
     tasks.forEachIndexed { index, link ->
-        val d = taskDuration(link.task)
-        val next = acc + d
-        if (d > Duration.ZERO && elapsed < next) return index
-        acc = next
+        val d = linkDuration(link).coerceAtLeast(Duration.ZERO)
+        val next = cursor + d
+
+        if (d == Duration.ZERO) {
+            if (now == cursor) return index
+        } else {
+            if (now < next) return index
+        }
+
+        cursor = next
     }
 
-    return null
+    return tasks.lastIndex
 }
 
 @Composable
@@ -489,7 +532,8 @@ private fun PagerDots(
                 modifier = Modifier
                     .size(if (isActive) 8.dp else 6.dp)
                     .background(
-                        color = if (isActive) active else inactive, shape = CircleShape
+                        color = if (isActive) active else inactive,
+                        shape = CircleShape
                     )
             )
         }
@@ -503,6 +547,8 @@ fun LandingContentPreview() {
         LandingContent(
             viewState = LandingState.Success(
                 routines = PreviewConstants.routinesFull,
-            ), onEditRoutine = {})
+            ),
+            onEditRoutine = {}
+        )
     }
 }

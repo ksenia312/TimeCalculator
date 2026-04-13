@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.features.routineslist.presentation.RoutinesListState
+import com.example.morningcalculator.features.routineslist.presentation.sortRoutines
 import com.example.morningcalculator.shared.extensions.isOngoing
 import com.example.morningcalculator.shared.extensions.startAtInstant
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,18 +26,16 @@ class LandingViewModel(
     private fun loadRoutines() {
         viewModelScope.launch {
             routineRepository.routinesFlow.collect { routines ->
-                val sorted = routines.sortedBy { it.startAtInstant().toEpochMilliseconds() }
-
-                val ongoing = sorted.filter { it.isOngoing() }
-                val upcoming = sorted.filter { !it.isOngoing() }
-
-                val displayRoutines = (ongoing + upcoming)
-                    .distinct()
-                    .take(2)
-                    .ifEmpty { sorted.take(2) }
+                val sorted = sortRoutines(
+                    routines = routines,
+                    sort = RoutinesListState.Sort(
+                        RoutinesListState.Sort.SortType.DATE,
+                        RoutinesListState.Sort.SortOrder.DESCENDING
+                    )
+                )
 
                 _viewState.value = LandingState.Success(
-                    routines = displayRoutines,
+                    routines = sorted.take(3),
                 )
             }
         }
