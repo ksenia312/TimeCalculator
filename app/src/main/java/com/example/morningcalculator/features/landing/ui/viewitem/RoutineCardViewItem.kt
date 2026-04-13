@@ -1,14 +1,19 @@
 package com.example.morningcalculator.features.landing.ui.viewitem
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.platform.LocalInspectionMode
 import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.shared.extensions.currentDuration
 import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing
 import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.extensions.stringValue
 import com.example.morningcalculator.shared.extensions.whenToStart
-import com.example.morningcalculator.shared.extensions.currentDuration
+import kotlinx.coroutines.delay
+import kotlin.time.Instant
 
 data class RoutineCardViewItem(
     val isOngoing: Boolean,
@@ -23,6 +28,8 @@ data class RoutineCardViewItem(
     companion object Companion {
         @Composable
         fun create(routine: Routine): RoutineCardViewItem {
+            rememberNow(tickMillis = 1000L)
+
             val isOngoing = routine.isOngoing()
             val isCompleted = routine.isCompleted()
             val startLabel = when {
@@ -52,4 +59,26 @@ data class RoutineCardViewItem(
             )
         }
     }
+}
+
+@Composable
+fun rememberNow(
+    tickMillis: Long = 1000L,
+): Instant {
+    val isPreview = LocalInspectionMode.current
+
+    val now by produceState(
+        initialValue = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
+        key1 = tickMillis,
+        key2 = isPreview,
+    ) {
+        if (isPreview) return@produceState
+
+        while (true) {
+            value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+            delay(tickMillis)
+        }
+    }
+
+    return now
 }

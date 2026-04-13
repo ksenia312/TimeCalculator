@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.landing.ui.viewitem
+package com.example.morningcalculator.features.landing.ui.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

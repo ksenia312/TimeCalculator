@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.landing.ui.currentTaskIndex
-import com.example.morningcalculator.features.landing.ui.viewitem.LandingCardTaskItem
+import com.example.morningcalculator.features.landing.ui.viewitem.LandingCardTaskViewItem
 import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.features.RoutineCardStatusRow
 import com.example.morningcalculator.shared.features.RoutineCardTimeInfo

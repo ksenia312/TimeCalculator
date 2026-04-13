@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.landing.ui.card
+package com.example.morningcalculator.features.landing.ui.viewitem
 
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.landing.ui.linkDuration
@@ -74,3 +74,4 @@ data class LandingCardTaskViewItem(
         }
     }
 }
+
