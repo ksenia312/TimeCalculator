@@ -10,20 +10,30 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.time.Instant
 
 @Serializable
+enum class RoutineScheduleAnchor {
+    START,
+    END,
+}
+
+@Serializable
 data class Routine(
     val id: String,
     val title: String,
     @Serializable(with = InstantIsoSerializer::class)
     val scheduledAt: Instant,
+    val scheduledAtAnchor: RoutineScheduleAnchor = RoutineScheduleAnchor.END,
     val modifiedAt: Long,
     val color: String,
     val data: List<RoutineLink>,
 )
 
+@Serializable
 data class RoutineRequest(
     val title: String,
+    @Serializable(with = InstantIsoSerializer::class)
     val scheduledAt: Instant,
-    val color: String
+    val scheduledAtAnchor: RoutineScheduleAnchor = RoutineScheduleAnchor.END,
+    val color: String,
 )
 
 object InstantIsoSerializer : KSerializer<Instant> {

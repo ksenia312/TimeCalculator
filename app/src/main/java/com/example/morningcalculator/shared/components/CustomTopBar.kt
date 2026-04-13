@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.shared.extensions.endAt
-import com.example.morningcalculator.shared.extensions.formatAsDateTime
+import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
@@ -111,7 +111,7 @@ fun CustomTopBarPreview() {
             onAccentColor = Color.White,
             titleItems = {
                 CustomTopBarHeadingItem(
-                    title = routine.whenToStart().toString(),
+                    title = routine.whenToStart().stringDateTime(),
                     subtitle = "Start at",
                 )
                 Icon(
@@ -120,7 +120,7 @@ fun CustomTopBarPreview() {
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
                 CustomTopBarHeadingItem(
-                    title = routine.endAt().toString(),
+                    title = routine.endAt().stringDateTime(),
                     subtitle = "End at",
                 )
             },
@@ -135,7 +135,7 @@ fun CustomTopBarPreview() {
                         textAlign = TextAlign.End
                     )
                     Text(
-                        routine.modifiedAt.formatAsDateTime(),
+                        routine.modifiedAt.stringDateTime(),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End

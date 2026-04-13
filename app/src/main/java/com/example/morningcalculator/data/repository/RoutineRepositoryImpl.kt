@@ -3,6 +3,7 @@ package com.example.morningcalculator.data.repository
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.RoutineRequest
+import com.example.morningcalculator.core.model.RoutineScheduleAnchor
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.repository.RoutineRepository
@@ -23,9 +24,7 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 import kotlin.time.Instant
 
-class RoutineRepositoryImpl(
-    private val dao: RoutinesDao
-) : RoutineRepository {
+class RoutineRepositoryImpl(private val dao: RoutinesDao) : RoutineRepository {
 
     private val populatedFlow = dao.getRoutinesPopulated()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -39,16 +38,14 @@ class RoutineRepositoryImpl(
             initialValue = emptyList()
         )
 
-    override val routineFlow: StateFlow<Routine?> = combine(
-        routinesFlow,
-        _selectedRoutineId
-    ) { routines, selectedId ->
-        routines.firstOrNull { it.id == selectedId }
-    }.stateIn(
-        scope = scope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+    override val routineFlow: StateFlow<Routine?> =
+        combine(routinesFlow, _selectedRoutineId) { routines, selectedId ->
+            routines.firstOrNull { it.id == selectedId }
+        }.stateIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     override fun initializeId(id: String) {
         _selectedRoutineId.value = id
@@ -64,6 +61,7 @@ class RoutineRepositoryImpl(
             title = request.title,
             color = request.color,
             scheduledAtMillis = request.scheduledAt.toEpochMilliseconds(),
+            scheduledAtAnchor = request.scheduledAtAnchor.name,
             modifiedAt = System.currentTimeMillis()
         )
 
@@ -78,6 +76,7 @@ class RoutineRepositoryImpl(
             title = routine.title,
             color = routine.color,
             scheduledAtMillis = routine.scheduledAt.toEpochMilliseconds(),
+            scheduledAtAnchor = routine.scheduledAtAnchor.name,
             modifiedAt = System.currentTimeMillis()
         )
 
@@ -123,11 +122,18 @@ class RoutineRepositoryImpl(
             )
         }
 
+        val anchor = runCatching {
+            RoutineScheduleAnchor.valueOf(populated.routine.scheduledAtAnchor)
+        }.getOrDefault(RoutineScheduleAnchor.START)
+
         return Routine(
             id = populated.routine.id,
             title = populated.routine.title,
             color = populated.routine.color,
-            scheduledAt = Instant.fromEpochMilliseconds(populated.routine.scheduledAtMillis),
+            scheduledAt = Instant.fromEpochMilliseconds(
+                populated.routine.scheduledAtMillis
+            ),
+            scheduledAtAnchor = anchor,
             modifiedAt = populated.routine.modifiedAt,
             data = fullLinks
         )

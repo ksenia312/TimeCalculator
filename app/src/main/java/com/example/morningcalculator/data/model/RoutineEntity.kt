@@ -10,5 +10,6 @@ data class RoutineEntity(
     val title: String,
     val color: String,
     val scheduledAtMillis: Long,
+    val scheduledAtAnchor: String,
     val modifiedAt: Long
 )

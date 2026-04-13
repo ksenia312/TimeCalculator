@@ -8,4 +8,5 @@ data class CustomColorScheme(
     val label: Color,
     val unselected: Color,
     val placeholder: Color,
+    val success: Color,
 )

@@ -20,23 +20,24 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.core.mapper.copyWithRequest
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
-import com.example.morningcalculator.shared.extensions.formatAsDateTime
+import com.example.morningcalculator.shared.extensions.endAt
+import com.example.morningcalculator.shared.extensions.isCompleted
+import com.example.morningcalculator.shared.extensions.isOngoing
+import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.navigator.LocalNavHostController
 import com.example.morningcalculator.shared.navigator.Screen
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
-import kotlinx.datetime.toJavaLocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.time.Instant
 
 @Composable
 fun RoutineListItem(
-    links: Routine,
+    routine: Routine,
     onEdit: (Routine) -> Unit = {}
 ) {
     val navigator = LocalNavHostController.current
@@ -45,20 +46,15 @@ fun RoutineListItem(
         navigator.navigate(Screen.Routine.route)
         navigator.currentBackStackEntry?.savedStateHandle?.set(
             "routineId",
-            links.id
+            routine.id
         )
     }
 
     if (isEditing.value) {
         RoutineDialog(
-            initialRoutine = links,
+            initialRoutine = routine,
             onConfirm = { request ->
-                onEdit(
-                    links.copy(
-                        title = request.title,
-                        scheduledAt = request.scheduledAt
-                    )
-                )
+                onEdit(routine.copyWithRequest(request))
                 isEditing.value = false
             },
             onDismiss = {
@@ -68,7 +64,7 @@ fun RoutineListItem(
     }
 
     RoutineListItem(
-        links = links,
+        routine = routine,
         onNavigate = onNavigate,
         onEditClick = {
             isEditing.value = true
@@ -78,13 +74,24 @@ fun RoutineListItem(
 
 @Composable
 private fun RoutineListItem(
-    links: Routine,
+    routine: Routine,
     onNavigate: () -> Unit,
     onEditClick: () -> Unit,
 ) {
-    val startText = links.whenToStart()
-        .toJavaLocalDateTime()
-        .format(DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale.ENGLISH))
+    val isCompleted = routine.isCompleted()
+    val isOngoing = routine.isOngoing()
+
+    val (statusPrefix, statusText) = when {
+        isCompleted -> "completed on" to routine.endAt().stringDateTime()
+        isOngoing -> "running now, ends on" to routine.endAt().stringDateTime()
+        else -> "planned for" to routine.whenToStart().stringDateTime()
+    }
+
+    val color = when {
+        isCompleted -> LocalCustomColorScheme.current.label
+        isOngoing -> LocalCustomColorScheme.current.accent
+        else -> LocalCustomColorScheme.current.success
+    }
 
     ListItem(
         modifier = Modifier
@@ -93,27 +100,21 @@ private fun RoutineListItem(
             .clickable(onClick = onNavigate),
         headlineContent = {
             Column {
-                val text = buildAnnotatedString {
-                    append("${links.title} (")
-                    pushStyle(
-                        SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = LocalCustomColorScheme.current.accent
-                        )
-                    )
-                    append(links.modifiedAt.formatAsDateTime())
-                    pop()
-                    append(")")
-                }
-
                 Text(
-                    text = text,
-                    style = MaterialTheme.typography.titleSmall
+                    text = routine.title,
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "planned for $startText",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = LocalCustomColorScheme.current.accent
+                    text = buildAnnotatedString {
+                        append(statusPrefix)
+                        append(" ")
+                        pushStyle(
+                            style = SpanStyle(fontWeight = FontWeight.Bold)
+                        )
+                        append(statusText)
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = color
                 )
             }
         },
@@ -143,7 +144,7 @@ fun RoutineListItemPreview() {
             data = listOf()
         )
         RoutineListItem(
-            links = routine,
+            routine = routine,
             onNavigate = {},
             onEditClick = {}
         )

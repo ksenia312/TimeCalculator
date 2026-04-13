@@ -6,12 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,15 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
+import com.example.morningcalculator.core.model.RoutineScheduleAnchor
 import com.example.morningcalculator.shared.components.AppTextField
+import com.example.morningcalculator.shared.components.DatePickerField
 import com.example.morningcalculator.shared.components.TimePickerField
 import com.example.morningcalculator.shared.extensions.toHexString
 import com.example.morningcalculator.shared.utils.RoutineColorPicker
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.toJavaLocalTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +46,11 @@ fun RoutineDialog(
     }
 
     var title by remember { mutableStateOf(initialRoutine?.title ?: "") }
+    var anchor by remember {
+        mutableStateOf(
+            initialRoutine?.scheduledAtAnchor ?: RoutineScheduleAnchor.START
+        )
+    }
     var date by remember {
         mutableStateOf(initialDateTime?.toLocalDate() ?: LocalDate.now(zoneId))
     }
@@ -58,38 +62,11 @@ fun RoutineDialog(
         )
     }
 
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    if (showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = date
-                .atStartOfDay(ZoneOffset.UTC)
-                .toInstant()
-                .toEpochMilli()
+    val options = remember {
+        listOf(
+            RoutineScheduleAnchor.START to "Start at",
+            RoutineScheduleAnchor.END to "End at"
         )
-
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val selectedMillis = datePickerState.selectedDateMillis
-                        if (selectedMillis != null) {
-                            date = java.time.Instant
-                                .ofEpochMilli(selectedMillis)
-                                .atZone(ZoneOffset.UTC)
-                                .toLocalDate()
-                        }
-                        showDatePicker = false
-                    }
-                ) { Text("Ok") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
     }
 
     AlertDialog(
@@ -100,15 +77,7 @@ fun RoutineDialog(
                 enabled = title.isNotBlank(),
                 onClick = {
                     val scheduledAtMillis = LocalDateTime
-                        .of(
-                            date,
-                            java.time.LocalTime.of(
-                                time.hour,
-                                time.minute,
-                                time.second,
-                                time.nanosecond
-                            )
-                        )
+                        .of(date, time.toJavaLocalTime())
                         .atZone(zoneId)
                         .toInstant()
                         .toEpochMilli()
@@ -117,6 +86,7 @@ fun RoutineDialog(
                         RoutineRequest(
                             title = title,
                             scheduledAt = Instant.fromEpochMilliseconds(scheduledAtMillis),
+                            scheduledAtAnchor = anchor,
                             color = RoutineColorPicker.pick().toHexString()
                         )
                     )
@@ -138,14 +108,28 @@ fun RoutineDialog(
 
                 Spacer(Modifier.height(12.dp))
 
-                TextButton(onClick = { showDatePicker = true }) {
-                    Text(date.toString())
-                }
+                RoutineAnchorSelector(
+                    options = options,
+                    anchor = anchor,
+                    onChanged = { anchor = it }
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                DatePickerField(
+                    label = "Date",
+                    initialDate = date,
+                    onDateChange = { date = it }
+                )
 
                 Spacer(Modifier.height(12.dp))
 
                 TimePickerField(
-                    label = "When to leave?",
+                    label = if (anchor == RoutineScheduleAnchor.START) {
+                        "Start time"
+                    } else {
+                        "End time"
+                    },
                     initialTime = time,
                     onTimeChange = { time = it }
                 )

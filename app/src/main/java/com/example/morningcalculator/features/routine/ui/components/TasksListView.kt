@@ -24,6 +24,7 @@ import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
+import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
@@ -33,8 +34,7 @@ import java.time.format.DateTimeFormatter
 fun TasksListView(
     routine: Routine, viewModel: RoutineViewModel
 ) {
-    val whenToGetUp = routine.whenToStart().toJavaLocalDateTime()
-        .format(DateTimeFormatter.ofPattern("HH:mm"))
+    val whenToGetUp = routine.whenToStart().stringTime()
     val fullLinks = remember(routine) { routine.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }

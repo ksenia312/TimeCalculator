@@ -23,13 +23,11 @@ import com.example.morningcalculator.features.routine.ui.components.LocalRoutine
 import com.example.morningcalculator.shared.components.CustomTopBar
 import com.example.morningcalculator.shared.components.CustomTopBarHeadingItem
 import com.example.morningcalculator.shared.extensions.endAt
-import com.example.morningcalculator.shared.extensions.formatAsDateTime
+import com.example.morningcalculator.shared.extensions.stringDateTime
+import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
-import kotlinx.datetime.toJavaLocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,14 +38,8 @@ fun SuccessTopAppBar(
     val routine = viewState.full
     val routineColor = LocalRoutineColor.current
 
-    val startText = routine.whenToStart()
-        .toJavaLocalDateTime()
-        .format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
-
-    val endText = routine.endAt()
-        .toJavaLocalDateTime()
-        .format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
-
+    val startText = routine.whenToStart().stringTime()
+    val endText = routine.endAt().stringTime()
 
     CustomTopBar(
         titleItems = {
@@ -80,7 +72,7 @@ fun SuccessTopAppBar(
                     textAlign = TextAlign.End
                 )
                 Text(
-                    routine.modifiedAt.formatAsDateTime(),
+                    routine.modifiedAt.stringDateTime(),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.End

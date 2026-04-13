@@ -27,20 +27,6 @@ fun HomeAppBar(selectedTab: HomeTab) {
             )
         },
     )
-//    val routinesCount = (homeViewState as? RoutinesListState.Success)?.routines?.size
-//    val accentColor = LocalCustomColorScheme.current.accent
-//
-//    CustomTopBar(
-//        accentColor = accentColor,
-//        onAccentColor = MaterialTheme.colorScheme.onPrimary,
-//        titleItems = {
-//            CustomTopBarHeadingItem(
-//                title = "${routinesCount ?: 0}",
-//                subtitle = "Scheduled Routines",
-//            )
-//        },
-//        actions = {}
-//    )
 }
 
 @PreviewAll
