@@ -1,6 +1,7 @@
 package com.example.morningcalculator.features.landing.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +23,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,9 +39,11 @@ import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.features.home.ui.bottomIndent
 import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.shared.extensions.endAt
+import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing
 import com.example.morningcalculator.shared.extensions.startAtInstant
 import com.example.morningcalculator.shared.extensions.stringDateTime
+import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.navigator.LocalNavHostController
 import com.example.morningcalculator.shared.navigator.Screen
@@ -95,7 +97,11 @@ fun LandingContent(
                         )
                     }
 
-                    Spacer(Modifier.weight(1f).bottomIndent())
+                    Spacer(
+                        Modifier
+                            .weight(1f)
+                            .bottomIndent()
+                    )
                 }
             }
 
@@ -157,36 +163,37 @@ private fun RoutineHeroCard(
     modifier: Modifier = Modifier,
 ) {
     val isOngoing = routine.isOngoing()
+    val isCompleted = routine.isCompleted()
+
     val baseGradient = if (isOngoing) {
         LocalCustomColorScheme.current.accentDark
     } else {
-        LocalCustomColorScheme.current.placeholder
+        Color.Black
     }
+
     val statusDot = if (isOngoing) {
         LocalCustomColorScheme.current.success
     } else {
-        LocalCustomColorScheme.current.label
+        LocalCustomColorScheme.current.unselected
     }
 
-    val background = if (isOngoing) {
-        Brush.linearGradient(
-            listOf(
-                baseGradient,
-                baseGradient.copy(alpha = 0.85f),
-                baseGradient.copy(alpha = 0.72f),
-            )
+    val background = Brush.linearGradient(
+        listOf(
+            baseGradient,
+            baseGradient.copy(alpha = 0.85f),
+            baseGradient.copy(alpha = 0.72f),
         )
-    } else {
-        Brush.linearGradient(
-            listOf(
-                MaterialTheme.colorScheme.surfaceVariant,
-                MaterialTheme.colorScheme.surfaceVariant,
-            )
-        )
-    }
+    )
 
-    val startLabel = if (isOngoing) "Started at" else "Will start"
-    val endLabel = if (isOngoing) "Ends at" else "Will end"
+    val startLabel = when {
+        isOngoing || isCompleted -> "Started at"
+        else -> "Will start"
+    }
+    val endLabel = when {
+        isOngoing -> "Ends at"
+        isCompleted -> "Completed at"
+        else -> "Will end"
+    }
 
     val startText = routine.whenToStart().stringDateTime()
     val endText = routine.endAt().stringDateTime()
@@ -212,20 +219,15 @@ private fun RoutineHeroCard(
             .clip(RoundedCornerShape(28.dp))
             .background(background)
             .clickable { onNavigate(routine) }
-            .padding(24.dp, 32.dp)
-    ) {
+            .padding(24.dp, 32.dp)) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = routine.title,
-                    style = MaterialTheme.typography.titleLarge.copy(
+                    text = routine.title, style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold
-                    ),
-                    color = if (isOngoing) Color.White
-                    else MaterialTheme.colorScheme.onSurface
+                    ), maxLines = 3, color = MaterialTheme.colorScheme.surface
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -240,8 +242,7 @@ private fun RoutineHeroCard(
                     Text(
                         text = if (isOngoing) "Running" else "Not running",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (isOngoing) Color.White.copy(alpha = 0.92f)
-                        else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
                     )
                 }
             }
@@ -250,16 +251,12 @@ private fun RoutineHeroCard(
                 Text(
                     text = startLabel,
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (isOngoing) Color.White.copy(alpha = 0.75f)
-                    else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
                 )
                 Text(
-                    text = startText,
-                    style = MaterialTheme.typography.titleSmall.copy(
+                    text = startText, style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.SemiBold
-                    ),
-                    color = if (isOngoing) Color.White
-                    else MaterialTheme.colorScheme.onSurface
+                    ), color = MaterialTheme.colorScheme.surface
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -267,16 +264,12 @@ private fun RoutineHeroCard(
                 Text(
                     text = endLabel,
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (isOngoing) Color.White.copy(alpha = 0.75f)
-                    else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
                 )
                 Text(
-                    text = endText,
-                    style = MaterialTheme.typography.titleSmall.copy(
+                    text = endText, style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.SemiBold
-                    ),
-                    color = if (isOngoing) Color.White
-                    else MaterialTheme.colorScheme.onSurface
+                    ), color = MaterialTheme.colorScheme.surface
                 )
             }
         }
@@ -326,53 +319,50 @@ private fun TaskCard(
     modifier: Modifier = Modifier,
 ) {
     val cardBg = if (isOngoing) {
-        Color.White.copy(alpha = 0.16f)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.16f)
     } else {
-        MaterialTheme.colorScheme.surface
+        Color.Transparent
     }
 
-    val textColor = if (isOngoing) Color.White else MaterialTheme.colorScheme.onSurface
-    val subTextColor = if (isOngoing) {
-        Color.White.copy(alpha = 0.78f)
+    val cardBorderColor = if (isOngoing) {
+        Color.Transparent
     } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.16f)
     }
+
+    val textColor = MaterialTheme.colorScheme.surface
+    val subTextColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f)
 
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))
             .background(cardBg)
+            .border(
+                2.dp, cardBorderColor,
+                RoundedCornerShape(20.dp)
+            )
             .padding(14.dp)
     ) {
         Text(
-            text = header,
-            style = MaterialTheme.typography.labelMedium,
-            color = subTextColor
+            text = header, style = MaterialTheme.typography.labelMedium, color = subTextColor
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge.copy(
+            text = title, style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.SemiBold
-            ),
-            color = textColor
+            ), color = textColor
         )
 
         Spacer(Modifier.height(10.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = start,
-                style = MaterialTheme.typography.bodyMedium,
-                color = subTextColor
+                text = start, style = MaterialTheme.typography.bodyMedium, color = subTextColor
             )
             Text(
-                text = end,
-                style = MaterialTheme.typography.bodyMedium,
-                color = subTextColor
+                text = end, style = MaterialTheme.typography.bodyMedium, color = subTextColor
             )
         }
 
@@ -380,10 +370,8 @@ private fun TaskCard(
 
         LinearProgressIndicator(
             progress = { progress.coerceIn(0f, 1f) },
-            color = if (isOngoing) Color.White.copy(alpha = 0.7f)
-            else MaterialTheme.colorScheme.primary,
-            trackColor = if (isOngoing) Color.White.copy(alpha = 0.20f)
-            else ProgressIndicatorDefaults.linearTrackColor,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+            trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.20f),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp)
@@ -426,8 +414,8 @@ private fun routineTaskUI(
 
     return RoutineTaskUI(
         title = title,
-        start = startInstant.stringDateTime(),
-        end = endInstant.stringDateTime(),
+        start = startInstant.stringTime(),
+        end = endInstant.stringTime(),
         progress = progress
     )
 }
@@ -501,8 +489,7 @@ private fun PagerDots(
                 modifier = Modifier
                     .size(if (isActive) 8.dp else 6.dp)
                     .background(
-                        color = if (isActive) active else inactive,
-                        shape = CircleShape
+                        color = if (isActive) active else inactive, shape = CircleShape
                     )
             )
         }
@@ -516,8 +503,6 @@ fun LandingContentPreview() {
         LandingContent(
             viewState = LandingState.Success(
                 routines = PreviewConstants.routinesFull,
-            ),
-            onEditRoutine = {}
-        )
+            ), onEditRoutine = {})
     }
 }

@@ -1,6 +1,7 @@
 package com.example.morningcalculator.shared.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,6 +18,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 @Composable
@@ -43,7 +45,7 @@ fun AppTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource? = null,
-    shape: Shape = RoundedCornerShape(percent = 50),
+    shape: Shape = RoundedCornerShape(corner = CornerSize(32.dp)),
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = LocalCustomColorScheme.current.accent
     )

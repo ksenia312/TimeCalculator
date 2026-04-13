@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.morningcalculator.core.mapper.copyWithRequest
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
@@ -21,10 +22,7 @@ fun RoutineTopBar(viewModel: RoutineViewModel) {
             initialRoutine = routine,
             onConfirm = { request ->
                 viewModel.editRoutine(
-                    routine.copy(
-                        title = request.title,
-                        scheduledAt = request.scheduledAt
-                    )
+                    routine.copyWithRequest(request)
                 )
                 editingRoutine.value = null
             },

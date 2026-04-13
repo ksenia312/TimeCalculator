@@ -9,7 +9,6 @@ import com.example.morningcalculator.shared.extensions.startAtInstant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.time.Instant
 
 class LandingViewModel(
     val routineRepository: RoutineRepository,
@@ -25,18 +24,15 @@ class LandingViewModel(
     private fun loadRoutines() {
         viewModelScope.launch {
             routineRepository.routinesFlow.collect { routines ->
-                val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-                val ongoingRoutines = routines.filter { it.isOngoing() }
-                val displayRoutines = ongoingRoutines.ifEmpty {
-                    routines
-                        .filter { routine ->
-                            routine.startAtInstant() > now
-                        }
-                        .sortedBy { routine ->
-                            routine.startAtInstant().toEpochMilliseconds()
-                        }
-                        .take(2)
-                }
+                val sorted = routines.sortedBy { it.startAtInstant().toEpochMilliseconds() }
+
+                val ongoing = sorted.filter { it.isOngoing() }
+                val upcoming = sorted.filter { !it.isOngoing() }
+
+                val displayRoutines = (ongoing + upcoming)
+                    .distinct()
+                    .take(2)
+                    .ifEmpty { sorted.take(2) }
 
                 _viewState.value = LandingState.Success(
                     routines = displayRoutines,

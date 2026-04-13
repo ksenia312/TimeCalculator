@@ -112,7 +112,8 @@ private fun RoutineListItem(
             Column {
                 Text(
                     text = routine.title,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 3
                 )
                 Text(
                     text = buildAnnotatedString {

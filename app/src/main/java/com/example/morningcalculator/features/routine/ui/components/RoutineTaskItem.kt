@@ -40,10 +40,8 @@ import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.components.AppCircleIndicator
+import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.timeOnMoment
-import kotlinx.datetime.toJavaLocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +62,7 @@ fun RoutineTaskItem(
     }
 
     val time = routine.timeOnMoment(index)
-    val timeFormatted = time.toJavaLocalDateTime()
-        .format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
+    val timeFormatted = time.stringTime()
 
     Row(
         modifier = Modifier
