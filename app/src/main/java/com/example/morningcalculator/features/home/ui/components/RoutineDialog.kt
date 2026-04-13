@@ -48,11 +48,13 @@ fun RoutineDialog(
     var title by remember { mutableStateOf(initialRoutine?.title ?: "") }
     var anchor by remember {
         mutableStateOf(
-            initialRoutine?.scheduledAtAnchor ?: RoutineScheduleAnchor.START
+            initialRoutine?.scheduledAtAnchor ?: RoutineScheduleAnchor.END
         )
     }
     var date by remember {
-        mutableStateOf(initialDateTime?.toLocalDate() ?: LocalDate.now(zoneId))
+        mutableStateOf(
+            initialDateTime?.toLocalDate() ?: LocalDate.now(zoneId).plusDays(1)
+        )
     }
     var time by remember {
         mutableStateOf(

@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.shared.extensions.endAtInstant
+import com.example.morningcalculator.shared.extensions.isCompleted
+import com.example.morningcalculator.shared.extensions.isOngoing
+import com.example.morningcalculator.shared.extensions.startAtInstant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -27,17 +31,22 @@ class RoutinesListViewModel(
     }
 
     private fun sortRoutines(
-        sort: RoutinesListState.Sort,
-        routines: List<Routine>
+        sort: RoutinesListState.Sort, routines: List<Routine>
     ): List<Routine> {
-        fun selector(routine: Routine): Long {
-            return when (sort.sortType) {
-                RoutinesListState.Sort.SortType.DATE -> routine.modifiedAt
-            }
-        }
-        return when (sort.sortOrder) {
-            RoutinesListState.Sort.SortOrder.ASCENDING -> routines.sortedBy { selector(it) }
-            RoutinesListState.Sort.SortOrder.DESCENDING -> routines.sortedByDescending { selector(it) }
+        return when (sort.sortType) {
+            RoutinesListState.Sort.SortType.DATE -> routines.sortedWith(compareBy({ routine ->
+                when {
+                    routine.isOngoing() -> 0
+                    routine.isCompleted() -> 2
+                    else -> 1
+                }
+            }, { routine ->
+                when {
+                    routine.isOngoing() -> routine.endAtInstant().toEpochMilliseconds()
+                    routine.isCompleted() -> -routine.endAtInstant().toEpochMilliseconds()
+                    else -> routine.startAtInstant().toEpochMilliseconds()
+                }
+            }))
         }
     }
 
@@ -46,18 +55,16 @@ class RoutinesListViewModel(
             routineRepository.routinesFlow.collect {
                 val sort = RoutinesListState.Sort.DEFAULT
                 _viewState.value = RoutinesListState.Success(
-                    routines = it,
-                    sorted = sortRoutines(sort, it),
-                    sort = sort
+                    routines = it, sorted = sortRoutines(sort, it), sort = sort
                 )
             }
         }
     }
 }
 
-
 sealed interface RoutinesListState {
     object Loading : RoutinesListState
+
     data class Success(
         val routines: List<Routine>,
         val sorted: List<Routine>,
@@ -79,8 +86,7 @@ sealed interface RoutinesListState {
         }
 
         enum class SortOrder {
-            ASCENDING,
-            DESCENDING,
+            ASCENDING, DESCENDING,
         }
     }
 }

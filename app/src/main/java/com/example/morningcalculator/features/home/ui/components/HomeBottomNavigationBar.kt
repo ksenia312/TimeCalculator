@@ -33,7 +33,7 @@ enum class HomeTab(
     val label: String,
     val iconRes: Int,
 ) {
-    HOME("Home", R.drawable.home),
+    LANDING("Home", R.drawable.home),
     ROUTINES("Routines", R.drawable.routine),
     TASKS("Tasks", R.drawable.task),
 }

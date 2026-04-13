@@ -41,5 +41,5 @@ class HomeViewModel(
 }
 
 data class HomeViewState(
-    val selectedTab: HomeTab = HomeTab.HOME,
+    val selectedTab: HomeTab = HomeTab.LANDING,
 )

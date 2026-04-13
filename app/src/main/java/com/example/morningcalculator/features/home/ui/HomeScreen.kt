@@ -2,9 +2,6 @@ package com.example.morningcalculator.features.home.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -16,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
-import com.example.morningcalculator.features.home.ui.components.BOTTOM_BAR_MAX_HEIGHT
 import com.example.morningcalculator.features.home.ui.components.HomeAppBar
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.CreateTaskScreen

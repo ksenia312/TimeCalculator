@@ -2,7 +2,10 @@ package com.example.morningcalculator.features.routineslist.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EditCalendar
@@ -89,8 +92,8 @@ private fun RoutineListItem(
 
     val color = when {
         isCompleted -> LocalCustomColorScheme.current.label
-        isOngoing -> LocalCustomColorScheme.current.accent
-        else -> LocalCustomColorScheme.current.success
+        isOngoing -> LocalCustomColorScheme.current.success
+        else -> LocalCustomColorScheme.current.accent
     }
 
     ListItem(
@@ -98,6 +101,13 @@ private fun RoutineListItem(
             .clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onNavigate),
+        leadingContent = {
+            Box(
+                Modifier
+                    .size(14.dp)
+                    .background(color, shape = CircleShape)
+            )
+        },
         headlineContent = {
             Column {
                 Text(

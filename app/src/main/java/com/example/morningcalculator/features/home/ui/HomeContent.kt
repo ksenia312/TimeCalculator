@@ -39,7 +39,7 @@ fun HomeContent(
             )
     ) {
         when (current) {
-            HomeTab.HOME -> Box {}
+            HomeTab.LANDING -> Box {}
             HomeTab.ROUTINES -> RoutinesListScreen()
             HomeTab.TASKS -> TasksListScreen()
         }
