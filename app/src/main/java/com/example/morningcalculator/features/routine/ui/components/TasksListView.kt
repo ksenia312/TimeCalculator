@@ -4,12 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +24,6 @@ import com.example.morningcalculator.features.routine.presentation.RoutineViewMo
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.whenToStart
-import kotlinx.datetime.toJavaLocalDateTime
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,14 +61,6 @@ fun TasksListView(
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        item { Spacer(Modifier.height(12.dp)) }
-        item(key = "title") {
-            Text(
-                routine.title,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
         item { Spacer(Modifier.height(12.dp)) }
         if (fullLinks.isNotEmpty()) item(key = "wakeUp") {
             TimeSegment(whenToGetUp.toString(), isTitle = true, useSeparator = false)

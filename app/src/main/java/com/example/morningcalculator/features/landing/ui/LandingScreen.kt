@@ -13,6 +13,5 @@ fun LandingScreen(landingViewModel: LandingViewModel = koinViewModel()) {
 
     LandingContent(
         viewState = viewState.value,
-        onEditRoutine = { }
     )
 }

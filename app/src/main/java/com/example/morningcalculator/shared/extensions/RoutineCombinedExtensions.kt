@@ -53,6 +53,10 @@ fun Routine.timeOnMoment(index: Int): LocalDateTime {
     return (startAtInstant() + offset).toDeviceLocalDateTime()
 }
 
+fun Routine.currentDuration(): Duration {
+    return Instant.fromEpochMilliseconds(System.currentTimeMillis()) - startAtInstant()
+}
+
 private fun Routine.totalDuration(): Duration {
     return data.fold(Duration.ZERO) { acc, link ->
         acc + (link.subData?.duration ?: taskDuration(link.task))
