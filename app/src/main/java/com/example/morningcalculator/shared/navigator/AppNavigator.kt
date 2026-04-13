@@ -1,4 +1,4 @@
-package com.example.morningcalculator.shared.navigator
+ package com.example.morningcalculator.shared.navigator
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
@@ -23,22 +23,22 @@ fun AppNavigator() {
             startDestination = Screen.Home.route,
             enterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start, tween(200)
+                    AnimatedContentTransitionScope.SlideDirection.Start, tween(500)
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Start, tween(200)
+                    AnimatedContentTransitionScope.SlideDirection.Start, tween(500)
                 )
             },
             popEnterTransition = {
                 slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End, tween(200)
+                    AnimatedContentTransitionScope.SlideDirection.End, tween(500)
                 )
             },
             popExitTransition = {
                 slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End, tween(200)
+                    AnimatedContentTransitionScope.SlideDirection.End, tween(500)
                 )
             }
         ) {

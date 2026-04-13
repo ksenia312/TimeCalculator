@@ -1,6 +1,7 @@
 package com.example.morningcalculator.features.routine.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -42,6 +44,7 @@ import com.example.morningcalculator.features.routine.presentation.RoutineViewMo
 import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.timeOnMoment
+import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +58,7 @@ fun RoutineTaskItem(
     routineLinks: SnapshotStateList<RoutineLink>,
     viewModel: RoutineViewModel,
     editingLink: MutableState<RoutineLink?>,
+    isCurrent: Boolean,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     var current by remember(linkFull.subData) {
@@ -64,14 +68,27 @@ fun RoutineTaskItem(
     val time = routine.timeOnMoment(index)
     val timeFormatted = time.stringTime()
 
+    val shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp)
+    val bgColor = if (isCurrent) {
+        LocalCustomColorScheme.current.accentLight
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+
+    val borderColor = if (isCurrent) {
+        LocalCustomColorScheme.current.accentDark
+    } else {
+        Color.Transparent
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Max)
+            .height(IntrinsicSize.Max),
     ) {
         TimeSegment(
             timeFormatted,
-            isTitle = index == routine.data.size - 1
+            isTitle = index == routine.data.size - 1,
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -83,17 +100,18 @@ fun RoutineTaskItem(
                     draggingIndex = draggingIndex,
                     dragOffsetY = dragOffsetY,
                     routineLinks = routineLinks,
-                    viewModel = viewModel
+                    viewModel = viewModel,
                 )
-                .clip(RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp))
+                .clip(shape)
                 .background(
-                    color = MaterialTheme.colorScheme.surface
+                    color = bgColor
                 )
+                .border(1.dp, borderColor, shape)
                 .clickable {
                     editingLink.value = linkFull
                 }
-                .padding(24.dp, 12.dp, 8.dp, 12.dp)) {
-
+                .padding(24.dp, 12.dp, 8.dp, 12.dp),
+        ) {
             AppCircleIndicator(
                 backgroundColor = LocalRoutineColor.current.copy(alpha = 0.05f),
                 foregroundColor = LocalRoutineColor.current,
@@ -108,40 +126,53 @@ fun RoutineTaskItem(
             }
 
             ExposedDropdownMenuBox(
-                expanded = menuExpanded, onExpandedChange = { menuExpanded = !menuExpanded }) {
+                expanded = menuExpanded,
+                onExpandedChange = { menuExpanded = !menuExpanded },
+            ) {
                 ElevatedButton(
-                    onClick = { }, modifier = Modifier.menuAnchor(
-                        type = MenuAnchorType.PrimaryEditable, enabled = true
-                    )
+                    onClick = { },
+                    modifier = Modifier.menuAnchor(
+                        type = MenuAnchorType.PrimaryEditable,
+                        enabled = true,
+                    ),
                 ) {
                     Box {
                         Text(
                             current?.duration?.toString() ?: "Set duration",
-                            color = if (current != null) MaterialTheme.colorScheme.onBackground
-                            else MaterialTheme.colorScheme.error
+                            color = if (current != null) {
+                                MaterialTheme.colorScheme.onBackground
+                            } else {
+                                MaterialTheme.colorScheme.error
+                            },
                         )
                         ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = menuExpanded, modifier = Modifier
+                            expanded = menuExpanded,
+                            modifier = Modifier
                                 .align(Alignment.CenterEnd)
-                                .offset(24.dp)
+                                .offset(24.dp),
                         )
                     }
                 }
 
                 ExposedDropdownMenu(
-                    expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
+                ) {
                     linkFull.task.dataSortedByDuration.forEach { sub ->
-                        DropdownMenuItem(text = {
-                            Text("${sub.duration}")
-                        }, onClick = {
-                            current = sub
-                            menuExpanded = false
-                            viewModel.addOrEditTaskInRoutine(
-                                linkFull.copy(
-                                    subData = sub
+                        DropdownMenuItem(
+                            text = {
+                                Text("${sub.duration}")
+                            },
+                            onClick = {
+                                current = sub
+                                menuExpanded = false
+                                viewModel.addOrEditTaskInRoutine(
+                                    linkFull.copy(
+                                        subData = sub,
+                                    ),
                                 )
-                            )
-                        })
+                            },
+                        )
                     }
                 }
             }
@@ -161,7 +192,7 @@ fun Modifier.draggableItem(
     draggingIndex: MutableState<Int?>,
     dragOffsetY: MutableState<Float>,
     routineLinks: SnapshotStateList<RoutineLink>,
-    viewModel: RoutineViewModel
+    viewModel: RoutineViewModel,
 ): Modifier {
     val isDragging = draggingIndex.value == index
     val density = LocalDensity.current
@@ -169,34 +200,40 @@ fun Modifier.draggableItem(
 
     return offset {
         IntOffset(
-            0, if (isDragging) dragOffsetY.value.roundToInt() else 0
+            0,
+            if (isDragging) dragOffsetY.value.roundToInt() else 0,
         )
     }
         .zIndex(if (isDragging) 1f else 0f)
         .pointerInput(routineLinks) {
-            detectDragGesturesAfterLongPress(onDragStart = {
-                draggingIndex.value = index
-                dragOffsetY.value = 0f
-            }, onDrag = { change, dragAmount ->
-                change.consume()
-                val current = draggingIndex.value ?: return@detectDragGesturesAfterLongPress
-                val newOffset = dragOffsetY.value + dragAmount.y
-                val delta = (newOffset / itemHeightPx).roundToInt()
-                val target = (current + delta).coerceIn(0, routineLinks.lastIndex)
-                if (target != current) {
-                    routineLinks.move(current, target)
-                    draggingIndex.value = target
-                    dragOffsetY.value = newOffset - delta * itemHeightPx
-                } else {
-                    dragOffsetY.value = newOffset
-                }
-            }, onDragEnd = {
-                viewModel.reorderTasks(routineLinks.map { it.id })
-                draggingIndex.value = null
-                dragOffsetY.value = 0f
-            }, onDragCancel = {
-                draggingIndex.value = null
-                dragOffsetY.value = 0f
-            })
+            detectDragGesturesAfterLongPress(
+                onDragStart = {
+                    draggingIndex.value = index
+                    dragOffsetY.value = 0f
+                },
+                onDrag = { change, dragAmount ->
+                    change.consume()
+                    val current = draggingIndex.value ?: return@detectDragGesturesAfterLongPress
+                    val newOffset = dragOffsetY.value + dragAmount.y
+                    val delta = (newOffset / itemHeightPx).roundToInt()
+                    val target = (current + delta).coerceIn(0, routineLinks.lastIndex)
+                    if (target != current) {
+                        routineLinks.move(current, target)
+                        draggingIndex.value = target
+                        dragOffsetY.value = newOffset - delta * itemHeightPx
+                    } else {
+                        dragOffsetY.value = newOffset
+                    }
+                },
+                onDragEnd = {
+                    viewModel.reorderTasks(routineLinks.map { it.id })
+                    draggingIndex.value = null
+                    dragOffsetY.value = 0f
+                },
+                onDragCancel = {
+                    draggingIndex.value = null
+                    dragOffsetY.value = 0f
+                },
+            )
         }
 }
