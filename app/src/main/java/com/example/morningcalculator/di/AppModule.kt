@@ -2,9 +2,12 @@ package com.example.morningcalculator.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.morningcalculator.app.bootstrap.RoutineAlarmsBootstrapper
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
 import com.example.morningcalculator.data.db.AppDatabase
+import com.example.morningcalculator.data.manager.RoutineAlarmSchedulerManager
+import com.example.morningcalculator.data.memory.RoutineAlarmMemoryDataSource
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
@@ -22,21 +25,43 @@ object AppModule {
             name = "morning-db"
         ).build()
 
-        // Repositories
-        single<TasksRepository> {
-            TasksRepositoryImpl(db.tasksDao())
-        }
-        single<RoutineRepository> {
-            RoutineRepositoryImpl(db.routinesDao())
+        single { db.tasksDao() }
+        single { db.routinesDao() }
+
+        single { RoutineAlarmMemoryDataSource(context.applicationContext) }
+
+        single<RoutineAlarmSchedulerManager> {
+            RoutineAlarmSchedulerManager(
+                context = context.applicationContext,
+                memoryDataSource = get()
+            )
         }
 
-        // ViewModels
+        single {
+            RoutineAlarmsBootstrapper(
+                routinesDao = get(),
+                scheduler = get()
+            )
+        }
+
+        single<TasksRepository> {
+            TasksRepositoryImpl(get())
+        }
+
+        single<RoutineRepository> {
+            RoutineRepositoryImpl(
+                dao = get(),
+                schedulerManager = get()
+            )
+        }
+
         single {
             HomeViewModel(
                 routineRepository = get(),
                 tasksRepository = get()
             )
         }
+
         single {
             LandingViewModel(
                 routineRepository = get(),
@@ -55,5 +80,4 @@ object AppModule {
             )
         }
     }
-
 }

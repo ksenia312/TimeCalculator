@@ -25,3 +25,9 @@ fun Instant.stringTime(): String {
         .toKotlinLocalDateTime()
         .stringTime()
 }
+
+fun Instant.withZeroSeconds(): Instant {
+    val millis = toEpochMilliseconds()
+    val normalized = (millis / 60_000L) * 60_000L
+    return Instant.fromEpochMilliseconds(normalized)
+}

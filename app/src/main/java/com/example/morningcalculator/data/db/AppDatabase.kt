@@ -98,6 +98,10 @@ interface RoutinesDao {
     @Query("SELECT * FROM routines")
     fun getRoutinesPopulated(): Flow<List<RoutinePopulated>>
 
+    @Transaction
+    @Query("SELECT * FROM routines WHERE id = :id")
+    suspend fun getRoutinePopulated(id: String): RoutinePopulated?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRoutine(routine: RoutineEntity)
 
@@ -120,8 +124,8 @@ interface RoutinesDao {
     ) {
         insertRoutine(routine)
 
-        val existingTaskIds = getExistingTaskIds(items.map { it.taskId }.distinct())
-            .toHashSet()
+        val existingTaskIds =
+            getExistingTaskIds(items.map { it.taskId }.distinct()).toHashSet()
 
         val subDataIds = items.mapNotNull { it.subDataId }.distinct()
         val existingSubDataIds = if (subDataIds.isEmpty()) {

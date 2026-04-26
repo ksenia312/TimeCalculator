@@ -28,5 +28,5 @@ fun Modifier.routineCard(
                 isCompleted = viewItem.isCompleted
             )
         )
-        .padding(horizontalPadding, verticalPadding)
         .clickable(onClick = onClick)
+        .padding(horizontalPadding, verticalPadding)

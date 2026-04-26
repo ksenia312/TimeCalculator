@@ -27,9 +27,9 @@ import com.example.morningcalculator.shared.components.AppTextField
 import com.example.morningcalculator.shared.components.DatePickerField
 import com.example.morningcalculator.shared.components.TimePickerField
 import com.example.morningcalculator.shared.extensions.toHexString
+import com.example.morningcalculator.shared.extensions.withZeroSeconds
 import com.example.morningcalculator.shared.utils.RoutineColorPicker
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.toJavaLocalTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -63,7 +63,7 @@ fun RoutineDialog(
     var time by remember {
         mutableStateOf(
             initialDateTime?.toLocalTime()?.let {
-                LocalTime(it.hour, it.minute, it.second, it.nano)
+                LocalTime(it.hour, it.minute, 0, 0)
             } ?: LocalTime(7, 0)
         )
     }
@@ -119,7 +119,9 @@ fun RoutineDialog(
                         "End time"
                     },
                     initialTime = time,
-                    onTimeChange = { time = it }
+                    onTimeChange = { picked ->
+                        time = LocalTime(picked.hour, picked.minute, 0, 0)
+                    }
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -133,7 +135,7 @@ fun RoutineDialog(
                     ),
                     onClick = {
                         val scheduledAtMillis = LocalDateTime
-                            .of(date, time.toJavaLocalTime())
+                            .of(date, java.time.LocalTime.of(time.hour, time.minute, 0, 0))
                             .atZone(zoneId)
                             .toInstant()
                             .toEpochMilli()
@@ -141,7 +143,9 @@ fun RoutineDialog(
                         onConfirm(
                             RoutineRequest(
                                 title = title,
-                                scheduledAt = Instant.fromEpochMilliseconds(scheduledAtMillis),
+                                scheduledAt = Instant
+                                    .fromEpochMilliseconds(scheduledAtMillis)
+                                    .withZeroSeconds(),
                                 scheduledAtAnchor = anchor,
                                 color = RoutineColorPicker.pick().toHexString()
                             )
