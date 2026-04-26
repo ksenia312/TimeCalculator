@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalInspectionMode
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.shared.extensions.currentDuration
+import com.example.morningcalculator.shared.extensions.willStartIn
 import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing
@@ -23,7 +23,7 @@ data class RoutineCardViewItem(
     val startText: String,
     val endText: String,
     val title: String,
-    val currentDuration: String
+    val willStartIn: String
 ) {
     companion object Companion {
         @Composable
@@ -45,7 +45,7 @@ data class RoutineCardViewItem(
 
             val startText = routine.whenToStart().stringDateTime()
             val endText = routine.endAt().stringDateTime()
-            val currentDuration = routine.currentDuration()
+            val willStartIn = routine.willStartIn()
 
             return RoutineCardViewItem(
                 isOngoing = isOngoing,
@@ -54,7 +54,7 @@ data class RoutineCardViewItem(
                 endLabel = endLabel,
                 startText = startText,
                 endText = endText,
-                currentDuration = currentDuration.stringValue(),
+                willStartIn = willStartIn.stringValue(),
                 title = routine.title
             )
         }

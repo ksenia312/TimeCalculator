@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
 
@@ -18,20 +19,23 @@ fun RoutineCardTimeInfo(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier, horizontalAlignment = Alignment.End
+        modifier = modifier,
+        horizontalAlignment = Alignment.End
     ) {
-        if (viewItem.isOngoing) {
+        if (!viewItem.isOngoing && !viewItem.isCompleted) {
             Text(
-                text = "Current duration",
+                text = "Will start in",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+                textAlign = TextAlign.End
             )
             Text(
-                text = viewItem.currentDuration,
+                text = viewItem.willStartIn,
                 color = MaterialTheme.colorScheme.surface,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
+                textAlign = TextAlign.End
             )
             Spacer(Modifier.height(10.dp))
         }
@@ -39,12 +43,14 @@ fun RoutineCardTimeInfo(
         Text(
             text = viewItem.startLabel,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+            textAlign = TextAlign.End
         )
         Text(
             text = viewItem.startText, style = MaterialTheme.typography.titleSmall.copy(
                 fontWeight = FontWeight.SemiBold
-            ), color = MaterialTheme.colorScheme.surface
+            ), color = MaterialTheme.colorScheme.surface,
+            textAlign = TextAlign.End
         )
 
         Spacer(Modifier.height(10.dp))
@@ -52,12 +58,14 @@ fun RoutineCardTimeInfo(
         Text(
             text = viewItem.endLabel,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+            textAlign = TextAlign.End
         )
         Text(
             text = viewItem.endText, style = MaterialTheme.typography.titleSmall.copy(
                 fontWeight = FontWeight.SemiBold
-            ), color = MaterialTheme.colorScheme.surface
+            ), color = MaterialTheme.colorScheme.surface,
+            textAlign = TextAlign.End
         )
     }
 }

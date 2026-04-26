@@ -53,8 +53,8 @@ fun Routine.timeOnMoment(index: Int): LocalDateTime {
     return (startAtInstant() + offset).toDeviceLocalDateTime()
 }
 
-fun Routine.currentDuration(): Duration {
-    return Instant.fromEpochMilliseconds(System.currentTimeMillis()) - startAtInstant()
+fun Routine.willStartIn(): Duration {
+    return startAtInstant() - Instant.fromEpochMilliseconds(System.currentTimeMillis())
 }
 
 private fun Routine.totalDuration(): Duration {

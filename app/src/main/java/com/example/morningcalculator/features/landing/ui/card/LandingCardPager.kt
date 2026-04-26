@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 
-
 @Composable
 fun LandingCardPager(
     modifier: Modifier = Modifier,

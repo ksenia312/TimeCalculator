@@ -11,11 +11,11 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.morningcalculator"
+        applicationId = "com.example.morningcalculator.dev"
         minSdk = 30
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.1"
+        versionCode = 8
+        versionName = "2.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

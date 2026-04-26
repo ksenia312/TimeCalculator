@@ -47,6 +47,6 @@ fun RoutineCard(
         }
         Spacer(Modifier.width(16.dp))
 
-        RoutineCardTimeInfo(viewItem)
+        RoutineCardTimeInfo(viewItem, modifier = Modifier.weight(1f))
     }
 }

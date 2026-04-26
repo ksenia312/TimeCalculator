@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,9 +39,11 @@ fun LandingCard(
             .fillMaxWidth()
             .routineCard(viewItem = viewItem) {
                 onNavigate(routine)
-            }) {
+            }
+            .verticalScroll(rememberScrollState()),
+    ) {
         Row(
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.Top,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -57,13 +61,14 @@ fun LandingCard(
 
             Spacer(Modifier.width(16.dp))
 
-            RoutineCardTimeInfo(viewItem)
+            RoutineCardTimeInfo(viewItem, modifier = Modifier.weight(1f))
         }
 
+        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.weight(1f))
+
         Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier = modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom
         ) {
             val taskCount = routine.data.size
