@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.home.ui.bottomIndent
-import com.example.morningcalculator.features.home.ui.components.BOTTOM_BAR_MAX_HEIGHT
 import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.features.landing.ui.card.LandingCardPager
 import com.example.morningcalculator.shared.extensions.endAtInstant
