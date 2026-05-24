@@ -18,8 +18,7 @@ object RoutineNotificationPublisher {
     fun showTask(
         context: Context,
         routine: Routine,
-        taskIndex: Int,
-        shouldAlert: Boolean
+        taskIndex: Int
     ) {
         RoutineNotificationChannels.ensureCreated(context)
 
@@ -60,12 +59,6 @@ object RoutineNotificationPublisher {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = if (shouldAlert) {
-            RoutineNotificationChannels.ALARM_CHANNEL_ID
-        } else {
-            RoutineNotificationChannels.STATUS_CHANNEL_ID
-        }
-
         val style = NotificationCompat.InboxStyle()
             .addLine("Now: ${task.title}")
             .addLine("Next: $nextTitle")
@@ -73,26 +66,21 @@ object RoutineNotificationPublisher {
 
         manager.cancel(notificationId)
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(routine.title)
-            .setContentText("${task.title} · until $endsAtText")
-            .setSubText("Next: $nextTitle")
-            .setStyle(style)
-            .setCategory(
-                if (shouldAlert) NotificationCompat.CATEGORY_ALARM
-                else NotificationCompat.CATEGORY_SERVICE
-            )
-            .setPriority(
-                if (shouldAlert) NotificationCompat.PRIORITY_MAX
-                else NotificationCompat.PRIORITY_LOW
-            )
-            .setContentIntent(contentIntent)
-            .setOngoing(true)
-            .setAutoCancel(false)
-            .setOnlyAlertOnce(!shouldAlert)
-            .setSilent(!shouldAlert)
-            .build()
+        val notification =
+            NotificationCompat.Builder(context, RoutineNotificationChannels.CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(routine.title)
+                .setContentText("${task.title} · until $endsAtText")
+                .setSubText("Next: $nextTitle")
+                .setStyle(style)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(contentIntent)
+                .setOngoing(true)
+                .setAutoCancel(false)
+                .setOnlyAlertOnce(true)
+                .setSilent(true)
+                .build()
 
         manager.notify(notificationId, notification)
     }

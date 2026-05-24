@@ -1,8 +1,8 @@
 package com.example.morningcalculator.app
 
 import android.app.Application
+import com.example.morningcalculator.data.manager.RoutineWorkManagerScheduler
 import com.example.morningcalculator.di.AppModule
-import com.example.morningcalculator.app.bootstrap.RoutineAlarmsBootstrapper
 import org.koin.core.context.GlobalContext.startKoin
 
 class MorningCalculatorApplication : Application() {
@@ -13,6 +13,6 @@ class MorningCalculatorApplication : Application() {
             modules(AppModule.registerModules(context = applicationContext))
         }
 
-        koinApp.koin.get<RoutineAlarmsBootstrapper>().start()
+        koinApp.koin.get<RoutineWorkManagerScheduler>().schedulePeriodicCheck()
     }
 }

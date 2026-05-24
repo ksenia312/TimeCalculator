@@ -2,12 +2,10 @@ package com.example.morningcalculator.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.morningcalculator.app.bootstrap.RoutineAlarmsBootstrapper
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
 import com.example.morningcalculator.data.db.AppDatabase
-import com.example.morningcalculator.data.manager.RoutineAlarmSchedulerManager
-import com.example.morningcalculator.data.memory.RoutineAlarmMemoryDataSource
+import com.example.morningcalculator.data.manager.RoutineWorkManagerScheduler
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
@@ -28,21 +26,7 @@ object AppModule {
         single { db.tasksDao() }
         single { db.routinesDao() }
 
-        single { RoutineAlarmMemoryDataSource(context.applicationContext) }
-
-        single<RoutineAlarmSchedulerManager> {
-            RoutineAlarmSchedulerManager(
-                context = context.applicationContext,
-                memoryDataSource = get()
-            )
-        }
-
-        single {
-            RoutineAlarmsBootstrapper(
-                routinesDao = get(),
-                scheduler = get()
-            )
-        }
+        single { RoutineWorkManagerScheduler(context.applicationContext) }
 
         single<TasksRepository> {
             TasksRepositoryImpl(get())
@@ -51,7 +35,7 @@ object AppModule {
         single<RoutineRepository> {
             RoutineRepositoryImpl(
                 dao = get(),
-                schedulerManager = get()
+                context = context.applicationContext,
             )
         }
 
