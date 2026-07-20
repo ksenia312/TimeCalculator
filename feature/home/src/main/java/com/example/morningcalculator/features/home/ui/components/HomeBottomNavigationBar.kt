@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
@@ -45,7 +44,7 @@ fun HomeBottomNavigationBar(
     onTabSelected: (HomeTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ConstraintLayout(
+    Box(
         modifier = modifier.fillMaxWidth()
     ) {
         Surface(

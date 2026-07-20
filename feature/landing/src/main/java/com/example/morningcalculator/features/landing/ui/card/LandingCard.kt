@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.features.landing.presentation.LandingRoutineState
+import com.example.morningcalculator.shared.animation.routineCardSharedKey
 import com.example.morningcalculator.shared.features.RoutineCardStatusRow
 import com.example.morningcalculator.shared.features.RoutineCardTimeInfo
 import com.example.morningcalculator.shared.features.routineCard
@@ -32,7 +33,10 @@ fun LandingCard(
     Column(
         modifier
             .fillMaxWidth()
-            .routineCard(viewItem = viewItem) {
+            .routineCard(
+                viewItem = viewItem,
+                sharedKey = routineCardSharedKey(routineState.routineId),
+            ) {
                 onNavigate(routineState.routineId)
             }
             .verticalScroll(rememberScrollState()),

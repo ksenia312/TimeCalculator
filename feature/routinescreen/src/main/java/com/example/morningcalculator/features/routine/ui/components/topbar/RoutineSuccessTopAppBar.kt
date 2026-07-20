@@ -12,6 +12,7 @@ import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
+import com.example.morningcalculator.shared.animation.routineCardSharedKey
 import com.example.morningcalculator.shared.components.CustomTopBar
 import com.example.morningcalculator.shared.features.routineCard
 import com.example.morningcalculator.shared.preview.PreviewAll
@@ -35,6 +36,7 @@ fun RoutineSuccessTopAppBar(
                 verticalPadding = 24.dp,
                 horizontalPadding = 0.dp,
                 viewItem = viewItem,
+                sharedKey = routineCardSharedKey(viewState.routine.id),
                 shape = RoundedCornerShape(
                     bottomEnd = 28.dp,
                     bottomStart = 28.dp
