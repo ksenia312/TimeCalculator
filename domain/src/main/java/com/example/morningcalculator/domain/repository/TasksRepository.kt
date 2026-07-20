@@ -4,10 +4,9 @@ import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.domain.model.TaskRequest
 import com.example.morningcalculator.domain.model.TaskUpdateRequest
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 interface TasksRepository {
-    val tasksFlow: StateFlow<List<Task>>
+    val tasksFlow: Flow<List<Task>>
     fun getTaskFlow(id: String): Flow<Task?>
 
     suspend fun addTask(request: TaskRequest): Task

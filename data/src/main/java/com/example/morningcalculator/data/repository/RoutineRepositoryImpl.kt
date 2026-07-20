@@ -13,9 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
@@ -26,12 +25,12 @@ class RoutineRepositoryImpl(
     private val populatedFlow = dao.getRoutinesPopulated()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    override val routinesFlow: StateFlow<List<Routine>> = populatedFlow
+    override val routinesFlow: Flow<List<Routine>> = populatedFlow
         .map { list -> list.map { it.toDomain() } }
-        .stateIn(
+        .shareIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            replay = 1
         )
 
     override fun getRoutineFlow(id: String): Flow<Routine?> =

@@ -20,18 +20,6 @@ class TasksListViewModel(
         loadTasks()
     }
 
-    fun deleteTask(id: String) {
-        viewModelScope.launch {
-            repository.deleteTask(id)
-        }
-    }
-
-    fun editTask(request: TaskUpdateRequest) {
-        viewModelScope.launch {
-            repository.updateTask(request)
-        }
-    }
-
     private fun loadTasks() {
         viewModelScope.launch {
             repository.tasksFlow.collect {
