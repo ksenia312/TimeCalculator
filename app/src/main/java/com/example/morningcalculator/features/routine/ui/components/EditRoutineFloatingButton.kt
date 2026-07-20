@@ -34,7 +34,7 @@ fun EditRoutineFloatingButton(
     }
     if (showAddTaskDialog.value) {
         CreateTaskScreen(
-            linkedToRoutine = true,
+            canSelectCurrentTask = true,
             onConfirm = { request, selectedIndex ->
                 viewModel.addNewTask(
                     request,
@@ -59,7 +59,7 @@ fun EditRoutineFloatingButton(
                 }),
             FabItem(
                 title = stringResource(R.string.fab_manage_tasks),
-                iconRes = R.drawable.search,
+                iconRes = R.drawable.link,
                 contentDescription = stringResource(R.string.fab_manage_tasks),
                 onClick = {
                     showTasksSheet.value = true

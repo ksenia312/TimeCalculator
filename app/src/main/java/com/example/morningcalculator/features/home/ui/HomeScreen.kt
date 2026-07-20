@@ -42,7 +42,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
 
     if (showAddTaskDialog.value) {
         CreateTaskScreen(
-            linkedToRoutine = false,
+            canSelectCurrentTask = false,
             onConfirm = { request, selectedIndex ->
                 homeViewModel.addNewTask(request)
                 showAddTaskDialog.value = false

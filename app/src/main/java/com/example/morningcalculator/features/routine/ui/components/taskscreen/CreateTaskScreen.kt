@@ -19,15 +19,15 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun CreateTaskScreen(
-    linkedToRoutine: Boolean,
+    canSelectCurrentTask: Boolean,
     onConfirm: (TaskRequest, Int?) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var title by remember { mutableStateOf("") }
     val durations = remember { mutableStateListOf("") }
 
-    var selectedIndex by remember {
-        mutableStateOf(if (linkedToRoutine) 0 else null)
+    var selectedIndex by remember(canSelectCurrentTask) {
+        mutableStateOf(if (canSelectCurrentTask) 0 else null)
     }
 
     EditorDialogScaffold(
@@ -52,9 +52,13 @@ fun CreateTaskScreen(
                 DurationRow(
                     index = index,
                     value = value,
-                    selectable = linkedToRoutine,
+                    selectable = canSelectCurrentTask,
                     selected = selectedIndex == index,
-                    onSelect = { selectedIndex = index },
+                    onSelect = {
+                        if (canSelectCurrentTask) {
+                            selectedIndex = index
+                        }
+                    },
                     onValueChange = { new ->
                         if (new.all { it.isDigit() }) {
                             durations[index] = new
@@ -62,7 +66,7 @@ fun CreateTaskScreen(
                     },
                     onRemove = {
                         durations.removeAt(index)
-                        if (linkedToRoutine) {
+                        if (canSelectCurrentTask) {
                             selectedIndex = selectedIndexAfterRemove(
                                 current = selectedIndex,
                                 removedIndex = index,
@@ -78,7 +82,7 @@ fun CreateTaskScreen(
                     text = stringResource(R.string.task_add_more_durations),
                     onClick = {
                         durations.add("")
-                        if (linkedToRoutine) {
+                        if (canSelectCurrentTask) {
                             selectedIndex = durations.lastIndex
                         }
                     },

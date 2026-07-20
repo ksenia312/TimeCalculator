@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,25 +22,28 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun EditTaskScreen(
+    canSelectCurrentTask: Boolean,
     onConfirm: (TaskUpdateRequest, Int?) -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
     initialTask: Task,
-    initialSubDataId: String?,
+    initialSelectedSubDataId: String?,
     deleteIcon: @Composable () -> Unit,
 ) {
     var title by remember { mutableStateOf(initialTask.title) }
-    val initialIndex = remember(initialTask, initialSubDataId) {
-        if (initialSubDataId == null) {
+    val initialIndex = remember(initialTask, initialSelectedSubDataId) {
+        if (initialSelectedSubDataId == null) {
             0
         } else {
             initialTask.data
-                .indexOfFirst { it.id == initialSubDataId }
+                .indexOfFirst { it.id == initialSelectedSubDataId }
                 .takeIf { it >= 0 }
                 ?: 0
         }
     }
-    var selectedIndex by remember { mutableIntStateOf(initialIndex) }
+    var selectedIndex by remember(initialIndex, canSelectCurrentTask) {
+        mutableStateOf(if (canSelectCurrentTask) initialIndex else null)
+    }
 
     val subData = remember {
         (initialTask.data as List<SubData?>).toMutableStateList()
@@ -81,9 +83,13 @@ fun EditTaskScreen(
                 DurationRow(
                     index = index,
                     value = value,
-                    selectable = true,
+                    selectable = canSelectCurrentTask,
                     selected = selectedIndex == index,
-                    onSelect = { selectedIndex = index },
+                    onSelect = {
+                        if (canSelectCurrentTask) {
+                            selectedIndex = index
+                        }
+                    },
                     onValueChange = { new ->
                         if (new.all { it.isDigit() }) {
                             val duration = new.toIntOrNull()?.minutes
@@ -96,11 +102,13 @@ fun EditTaskScreen(
                     },
                     onRemove = {
                         subData.removeAt(index)
-                        selectedIndex = selectedIndexAfterRemove(
-                            current = selectedIndex,
-                            removedIndex = index,
-                            newLastIndex = subData.lastIndex,
-                        ) ?: 0
+                        if (canSelectCurrentTask) {
+                            selectedIndex = selectedIndexAfterRemove(
+                                current = selectedIndex,
+                                removedIndex = index,
+                                newLastIndex = subData.lastIndex,
+                            )
+                        }
                     },
                 )
             }
@@ -110,7 +118,9 @@ fun EditTaskScreen(
                     text = stringResource(R.string.task_add_more_durations),
                     onClick = {
                         subData.add(null)
-                        selectedIndex = subData.lastIndex
+                        if (canSelectCurrentTask) {
+                            selectedIndex = subData.lastIndex
+                        }
                     },
                 )
             }

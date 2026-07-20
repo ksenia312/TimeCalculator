@@ -29,8 +29,9 @@ fun TasksListScreen(
 
     editingTask.value?.let {
         EditTaskScreen(
+            canSelectCurrentTask = false,
             initialTask = it,
-            initialSubDataId = null,
+            initialSelectedSubDataId = null,
             onDismiss = { editingTask.value = null },
             onDelete = { viewModel.deleteTask(it.id) },
             deleteIcon = {

@@ -64,8 +64,9 @@ fun TasksListView(
     if (editingLink.value != null) {
         val link = editingLink.value!!
         EditTaskScreen(
+            canSelectCurrentTask = true,
             initialTask = link.task,
-            initialSubDataId = link.subData?.id,
+            initialSelectedSubDataId = link.subData?.id,
             onDismiss = { editingLink.value = null },
             onDelete = { viewModel.deleteTask(link.id) },
             deleteIcon = {

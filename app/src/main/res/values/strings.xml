@@ -22,8 +22,8 @@
 
     <string name="fab_task">Task</string>
     <string name="fab_routine">Routine</string>
-    <string name="fab_add_task">Add Task</string>
-    <string name="fab_manage_tasks">Manage Tasks</string>
+    <string name="fab_add_task">Create task</string>
+    <string name="fab_manage_tasks">Link existing tasks</string>
     <string name="fab_add_item">Add Item</string>
 
     <string name="routine_anchor_start_at">Start at</string>
