@@ -2,14 +2,13 @@ package com.example.morningcalculator.core.repository
 
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface RoutineRepository {
     val routinesFlow: StateFlow<List<Routine>>
-    val routineFlow: StateFlow<Routine?>
 
-    fun initializeId(id: String)
-    fun clearId()
+    fun getRoutineFlow(id: String): Flow<Routine?>
 
     suspend fun addRoutine(request: RoutineRequest)
 

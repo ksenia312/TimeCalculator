@@ -187,8 +187,6 @@ class RoutineViewModel(
     }
 
     fun loadRoutine() {
-        routineRepository.initializeId(id)
-
         viewModelScope.launch {
             tasksRepository.tasksFlow.collect {
                 _tasksState.value = it
@@ -200,7 +198,7 @@ class RoutineViewModel(
         }
 
         viewModelScope.launch {
-            routineRepository.routineFlow
+            routineRepository.getRoutineFlow(id)
                 .dropWhile { it == null }
                 .collect { routine ->
                     val currentDialogState = (_viewState.value as? RoutineViewState.Success)

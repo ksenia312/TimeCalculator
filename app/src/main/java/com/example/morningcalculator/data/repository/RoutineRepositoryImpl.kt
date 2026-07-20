@@ -14,16 +14,14 @@ import com.example.morningcalculator.shared.extensions.withZeroSeconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class RoutineRepositoryImpl(
@@ -33,7 +31,6 @@ class RoutineRepositoryImpl(
 
     private val populatedFlow = dao.getRoutinesPopulated()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val _selectedRoutineId = MutableStateFlow<String?>(null)
 
     override val routinesFlow: StateFlow<List<Routine>> = populatedFlow
         .map { list -> list.map { it.toDomain() } }
@@ -67,22 +64,8 @@ class RoutineRepositoryImpl(
         notificationChecker
     }
 
-    override val routineFlow: StateFlow<Routine?> =
-        combine(routinesFlow, _selectedRoutineId) { routines, selectedId ->
-            routines.firstOrNull { it.id == selectedId }
-        }.stateIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
-
-    override fun initializeId(id: String) {
-        _selectedRoutineId.value = id
-    }
-
-    override fun clearId() {
-        _selectedRoutineId.value = null
-    }
+    override fun getRoutineFlow(id: String): Flow<Routine?> =
+        routinesFlow.map { routines -> routines.firstOrNull { it.id == id } }
 
     override suspend fun addRoutine(request: RoutineRequest) {
         val scheduledAt = request.scheduledAt.withZeroSeconds()
