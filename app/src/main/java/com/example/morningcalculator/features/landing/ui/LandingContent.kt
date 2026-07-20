@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +18,7 @@ import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.home.ui.bottomIndent
+import com.example.morningcalculator.features.home.ui.components.HomeEmptyState
 import com.example.morningcalculator.features.landing.presentation.LandingRoutineState
 import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.features.landing.ui.card.LandingCardPager
@@ -37,6 +37,7 @@ import kotlin.time.Instant
 @Composable
 fun LandingContent(
     viewState: LandingState,
+    onCreateRoutineClick: () -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
     val onNavigate: (routineId: String) -> Unit = {
@@ -55,25 +56,29 @@ fun LandingContent(
 
             is LandingState.Success -> {
                 val routineStates = viewState.routineStates
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Spacer(Modifier.height(16.dp))
-
-                    if (routineStates.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.routines_list_no_routines_scheduled),
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    } else {
+                if (routineStates.isEmpty()) {
+                    HomeEmptyState(
+                        title = stringResource(R.string.landing_empty_title),
+                        subtitle = stringResource(R.string.landing_empty_subtitle),
+                        actionText = stringResource(R.string.landing_empty_action),
+                        onActionClick = onCreateRoutineClick,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .bottomIndent()
+                            .padding(horizontal = 24.dp),
+                    )
+                } else {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Spacer(Modifier.height(16.dp))
                         LandingCardPager(
                             modifier = Modifier.weight(5f),
                             routineStates = routineStates,
                             onNavigate = onNavigate,
                         )
-                    }
 
-                    Spacer(Modifier.height(54.dp))
-                    Spacer(Modifier.bottomIndent())
+                        Spacer(Modifier.height(54.dp))
+                        Spacer(Modifier.bottomIndent())
+                    }
                 }
             }
 

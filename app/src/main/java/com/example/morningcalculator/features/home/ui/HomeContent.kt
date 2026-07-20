@@ -26,6 +26,8 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 fun HomeContent(
     current: HomeTab,
     onTabSelected: (HomeTab) -> Unit,
+    onCreateRoutineClick: () -> Unit,
+    onCreateTaskClick: () -> Unit,
     paddingValues: PaddingValues
 ) {
     Box(
@@ -40,9 +42,9 @@ fun HomeContent(
             )
     ) {
         when (current) {
-            HomeTab.LANDING -> LandingScreen()
-            HomeTab.ROUTINES -> RoutinesListScreen()
-            HomeTab.TASKS -> TasksListScreen()
+            HomeTab.LANDING -> LandingScreen(onCreateRoutineClick = onCreateRoutineClick)
+            HomeTab.ROUTINES -> RoutinesListScreen(onCreateRoutineClick = onCreateRoutineClick)
+            HomeTab.TASKS -> TasksListScreen(onCreateTaskClick = onCreateTaskClick)
         }
 
         HomeBottomNavigationBar(
@@ -62,6 +64,8 @@ fun HomeContentPreview() {
         HomeContent(
             current = HomeTab.ROUTINES,
             onTabSelected = { },
+            onCreateRoutineClick = {},
+            onCreateTaskClick = {},
             paddingValues = PaddingValues(0.dp)
         )
     }

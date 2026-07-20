@@ -8,10 +8,14 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LandingScreen(landingViewModel: LandingViewModel = koinViewModel()) {
+fun LandingScreen(
+    onCreateRoutineClick: () -> Unit = {},
+    landingViewModel: LandingViewModel = koinViewModel(),
+) {
     val viewState = landingViewModel.viewState.collectAsStateWithLifecycle()
 
     LandingContent(
         viewState = viewState.value,
+        onCreateRoutineClick = onCreateRoutineClick,
     )
 }

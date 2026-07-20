@@ -91,6 +91,8 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
             paddingValues = it,
             current = viewState.value.selectedTab,
             onTabSelected = homeViewModel::onTabSelected,
+            onCreateRoutineClick = homeViewModel::onAddRoutineClick,
+            onCreateTaskClick = { showAddTaskDialog.value = true },
         )
     }
 }

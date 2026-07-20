@@ -20,7 +20,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TasksListScreen(viewModel: TasksListViewModel = koinViewModel()) {
+fun TasksListScreen(
+    onCreateTaskClick: () -> Unit = {},
+    viewModel: TasksListViewModel = koinViewModel()
+) {
     val viewState = viewModel.viewState.collectAsStateWithLifecycle()
     val editingTask = remember { mutableStateOf<Task?>(null) }
 
@@ -45,6 +48,7 @@ fun TasksListScreen(viewModel: TasksListViewModel = koinViewModel()) {
 
     TasksListContent(
         viewState = viewState.value,
-        onEditTask = { task -> editingTask.value = task }
+        onEditTask = { task -> editingTask.value = task },
+        onCreateTaskClick = onCreateTaskClick,
     )
 }

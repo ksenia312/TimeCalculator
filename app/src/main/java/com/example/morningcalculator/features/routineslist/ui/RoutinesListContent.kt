@@ -13,9 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.bottomIndent
+import com.example.morningcalculator.features.home.ui.components.HomeEmptyState
 import com.example.morningcalculator.features.routineslist.presentation.RoutinesListState
 import com.example.morningcalculator.features.routineslist.ui.components.RoutineListItem
 import com.example.morningcalculator.shared.preview.PreviewAll
@@ -27,6 +30,7 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 fun RoutinesListContent(
     viewState: RoutinesListState,
     onEditRoutine: (Routine) -> Unit,
+    onCreateRoutineClick: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -42,19 +46,32 @@ fun RoutinesListContent(
 
             is RoutinesListState.Success -> {
                 val routines = viewState.sorted
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                ) {
-                    item { Spacer(Modifier.height(16.dp)) }
-                    routines.forEach { routine ->
-                        item(key = routine.id) {
-                            RoutineListItem(routine) {
-                                onEditRoutine(it)
+                if (routines.isEmpty()) {
+                    HomeEmptyState(
+                        title = stringResource(R.string.routines_empty_title),
+                        subtitle = stringResource(R.string.routines_empty_subtitle),
+                        actionText = stringResource(R.string.routines_empty_action),
+                        onActionClick = onCreateRoutineClick,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .bottomIndent()
+                            .padding(horizontal = 24.dp)
+                    )
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    ) {
+                        item { Spacer(Modifier.height(16.dp)) }
+                        routines.forEach { routine ->
+                            item(key = routine.id) {
+                                RoutineListItem(routine) {
+                                    onEditRoutine(it)
+                                }
                             }
                         }
+                        item { Box(Modifier.bottomIndent()) }
                     }
-                    item { Box(Modifier.bottomIndent()) }
                 }
             }
 
@@ -81,7 +98,8 @@ fun RoutineListContentPreview() {
                 sorted = PreviewConstants.routinesFull,
                 sort = RoutinesListState.Sort.DEFAULT
             ),
-            onEditRoutine = {}
+            onEditRoutine = {},
+            onCreateRoutineClick = {},
         )
     }
 }

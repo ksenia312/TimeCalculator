@@ -41,6 +41,12 @@
     <string name="routines_list_status_running_ends_on">running now, ends on</string>
     <string name="routines_list_status_planned_for">planned for</string>
     <string name="routines_list_no_routines_scheduled">No routines scheduled</string>
+    <string name="landing_empty_title">No routines yet</string>
+    <string name="landing_empty_subtitle">Create your first routine to start planning your day.</string>
+    <string name="landing_empty_action">Create first routine</string>
+    <string name="routines_empty_title">No routines yet</string>
+    <string name="routines_empty_subtitle">Create your first routine and keep your day structured.</string>
+    <string name="routines_empty_action">Create routine</string>
 
     <string name="routine_card_started_at">Started at</string>
     <string name="routine_card_will_start">Will start</string>
@@ -57,6 +63,9 @@
 
     <string name="tasks_manage_title">Manage tasks</string>
     <string name="tasks_create_new">Create a new task</string>
+    <string name="tasks_empty_title">No tasks yet</string>
+    <string name="tasks_empty_subtitle">Create your first task to build routines faster.</string>
+    <string name="tasks_empty_action">Create task</string>
 
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>

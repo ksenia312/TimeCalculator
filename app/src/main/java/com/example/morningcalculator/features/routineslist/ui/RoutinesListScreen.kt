@@ -9,11 +9,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoutinesListScreen(routinesViewModel: RoutinesListViewModel = koinViewModel()) {
+fun RoutinesListScreen(
+    onCreateRoutineClick: () -> Unit = {},
+    routinesViewModel: RoutinesListViewModel = koinViewModel()
+) {
     val viewState = routinesViewModel.viewState.collectAsStateWithLifecycle()
 
     RoutinesListContent(
         viewState = viewState.value,
-        onEditRoutine = routinesViewModel::editRoutine
+        onEditRoutine = routinesViewModel::editRoutine,
+        onCreateRoutineClick = onCreateRoutineClick,
     )
 }
