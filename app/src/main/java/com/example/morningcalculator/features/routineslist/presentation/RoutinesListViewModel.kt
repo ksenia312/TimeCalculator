@@ -23,21 +23,6 @@ class RoutinesListViewModel(
         loadRoutines()
     }
 
-    fun editRoutine(routine: Routine) {
-        viewModelScope.launch {
-            routineRepository.updateRoutine(routine)
-            loadRoutines()
-        }
-    }
-
-    fun deleteRoutine(id: String) {
-        viewModelScope.launch {
-            routineRepository.deleteRoutine(id)
-            loadRoutines()
-        }
-    }
-
-
     private fun loadRoutines() {
         viewModelScope.launch {
             routineRepository.routinesFlow.collect {

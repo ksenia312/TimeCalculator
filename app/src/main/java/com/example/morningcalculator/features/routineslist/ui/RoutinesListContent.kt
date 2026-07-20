@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.bottomIndent
 import com.example.morningcalculator.features.home.ui.components.HomeEmptyState
 import com.example.morningcalculator.features.routineslist.presentation.RoutinesListState
@@ -29,8 +28,6 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 @Composable
 fun RoutinesListContent(
     viewState: RoutinesListState,
-    onEditRoutine: (Routine) -> Unit,
-    onDeleteRoutine: (String) -> Unit,
     onCreateRoutineClick: () -> Unit = {},
 ) {
     Box(
@@ -68,8 +65,6 @@ fun RoutinesListContent(
                             item(key = routine.id) {
                                 RoutineListItem(
                                     routine = routine,
-                                    onEdit = onEditRoutine,
-                                    onDelete = onDeleteRoutine,
                                 )
                             }
                         }
@@ -101,8 +96,6 @@ fun RoutineListContentPreview() {
                 sorted = PreviewConstants.routinesFull,
                 sort = RoutinesListState.Sort.DEFAULT
             ),
-            onEditRoutine = {},
-            onDeleteRoutine = {},
             onCreateRoutineClick = {},
         )
     }

@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.home.ui.components
+package com.example.morningcalculator.features.routineeditor.ui
 
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineScheduleAnchor
@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.time.Instant
 
-data class RoutineDialogViewState(
+data class RoutineEditorFormState(
     val isVisible: Boolean = false,
     val routineId: String? = null,
     val title: String = "",
@@ -18,13 +18,13 @@ data class RoutineDialogViewState(
     val time: LocalTime = LocalTime(7, 0),
 )
 
-fun Routine.toRoutineDialogViewState(zoneId: ZoneId = ZoneId.systemDefault()): RoutineDialogViewState {
+fun Routine.toRoutineEditorFormState(zoneId: ZoneId = ZoneId.systemDefault()): RoutineEditorFormState {
     val initialDateTime = java.time.Instant
         .ofEpochMilli(scheduledAt.toEpochMilliseconds())
         .atZone(zoneId)
         .toLocalDateTime()
 
-    return RoutineDialogViewState(
+    return RoutineEditorFormState(
         isVisible = true,
         routineId = id,
         title = title,
@@ -34,7 +34,7 @@ fun Routine.toRoutineDialogViewState(zoneId: ZoneId = ZoneId.systemDefault()): R
     )
 }
 
-fun RoutineDialogViewState.toScheduledAtInstant(
+fun RoutineEditorFormState.toScheduledAtInstant(
     zoneId: ZoneId = ZoneId.systemDefault(),
 ): Instant {
     val scheduledAtMillis = LocalDateTime
@@ -48,11 +48,11 @@ fun RoutineDialogViewState.toScheduledAtInstant(
         .withZeroSeconds()
 }
 
-fun Routine.applyRoutineDialogViewState(
-    routineDialogViewState: RoutineDialogViewState,
+fun Routine.applyRoutineEditorFormState(
+    routineEditorFormState: RoutineEditorFormState,
     zoneId: ZoneId = ZoneId.systemDefault(),
 ): Routine = copy(
-    title = routineDialogViewState.title,
-    scheduledAt = routineDialogViewState.toScheduledAtInstant(zoneId),
-    scheduledAtAnchor = routineDialogViewState.anchor,
+    title = routineEditorFormState.title,
+    scheduledAt = routineEditorFormState.toScheduledAtInstant(zoneId),
+    scheduledAtAnchor = routineEditorFormState.anchor,
 )

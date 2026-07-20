@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.routine.ui.components.taskscreen
+package com.example.morningcalculator.features.taskeditor.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
@@ -13,16 +13,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.TaskRequest
+import com.example.morningcalculator.features.taskeditor.presentation.CreateTaskViewModel
+import com.example.morningcalculator.shared.features.AddDurationButton
+import com.example.morningcalculator.shared.features.DurationRow
+import com.example.morningcalculator.shared.features.EditorScreenScaffold
+import com.example.morningcalculator.shared.features.SaveTaskButton
+import com.example.morningcalculator.shared.features.TaskNameField
+import com.example.morningcalculator.shared.features.selectedIndexAfterRemove
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun CreateTaskScreen(
-    canSelectCurrentTask: Boolean,
-    onConfirm: (TaskRequest, Int?) -> Unit,
-    onDismiss: () -> Unit,
+    routineId: String? = null,
+    viewModel: CreateTaskViewModel = koinViewModel(
+        parameters = { parametersOf(routineId) }
+    ),
 ) {
+    val navigator = LocalNavigator.current
+    val canSelectCurrentTask = routineId != null
     var title by remember { mutableStateOf("") }
     val durations = remember { mutableStateListOf("") }
 
@@ -30,9 +43,9 @@ fun CreateTaskScreen(
         mutableStateOf(if (canSelectCurrentTask) 0 else null)
     }
 
-    EditorDialogScaffold(
+    EditorScreenScaffold(
         screenTitle = stringResource(R.string.task_create_title),
-        onDismiss = onDismiss,
+        onDismiss = navigator::navigateBack,
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -95,17 +108,18 @@ fun CreateTaskScreen(
                     onConfirm = {
                         val durationsRes = runCatching { durations.map { it.toInt().minutes } }.getOrNull()
                         if (durationsRes != null) {
-                            onConfirm(
+                            viewModel.createTask(
                                 TaskRequest(
                                     title = title,
                                     description = "",
                                     durations = durationsRes
                                 ),
-                                selectedIndex,
+                                selectedDurationIndex = selectedIndex,
                             )
+                            navigator.navigateBack()
                         }
                     },
-                    onDismiss = onDismiss,
+                    onDismiss = navigator::navigateBack,
                 )
             }
         }

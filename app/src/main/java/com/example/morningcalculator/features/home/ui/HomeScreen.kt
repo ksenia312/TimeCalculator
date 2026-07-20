@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,40 +14,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.home.ui.components.HomeAppBar
-import com.example.morningcalculator.features.home.ui.components.RoutineDialog
-import com.example.morningcalculator.features.routine.ui.components.taskscreen.CreateTaskScreen
 import com.example.morningcalculator.shared.components.AppScaffold
 import com.example.morningcalculator.shared.components.FabItem
 import com.example.morningcalculator.shared.components.FabMenu
+import com.example.morningcalculator.shared.navigator.AppRoute
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
-
+    val navigator = LocalNavigator.current
     val viewState = homeViewModel.uiState.collectAsStateWithLifecycle()
-    val showAddTaskDialog = remember { mutableStateOf(false) }
-    val routineDialogViewState = viewState.value.routineDialogViewState
-
-    if (routineDialogViewState.isVisible) {
-        RoutineDialog(
-            screenTitle = stringResource(R.string.routine_dialog_add_title),
-            onConfirm = homeViewModel::onRoutineDialogConfirm,
-            onDismiss = homeViewModel::onRoutineDialogDismiss,
-            viewState = routineDialogViewState,
-            onStateChange = homeViewModel::onRoutineDialogViewStateChange,
-        )
-    }
-
-    if (showAddTaskDialog.value) {
-        CreateTaskScreen(
-            canSelectCurrentTask = false,
-            onConfirm = { request, selectedIndex ->
-                homeViewModel.addNewTask(request)
-                showAddTaskDialog.value = false
-            }, onDismiss = { showAddTaskDialog.value = false }
-        )
-    }
 
     val isBarExpanded = rememberSaveable { mutableStateOf(false) }
     AppScaffold(
@@ -70,7 +47,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
                         title = stringResource(R.string.fab_task),
                         onClick = {
                             isBarExpanded.value = false
-                            showAddTaskDialog.value = true
+                            navigator.navigateTo(AppRoute.CreateTask())
                         },
                         contentDescription = stringResource(R.string.fab_task)
                     ),
@@ -79,7 +56,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
                         title = stringResource(R.string.fab_routine),
                         onClick = {
                             isBarExpanded.value = false
-                            homeViewModel.onAddRoutineClick()
+                            navigator.navigateTo(AppRoute.CreateRoutine)
                         },
                         contentDescription = stringResource(R.string.fab_routine)
                     )
@@ -91,8 +68,8 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
             paddingValues = it,
             current = viewState.value.selectedTab,
             onTabSelected = homeViewModel::onTabSelected,
-            onCreateRoutineClick = homeViewModel::onAddRoutineClick,
-            onCreateTaskClick = { showAddTaskDialog.value = true },
+            onCreateRoutineClick = { navigator.navigateTo(AppRoute.CreateRoutine) },
+            onCreateTaskClick = { navigator.navigateTo(AppRoute.CreateTask()) },
         )
     }
 }

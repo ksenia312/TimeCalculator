@@ -15,8 +15,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -27,10 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.features.home.ui.components.applyRoutineDialogViewState
-import com.example.morningcalculator.features.home.ui.components.RoutineDialog
-import com.example.morningcalculator.features.home.ui.components.RoutineDialogViewState
-import com.example.morningcalculator.features.home.ui.components.toRoutineDialogViewState
 import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing
@@ -46,34 +40,11 @@ import kotlin.time.Instant
 @Composable
 fun RoutineListItem(
     routine: Routine,
-    onEdit: (Routine) -> Unit = {},
-    onDelete: (String) -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
-    val editingRoutineDialogState = remember { mutableStateOf<RoutineDialogViewState?>(null) }
     val onNavigate: () -> Unit = {
         navigator.navigateTo(
             AppRoute.Routine(routineId = routine.id),
-        )
-    }
-
-    if (editingRoutineDialogState.value != null) {
-        val routineDialogViewState = editingRoutineDialogState.value!!
-        RoutineDialog(
-            screenTitle = stringResource(R.string.routine_dialog_edit_title),
-            viewState = routineDialogViewState,
-            onStateChange = { editingRoutineDialogState.value = it },
-            onConfirm = {
-                onEdit(routine.applyRoutineDialogViewState(routineDialogViewState))
-                editingRoutineDialogState.value = null
-            },
-            onDismiss = {
-                editingRoutineDialogState.value = null
-            },
-            onDelete = {
-                onDelete(routine.id)
-                editingRoutineDialogState.value = null
-            }
         )
     }
 
@@ -81,7 +52,12 @@ fun RoutineListItem(
         routine = routine,
         onNavigate = onNavigate,
         onEditClick = {
-            editingRoutineDialogState.value = routine.toRoutineDialogViewState()
+            navigator.navigateTo(
+                AppRoute.EditRoutine(
+                    routineId = routine.id,
+                    fromRoutineScreen = false,
+                )
+            )
         }
     )
 }

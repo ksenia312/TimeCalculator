@@ -1,4 +1,4 @@
-package com.example.morningcalculator.features.home.ui.components
+package com.example.morningcalculator.features.routineeditor.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,21 +26,93 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.RoutineScheduleAnchor
-import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditorDialogScaffold
+import com.example.morningcalculator.features.routineeditor.presentation.CreateRoutineViewModel
+import com.example.morningcalculator.features.routineeditor.presentation.EditRoutineViewModel
+import com.example.morningcalculator.features.routineeditor.presentation.EditRoutineViewState
+import com.example.morningcalculator.features.routineeditor.ui.components.RoutineAnchorSelector
+import com.example.morningcalculator.shared.features.EditorScreenScaffold
 import com.example.morningcalculator.shared.components.AppTextField
 import com.example.morningcalculator.shared.components.DatePickerField
 import com.example.morningcalculator.shared.components.SmallIconButton
 import com.example.morningcalculator.shared.components.TimePickerField
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import kotlinx.datetime.LocalTime
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+@Composable
+fun CreateRoutineScreen(
+    viewModel: CreateRoutineViewModel = koinViewModel(),
+) {
+    val navigator = LocalNavigator.current
+    val form by viewModel.viewState.collectAsStateWithLifecycle()
+    RoutineEditorScreen(
+        screenTitle = stringResource(R.string.routine_dialog_add_title),
+        viewState = form,
+        onStateChange = viewModel::onStateChange,
+        onConfirm = {
+            viewModel.saveRoutine()
+            navigator.navigateBack()
+        },
+        onDismiss = navigator::navigateBack,
+    )
+}
+
+@Composable
+fun EditRoutineScreen(
+    routineId: String,
+    fromRoutineScreen: Boolean,
+    viewModel: EditRoutineViewModel = koinViewModel(
+        parameters = { parametersOf(routineId) }
+    ),
+) {
+    val navigator = LocalNavigator.current
+    val state by viewModel.viewState.collectAsStateWithLifecycle()
+    when (val viewState = state) {
+        EditRoutineViewState.Loading -> CircularProgressIndicator()
+        EditRoutineViewState.Error -> {
+            EditorScreenScaffold(
+                screenTitle = stringResource(R.string.routine_dialog_edit_title),
+                onDismiss = navigator::navigateBack,
+            ) { padding ->
+                Text(
+                    text = stringResource(R.string.top_bar_error),
+                    modifier = Modifier.padding(padding).padding(16.dp),
+                )
+            }
+        }
+
+        is EditRoutineViewState.Success -> {
+            RoutineEditorScreen(
+                screenTitle = stringResource(R.string.routine_dialog_edit_title),
+                viewState = viewState.form,
+                onStateChange = viewModel::onStateChange,
+                onConfirm = {
+                    viewModel.saveRoutine()
+                    navigator.navigateBack()
+                },
+                onDismiss = navigator::navigateBack,
+                onDelete = {
+                    viewModel.deleteRoutine()
+                    navigator.navigateBack()
+                    if (fromRoutineScreen) {
+                        navigator.navigateBack()
+                    }
+                },
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoutineDialog(
+private fun RoutineEditorScreen(
     screenTitle: String,
-    viewState: RoutineDialogViewState,
-    onStateChange: (RoutineDialogViewState) -> Unit,
+    viewState: RoutineEditorFormState,
+    onStateChange: (RoutineEditorFormState) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     onDelete: (() -> Unit)? = null,
@@ -55,7 +128,7 @@ fun RoutineDialog(
         RoutineScheduleAnchor.END to stringResource(R.string.routine_anchor_end_at)
     )
 
-    EditorDialogScaffold(
+    EditorScreenScaffold(
         screenTitle = screenTitle,
         onDismiss = onDismiss,
         headerActions = {
@@ -141,7 +214,6 @@ fun RoutineDialog(
                     ),
                     onClick = {
                         onConfirm()
-                        onDismiss()
                     }
                 ) { Text(stringResource(R.string.action_ok)) }
             }
@@ -158,7 +230,6 @@ fun RoutineDialog(
                     onClick = {
                         showDeleteConfirmation = false
                         onDelete()
-                        onDismiss()
                     }
                 ) {
                     Text(

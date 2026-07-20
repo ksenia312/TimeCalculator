@@ -1,11 +1,10 @@
-package com.example.morningcalculator.features.routine.ui.components.taskscreen
+package com.example.morningcalculator.shared.features
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -18,7 +17,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,8 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.components.AddNewButton
 import com.example.morningcalculator.shared.components.AppScaffold
@@ -42,35 +38,33 @@ import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorDialogScaffold(
+fun EditorScreenScaffold(
     screenTitle: String,
     onDismiss: () -> Unit,
     headerActions: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    FullScreenDialog(onDismiss = onDismiss) {
-        AppScaffold(
-            modifier = Modifier.imePadding(),
-            containerColor = MaterialTheme.colorScheme.surface,
-            topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        BackButton(
-                            overrideOnBack = onDismiss,
-                        )
-                    },
-                    title = {
-                        Text(
-                            screenTitle,
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                    },
-                    actions = headerActions,
-                )
-            },
-        ) { padding ->
-            content(padding)
-        }
+    AppScaffold(
+        modifier = Modifier.imePadding(),
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    BackButton(
+                        overrideOnBack = onDismiss,
+                    )
+                },
+                title = {
+                    Text(
+                        screenTitle,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                actions = headerActions,
+            )
+        },
+    ) { padding ->
+        content(padding)
     }
 }
 
@@ -189,27 +183,6 @@ fun SaveTaskButton(
         ),
     ) {
         Text(stringResource(R.string.action_save))
-    }
-}
-
-@Composable
-fun FullScreenDialog(
-    onDismiss: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false,
-        ),
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            tonalElevation = 0.dp,
-        ) {
-            content()
-        }
     }
 }
 

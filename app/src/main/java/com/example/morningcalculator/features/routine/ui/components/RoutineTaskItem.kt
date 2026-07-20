@@ -59,7 +59,7 @@ fun RoutineTaskItem(
     dragOffsetY: MutableState<Float>,
     routineLinks: SnapshotStateList<RoutineLink>,
     viewModel: RoutineViewModel,
-    editingLink: MutableState<RoutineLink?>,
+    onEditClick: () -> Unit,
     isCurrent: Boolean,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -110,7 +110,7 @@ fun RoutineTaskItem(
                 )
                 .border(1.dp, borderColor, shape)
                 .clickable {
-                    editingLink.value = linkFull
+                    onEditClick()
                 }
                 .padding(24.dp, 12.dp, 8.dp, 12.dp),
         ) {

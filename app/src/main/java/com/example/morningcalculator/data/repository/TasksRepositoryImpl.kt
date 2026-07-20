@@ -11,6 +11,7 @@ import com.example.morningcalculator.data.model.TaskEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -41,6 +42,9 @@ class TasksRepositoryImpl(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    override fun getTaskFlow(id: String): Flow<Task?> =
+        tasksFlow.map { tasks -> tasks.firstOrNull { it.id == id } }
 
     override suspend fun updateTask(request: TaskUpdateRequest): Task {
         val taskEntity = TaskEntity(

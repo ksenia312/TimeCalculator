@@ -5,13 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.Task
-import com.example.morningcalculator.core.model.TaskRequest
-import com.example.morningcalculator.core.model.TaskUpdateRequest
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
-import com.example.morningcalculator.features.home.ui.components.RoutineDialogViewState
-import com.example.morningcalculator.features.home.ui.components.toScheduledAtInstant
-import com.example.morningcalculator.features.home.ui.components.toRoutineDialogViewState
 import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import kotlinx.coroutines.delay
@@ -22,7 +17,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.UUID
 import kotlin.time.Instant
 
 class RoutineViewModel(
@@ -56,53 +50,6 @@ class RoutineViewModel(
             while (true) {
                 delay(1000)
                 _now.value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-            }
-        }
-    }
-
-    fun addNewTask(request: TaskRequest, selectedDurationIndex: Int) {
-        viewModelScope.launch {
-            val task = tasksRepository.addTask(request)
-            val subData = task.data[selectedDurationIndex]
-            addOrEditTaskInRoutine(
-                RoutineLink(
-                    id = UUID.randomUUID().toString(),
-                    task = task,
-                    subData = subData
-                )
-            )
-        }
-    }
-
-    fun editTask(
-        request: TaskUpdateRequest,
-        selectedDurationIndex: Int,
-        linkId: String
-    ) {
-        viewModelScope.launch {
-            val task = tasksRepository.updateTask(request)
-            val subData = task.data[selectedDurationIndex]
-            addOrEditTaskInRoutine(
-                RoutineLink(
-                    id = linkId,
-                    task = task,
-                    subData = subData
-                )
-            )
-        }
-    }
-
-    fun deleteTask(linkId: String) {
-        viewModelScope.launch {
-            _viewState.asSuccess {
-                val routineCombined = it.routine
-                val newRoutineCombined = routineCombined.copy(
-                    data = routineCombined.data.mapNotNull { e ->
-                        if (e.id == linkId) null else e
-                    }
-                )
-
-                editRoutine(newRoutineCombined)
             }
         }
     }
@@ -155,55 +102,9 @@ class RoutineViewModel(
         }
     }
 
-    fun onShowEditDialog() {
-        _viewState.asSuccess { state ->
-            _viewState.value = state.copy(
-                routineDialogViewState = state.routine.toRoutineDialogViewState()
-            )
-        }
-    }
-
-    fun onRoutineDialogViewStateChange(routineDialogViewState: RoutineDialogViewState) {
-        _viewState.asSuccess { state ->
-            _viewState.value = state.copy(
-                routineDialogViewState = routineDialogViewState
-            )
-        }
-    }
-
-    fun onRoutineDialogDismiss() {
-        _viewState.asSuccess { state ->
-            _viewState.value = state.copy(
-                routineDialogViewState = null
-            )
-        }
-    }
-
-    fun onRoutineDialogConfirm() {
-        _viewState.asSuccess { state ->
-            val dialogState = state.routineDialogViewState ?: return@asSuccess
-            editRoutine(
-                state.routine.copy(
-                    title = dialogState.title,
-                    scheduledAt = dialogState.toScheduledAtInstant(),
-                    scheduledAtAnchor = dialogState.anchor
-                )
-            )
-            _viewState.value = state.copy(
-                routineDialogViewState = null
-            )
-        }
-    }
-
     fun editRoutine(routine: Routine) {
         viewModelScope.launch {
             routineRepository.updateRoutine(routine)
-        }
-    }
-
-    fun deleteRoutine() {
-        viewModelScope.launch {
-            routineRepository.deleteRoutine(id)
         }
     }
 
@@ -224,14 +125,11 @@ class RoutineViewModel(
                 _now
             ) { routine, now -> Pair(routine, now) }
             .collect { (routine, now) ->
-                val currentDialogState = (_viewState.value as? RoutineViewState.Success)
-                    ?.routineDialogViewState
                 _viewState.value =
                     if (routine == null) RoutineViewState.Error
                     else RoutineViewState.Success(
                         routine = routine,
                         cardViewItem = routine.toRoutineCardViewItem(now),
-                        routineDialogViewState = currentDialogState
                     )
             }
         }
@@ -249,7 +147,6 @@ sealed interface RoutineViewState {
     data class Success(
         val routine: Routine,
         val cardViewItem: RoutineCardViewItem,
-        val routineDialogViewState: RoutineDialogViewState? = null,
     ) : RoutineViewState
 
     object Error : RoutineViewState

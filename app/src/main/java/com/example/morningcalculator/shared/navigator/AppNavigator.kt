@@ -15,8 +15,12 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
+import com.example.morningcalculator.features.routineeditor.ui.CreateRoutineScreen
+import com.example.morningcalculator.features.routineeditor.ui.EditRoutineScreen
 import com.example.morningcalculator.features.home.ui.HomeScreen
 import com.example.morningcalculator.features.routine.ui.RoutineScreen
+import com.example.morningcalculator.features.taskeditor.ui.CreateTaskScreen
+import com.example.morningcalculator.features.taskeditor.ui.EditTaskScreen
 
 @Composable
 fun AppNavigator() {
@@ -41,6 +45,33 @@ fun AppNavigator() {
                     is AppRoute.Routine -> {
                         NavEntry(key = key) {
                             RoutineScreen(id = key.routineId)
+                        }
+                    }
+
+                    is AppRoute.CreateTask -> {
+                        NavEntry(key = key) {
+                            CreateTaskScreen(routineId = key.routineId)
+                        }
+                    }
+
+                    is AppRoute.EditTask -> {
+                        NavEntry(key = key) {
+                            EditTaskScreen(arguments = key.arguments)
+                        }
+                    }
+
+                    AppRoute.CreateRoutine -> {
+                        NavEntry(key = key) {
+                            CreateRoutineScreen()
+                        }
+                    }
+
+                    is AppRoute.EditRoutine -> {
+                        NavEntry(key = key) {
+                            EditRoutineScreen(
+                                routineId = key.routineId,
+                                fromRoutineScreen = key.fromRoutineScreen,
+                            )
                         }
                     }
 

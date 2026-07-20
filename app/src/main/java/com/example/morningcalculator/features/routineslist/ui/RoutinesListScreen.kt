@@ -4,7 +4,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.features.routineslist.presentation.RoutinesListViewModel
-import com.example.morningcalculator.shared.components.AppScaffold
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -17,8 +16,6 @@ fun RoutinesListScreen(
 
     RoutinesListContent(
         viewState = viewState.value,
-        onEditRoutine = routinesViewModel::editRoutine,
-        onDeleteRoutine = routinesViewModel::deleteRoutine,
         onCreateRoutineClick = onCreateRoutineClick,
     )
 }

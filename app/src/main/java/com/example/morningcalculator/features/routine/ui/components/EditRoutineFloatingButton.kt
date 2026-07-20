@@ -10,7 +10,8 @@ import androidx.compose.ui.res.stringResource
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
-import com.example.morningcalculator.features.routine.ui.components.taskscreen.CreateTaskScreen
+import com.example.morningcalculator.shared.navigator.AppRoute
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.features.routine.ui.components.tasksselection.TasksBottomSheet
 import com.example.morningcalculator.shared.components.FabItem
 import com.example.morningcalculator.shared.components.FabMenu
@@ -20,28 +21,18 @@ fun EditRoutineFloatingButton(
     routine: Routine,
     viewModel: RoutineViewModel,
 ) {
+    val navigator = LocalNavigator.current
     val isBarExpanded = rememberSaveable { mutableStateOf(false) }
     val showTasksSheet = remember { mutableStateOf(false) }
-    val showAddTaskDialog = remember { mutableStateOf(false) }
 
     if (showTasksSheet.value) {
         TasksBottomSheet(
             routine = routine,
             onDismiss = { showTasksSheet.value = false },
-            onShowAddTasksDialog = { showAddTaskDialog.value = true },
+            onShowAddTasksDialog = {
+                navigator.navigateTo(AppRoute.CreateTask(routineId = routine.id))
+            },
             viewModel = viewModel
-        )
-    }
-    if (showAddTaskDialog.value) {
-        CreateTaskScreen(
-            canSelectCurrentTask = true,
-            onConfirm = { request, selectedIndex ->
-                viewModel.addNewTask(
-                    request,
-                    selectedIndex ?: 0
-                )
-                showAddTaskDialog.value = false
-            }, onDismiss = { showAddTaskDialog.value = false }
         )
     }
 
@@ -55,7 +46,7 @@ fun EditRoutineFloatingButton(
                 iconRes = R.drawable.task,
                 contentDescription = stringResource(R.string.fab_add_task),
                 onClick = {
-                    showAddTaskDialog.value = true
+                    navigator.navigateTo(AppRoute.CreateTask(routineId = routine.id))
                 }),
             FabItem(
                 title = stringResource(R.string.fab_manage_tasks),
