@@ -34,8 +34,8 @@ import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing
 import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.extensions.whenToStart
-import com.example.morningcalculator.shared.navigator.LocalNavHostController
-import com.example.morningcalculator.shared.navigator.Screen
+import com.example.morningcalculator.shared.navigator.AppRoute
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
@@ -46,13 +46,11 @@ fun RoutineListItem(
     routine: Routine,
     onEdit: (Routine) -> Unit = {}
 ) {
-    val navigator = LocalNavHostController.current
+    val navigator = LocalNavigator.current
     val isEditing = remember { mutableStateOf(false) }
     val onNavigate: () -> Unit = {
-        navigator.navigate(Screen.Routine.route)
-        navigator.currentBackStackEntry?.savedStateHandle?.set(
-            "routineId",
-            routine.id
+        navigator.navigateTo(
+            AppRoute.Routine(routineId = routine.id),
         )
     }
 

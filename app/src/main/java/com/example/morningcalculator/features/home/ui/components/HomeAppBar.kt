@@ -12,14 +12,10 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
-import com.example.morningcalculator.shared.theme.ChangeSystemTopBarTheme
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun HomeAppBar(selectedTab: HomeTab) {
-    ChangeSystemTopBarTheme(
-        foreground = MaterialTheme.colorScheme.onSurface,
-    )
     TopAppBar(
         modifier = Modifier.shadow(6.dp),
         title = {

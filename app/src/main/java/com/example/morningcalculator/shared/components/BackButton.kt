@@ -9,15 +9,15 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.morningcalculator.R
-import com.example.morningcalculator.shared.navigator.LocalNavHostController
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 
 @Composable
 fun BackButton(
     color: Color = MaterialTheme.colorScheme.onBackground,
     overrideOnBack: (() -> Unit)? = null,
 ) {
-    val navigator = LocalNavHostController.current
-    IconButton(onClick = { if (overrideOnBack != null) overrideOnBack() else navigator.popBackStack() }) {
+    val navigator = LocalNavigator.current
+    IconButton(onClick = { if (overrideOnBack != null) overrideOnBack() else navigator.navigateBack() }) {
         Image(
             painterResource(R.drawable.back_arrow),
             contentDescription = stringResource(R.string.content_desc_back),

@@ -23,8 +23,8 @@ import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.features.landing.ui.card.LandingCardPager
 import com.example.morningcalculator.shared.extensions.endAtInstant
 import com.example.morningcalculator.shared.extensions.startAtInstant
-import com.example.morningcalculator.shared.navigator.LocalNavHostController
-import com.example.morningcalculator.shared.navigator.Screen
+import com.example.morningcalculator.shared.navigator.AppRoute
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
 import com.example.morningcalculator.shared.preview.PreviewTheme
@@ -36,10 +36,9 @@ import kotlin.time.Instant
 fun LandingContent(
     viewState: LandingState,
 ) {
-    val navigator = LocalNavHostController.current
+    val navigator = LocalNavigator.current
     val onNavigate: (routine: Routine) -> Unit = {
-        navigator.navigate(Screen.Routine.route)
-        navigator.currentBackStackEntry?.savedStateHandle?.set("routineId", it.id)
+        navigator.navigateTo(AppRoute.Routine(routineId = it.id))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

@@ -26,7 +26,6 @@ import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
 import com.example.morningcalculator.shared.preview.PreviewTheme
-import com.example.morningcalculator.shared.theme.ChangeSystemTopBarTheme
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,9 +36,9 @@ fun CustomTopBar(
     showNavigationIcon: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    ChangeSystemTopBarTheme(onAccentColor)
-
-    Column(modifier.fillMaxWidth().statusBarsPadding()) {
+    Column(modifier
+        .fillMaxWidth()
+        .statusBarsPadding()) {
         if (showNavigationIcon) Box(
             Modifier.align(Alignment.Start)
         ) {
