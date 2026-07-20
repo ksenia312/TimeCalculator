@@ -7,6 +7,10 @@ import com.example.morningcalculator.core.model.TaskRequest
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
 import com.example.morningcalculator.features.home.ui.components.HomeTab
+import com.example.morningcalculator.features.home.ui.components.RoutineDialogViewState
+import com.example.morningcalculator.features.home.ui.components.toScheduledAtInstant
+import com.example.morningcalculator.shared.extensions.toHexString
+import com.example.morningcalculator.shared.utils.RoutineColorPicker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,8 +42,59 @@ class HomeViewModel(
     fun onTabSelected(tab: HomeTab) {
         _viewState.update { it.copy(selectedTab = tab) }
     }
+
+    fun onAddRoutineClick() {
+        _viewState.update {
+            it.copy(
+                routineDialogViewState = RoutineDialogViewState(
+                    isVisible = true
+                )
+            )
+        }
+    }
+
+    fun onRoutineDialogDismiss() {
+        _viewState.update {
+            it.copy(
+                routineDialogViewState = it.routineDialogViewState.copy(
+                    isVisible = false
+                )
+            )
+        }
+    }
+
+    fun onRoutineDialogViewStateChange(routineDialogViewState: RoutineDialogViewState) {
+        _viewState.update {
+            it.copy(
+                routineDialogViewState = routineDialogViewState
+            )
+        }
+    }
+
+    fun onRoutineDialogConfirm() {
+        val state = uiState.value.routineDialogViewState
+        val request = RoutineRequest(
+            title = state.title,
+            scheduledAt = state.toScheduledAtInstant(),
+            scheduledAtAnchor = state.anchor,
+            color = RoutineColorPicker.pick().toHexString()
+        )
+
+        viewModelScope.launch {
+            routineRepository.addRoutine(request)
+        }
+        _viewState.update {
+            it.copy(
+                selectedTab = HomeTab.ROUTINES,
+                routineDialogViewState = it.routineDialogViewState.copy(
+                    isVisible = false
+                )
+            )
+        }
+    }
 }
 
 data class HomeViewState(
     val selectedTab: HomeTab = HomeTab.LANDING,
+    val routineDialogViewState: RoutineDialogViewState = RoutineDialogViewState(),
 )

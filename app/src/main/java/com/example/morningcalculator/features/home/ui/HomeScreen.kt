@@ -28,13 +28,16 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
 
     val viewState = homeViewModel.uiState.collectAsStateWithLifecycle()
     val showAddTaskDialog = remember { mutableStateOf(false) }
-    val showAddRoutineDialog = remember { mutableStateOf(false) }
+    val routineDialogViewState = viewState.value.routineDialogViewState
 
-    if (showAddRoutineDialog.value) {
-        RoutineDialog(onConfirm = { request ->
-            homeViewModel.addRoutine(request)
-            showAddRoutineDialog.value = false
-        }, onDismiss = { showAddRoutineDialog.value = false })
+    if (routineDialogViewState.isVisible) {
+        RoutineDialog(
+            screenTitle = stringResource(R.string.routine_dialog_add_title),
+            onConfirm = homeViewModel::onRoutineDialogConfirm,
+            onDismiss = homeViewModel::onRoutineDialogDismiss,
+            viewState = routineDialogViewState,
+            onStateChange = homeViewModel::onRoutineDialogViewStateChange,
+        )
     }
 
     if (showAddTaskDialog.value) {
@@ -76,7 +79,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
                         title = stringResource(R.string.fab_routine),
                         onClick = {
                             isBarExpanded.value = false
-                            showAddRoutineDialog.value = true
+                            homeViewModel.onAddRoutineClick()
                         },
                         contentDescription = stringResource(R.string.fab_routine)
                     )

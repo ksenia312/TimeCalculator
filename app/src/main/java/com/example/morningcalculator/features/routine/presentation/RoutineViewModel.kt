@@ -9,6 +9,9 @@ import com.example.morningcalculator.core.model.TaskRequest
 import com.example.morningcalculator.core.model.TaskUpdateRequest
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.features.home.ui.components.RoutineDialogViewState
+import com.example.morningcalculator.features.home.ui.components.toScheduledAtInstant
+import com.example.morningcalculator.features.home.ui.components.toRoutineDialogViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -77,7 +80,7 @@ class RoutineViewModel(
     fun deleteTask(linkId: String) {
         viewModelScope.launch {
             _viewState.asSuccess {
-                val routineCombined = it.full
+                val routineCombined = it.routine
                 val newRoutineCombined = routineCombined.copy(
                     data = routineCombined.data.mapNotNull { e ->
                         if (e.id == linkId) null else e
@@ -92,7 +95,7 @@ class RoutineViewModel(
     fun reorderTasks(newLinksIds: List<String>) {
         viewModelScope.launch {
             _viewState.asSuccess {
-                val fullRoutine = it.full
+                val fullRoutine = it.routine
                 val newTaskPairs = newLinksIds.mapNotNull { id ->
                     fullRoutine.data.firstOrNull { r -> r.id == id }
                 }
@@ -105,7 +108,7 @@ class RoutineViewModel(
     fun editLinksInRoutine(links: List<RoutineLink>) {
         viewModelScope.launch {
             _viewState.asSuccess { r ->
-                val modifiedFull = r.full.copy(data = links)
+                val modifiedFull = r.routine.copy(data = links)
                 editRoutine(modifiedFull)
             }
         }
@@ -114,7 +117,7 @@ class RoutineViewModel(
     fun addOrEditTaskInRoutine(link: RoutineLink) {
         viewModelScope.launch {
             _viewState.asSuccess { r ->
-                val routineCombined = r.full
+                val routineCombined = r.routine
                 var newRoutineCombined = routineCombined.copy(
                     data = routineCombined.data.map { entry ->
                         if (entry.id == link.id) {
@@ -137,6 +140,46 @@ class RoutineViewModel(
         }
     }
 
+    fun onShowEditDialog() {
+        _viewState.asSuccess { state ->
+            _viewState.value = state.copy(
+                routineDialogViewState = state.routine.toRoutineDialogViewState()
+            )
+        }
+    }
+
+    fun onRoutineDialogViewStateChange(routineDialogViewState: RoutineDialogViewState) {
+        _viewState.asSuccess { state ->
+            _viewState.value = state.copy(
+                routineDialogViewState = routineDialogViewState
+            )
+        }
+    }
+
+    fun onRoutineDialogDismiss() {
+        _viewState.asSuccess { state ->
+            _viewState.value = state.copy(
+                routineDialogViewState = null
+            )
+        }
+    }
+
+    fun onRoutineDialogConfirm() {
+        _viewState.asSuccess { state ->
+            val dialogState = state.routineDialogViewState ?: return@asSuccess
+            editRoutine(
+                state.routine.copy(
+                    title = dialogState.title,
+                    scheduledAt = dialogState.toScheduledAtInstant(),
+                    scheduledAtAnchor = dialogState.anchor
+                )
+            )
+            _viewState.value = state.copy(
+                routineDialogViewState = null
+            )
+        }
+    }
+
     fun editRoutine(routine: Routine) {
         viewModelScope.launch {
             routineRepository.updateRoutine(routine)
@@ -151,7 +194,7 @@ class RoutineViewModel(
                 _tasksState.value = it
                 val viewState = _viewState.value
                 if (viewState is RoutineViewState.Success) {
-                    _viewState.value = RoutineViewState.Success(viewState.full)
+                    _viewState.value = viewState.copy(routine = viewState.routine)
                 }
             }
         }
@@ -160,9 +203,14 @@ class RoutineViewModel(
             routineRepository.routineFlow
                 .dropWhile { it == null }
                 .collect { routine ->
+                    val currentDialogState = (_viewState.value as? RoutineViewState.Success)
+                        ?.routineDialogViewState
                     _viewState.value =
                         if (routine == null) RoutineViewState.Error
-                        else RoutineViewState.Success(routine)
+                        else RoutineViewState.Success(
+                            routine = routine,
+                            routineDialogViewState = currentDialogState
+                        )
                 }
         }
     }
@@ -176,6 +224,10 @@ fun MutableStateFlow<RoutineViewState>.asSuccess(
 
 sealed interface RoutineViewState {
     object Loading : RoutineViewState
-    data class Success(val full: Routine) : RoutineViewState
+    data class Success(
+        val routine: Routine,
+        val routineDialogViewState: RoutineDialogViewState? = null,
+    ) : RoutineViewState
+
     object Error : RoutineViewState
 }

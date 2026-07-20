@@ -32,7 +32,7 @@ data class LandingCardTaskViewItem(
             val startOffset = durationUntilIndex(routine, index - 1)
             val startInstant = routine.startAtInstant() + startOffset
 
-            val duration = linkDuration(link).coerceAtLeast(Duration.Companion.ZERO)
+            val duration = linkDuration(link).coerceAtLeast(Duration.ZERO)
             val endInstant = startInstant + duration
 
             val progress = when {
@@ -50,9 +50,9 @@ data class LandingCardTaskViewItem(
 
             val remaining = when {
                 now <= startInstant -> duration
-                now >= endInstant -> Duration.Companion.ZERO
+                now >= endInstant -> Duration.ZERO
                 else -> endInstant - now
-            }.coerceAtLeast(Duration.Companion.ZERO)
+            }.coerceAtLeast(Duration.ZERO)
 
             val header = stringResource(
                 R.string.task_duration_left,
@@ -69,14 +69,14 @@ data class LandingCardTaskViewItem(
         }
 
         private fun durationUntilIndex(routine: Routine, index: Int): Duration {
-            if (index < 0) return Duration.Companion.ZERO
-            if (routine.data.isEmpty()) return Duration.Companion.ZERO
+            if (index < 0) return Duration.ZERO
+            if (routine.data.isEmpty()) return Duration.ZERO
 
             val last = index.coerceAtMost(routine.data.lastIndex)
-            var acc = Duration.Companion.ZERO
+            var acc = Duration.ZERO
 
             for (i in 0..last) {
-                acc += linkDuration(routine.data[i]).coerceAtLeast(Duration.Companion.ZERO)
+                acc += linkDuration(routine.data[i]).coerceAtLeast(Duration.ZERO)
             }
 
             return acc

@@ -26,9 +26,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.mapper.copyWithRequest
 import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.features.home.ui.components.applyRoutineDialogViewState
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
+import com.example.morningcalculator.features.home.ui.components.RoutineDialogViewState
+import com.example.morningcalculator.features.home.ui.components.toRoutineDialogViewState
 import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing
@@ -47,22 +49,25 @@ fun RoutineListItem(
     onEdit: (Routine) -> Unit = {}
 ) {
     val navigator = LocalNavigator.current
-    val isEditing = remember { mutableStateOf(false) }
+    val editingRoutineDialogState = remember { mutableStateOf<RoutineDialogViewState?>(null) }
     val onNavigate: () -> Unit = {
         navigator.navigateTo(
             AppRoute.Routine(routineId = routine.id),
         )
     }
 
-    if (isEditing.value) {
+    if (editingRoutineDialogState.value != null) {
+        val routineDialogViewState = editingRoutineDialogState.value!!
         RoutineDialog(
-            initialRoutine = routine,
-            onConfirm = { request ->
-                onEdit(routine.copyWithRequest(request))
-                isEditing.value = false
+            screenTitle = stringResource(R.string.routine_dialog_edit_title),
+            viewState = routineDialogViewState,
+            onStateChange = { editingRoutineDialogState.value = it },
+            onConfirm = {
+                onEdit(routine.applyRoutineDialogViewState(routineDialogViewState))
+                editingRoutineDialogState.value = null
             },
             onDismiss = {
-                isEditing.value = false
+                editingRoutineDialogState.value = null
             },
         )
     }
@@ -71,7 +76,7 @@ fun RoutineListItem(
         routine = routine,
         onNavigate = onNavigate,
         onEditClick = {
-            isEditing.value = true
+            editingRoutineDialogState.value = routine.toRoutineDialogViewState()
         }
     )
 }

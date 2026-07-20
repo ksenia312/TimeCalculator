@@ -78,7 +78,7 @@
     <string name="relative_day_yesterday">Yesterday</string>
     <string name="relative_day_tomorrow">Tomorrow</string>
     <string name="datetime_with_comma">%1$s, %2$s</string>
-    <string name="duration_list_separator">, </string>
+    <string name="duration_list_separator">,\u0020</string>
 
     <plurals name="duration_minutes">
         <item quantity="one">%d minute</item>

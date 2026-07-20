@@ -19,13 +19,13 @@ import com.example.morningcalculator.shared.theme.SetStatusBarLightIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuccessTopAppBar(
+fun RoutineSuccessTopAppBar(
     viewState: RoutineViewState.Success,
     onShowEditDialog: () -> Unit = { },
 ) {
     SetStatusBarLightIcons(enabled = false)
 
-    val routine = viewState.full
+    val routine = viewState.routine
     val viewItem = RoutineCardViewItem.create(routine = routine)
 
     CustomTopBar(
@@ -50,7 +50,7 @@ fun SuccessTopAppBar(
 
 @PreviewAll
 @Composable
-fun SuccessTopAppBarPreview() {
+fun RoutineSuccessTopAppBarPreview() {
     val routine = Routine(
         id = "1",
         title = stringResource(R.string.sample_morning_routine),
@@ -60,10 +60,10 @@ fun SuccessTopAppBarPreview() {
         data = listOf()
     )
     val viewState = RoutineViewState.Success(
-        full = routine,
+        routine = routine,
     )
     PreviewTheme {
-        SuccessTopAppBar(
+        RoutineSuccessTopAppBar(
             viewState = viewState,
         )
     }

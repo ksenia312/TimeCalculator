@@ -23,9 +23,9 @@ class RoutinesListViewModel(
         loadRoutines()
     }
 
-    fun editRoutine(request: Routine) {
+    fun editRoutine(routine: Routine) {
         viewModelScope.launch {
-            routineRepository.updateRoutine(request)
+            routineRepository.updateRoutine(routine)
             loadRoutines()
         }
     }

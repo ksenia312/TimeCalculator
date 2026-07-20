@@ -16,7 +16,7 @@ fun RoutineColorWrapper(viewState: RoutineViewState, content: @Composable () -> 
     val primary = MaterialTheme.colorScheme.primary
     val routineColor by remember(viewState) {
         derivedStateOf {
-            (viewState as? RoutineViewState.Success)?.full?.color?.toColor() ?: primary
+            (viewState as? RoutineViewState.Success)?.routine?.color?.toColor() ?: primary
         }
     }
 
