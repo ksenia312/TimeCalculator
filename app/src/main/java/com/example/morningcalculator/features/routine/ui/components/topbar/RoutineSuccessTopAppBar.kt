@@ -62,6 +62,7 @@ fun RoutineSuccessTopAppBarPreview() {
     val viewState = RoutineViewState.Success(
         routine = routine,
         cardViewItem = routine.toRoutineCardViewItem(),
+        currentTaskIndex = null,
     )
     PreviewTheme {
         RoutineSuccessTopAppBar(
