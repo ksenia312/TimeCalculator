@@ -3,7 +3,6 @@ package com.example.morningcalculator.features.taskeditor.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.domain.model.RoutineLink
-import com.example.morningcalculator.domain.model.SubData
 import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.domain.model.TaskUpdateRequest
 import com.example.morningcalculator.domain.repository.RoutineRepository
@@ -15,19 +14,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 
 class EditTaskViewModel(
-    private val arguments: EditTaskArguments,
+    arguments: EditTaskArguments,
     private val tasksRepository: TasksRepository,
     private val routineRepository: RoutineRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<EditTaskViewState>(EditTaskViewState.Loading)
     val viewState: StateFlow<EditTaskViewState> = _viewState.asStateFlow()
+
     private val source = arguments.source
     private val taskId: String = arguments.taskId
 
     val hasRoutine: Boolean = source is EditTaskSource.Routine
+
+    private val _showDuplicateError = MutableStateFlow(false)
+    val showDuplicateError: StateFlow<Boolean> = _showDuplicateError.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -55,9 +59,14 @@ class EditTaskViewModel(
 
     fun saveTask(
         title: String,
-        subData: List<SubData>,
+        durations: List<Duration>,
         selectedDurationIndex: Int?,
-    ) {
+    ): Boolean {
+        if (durations.hasDuplicateDurations()) {
+            _showDuplicateError.value = true
+            return false
+        }
+        _showDuplicateError.value = false
         viewModelScope.launch {
             val currentTask = (_viewState.value as? EditTaskViewState.Success)?.task
             val updatedTask = tasksRepository.updateTask(
@@ -65,13 +74,14 @@ class EditTaskViewModel(
                     taskId = taskId,
                     title = title,
                     description = currentTask?.description.orEmpty(),
-                    subData = subData,
+                    durations = durations,
                 )
             )
             if (hasRoutine) {
                 updateRoutineLinkWithTask(updatedTask, selectedDurationIndex)
             }
         }
+        return true
     }
 
     fun delete() {

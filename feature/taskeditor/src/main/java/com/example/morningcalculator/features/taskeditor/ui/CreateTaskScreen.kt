@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -13,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
 import com.example.morningcalculator.domain.model.TaskRequest
 import com.example.morningcalculator.features.taskeditor.presentation.CreateTaskViewModel
@@ -38,6 +41,7 @@ fun CreateTaskScreen(
     val hasRoutine = viewModel.hasRoutine
     var title by remember { mutableStateOf("") }
     val durations = remember { mutableStateListOf("") }
+    val showDuplicateError by viewModel.showDuplicateError.collectAsStateWithLifecycle()
 
     var selectedIndex by remember(hasRoutine) {
         mutableStateOf(if (hasRoutine) 0 else null)
@@ -108,7 +112,7 @@ fun CreateTaskScreen(
                     onConfirm = {
                         val durationsRes = runCatching { durations.map { it.toInt().minutes } }.getOrNull()
                         if (durationsRes != null) {
-                            viewModel.createTask(
+                            val saved = viewModel.createTask(
                                 TaskRequest(
                                     title = title,
                                     description = "",
@@ -116,10 +120,21 @@ fun CreateTaskScreen(
                                 ),
                                 selectedDurationIndex = selectedIndex,
                             )
+                            if (saved) {
+                                navigator.navigateBack()
+                            }
                         }
                     },
-                    onDismiss = navigator::navigateBack,
                 )
+
+                if (showDuplicateError) {
+                    Text(
+                        text = stringResource(R.string.task_duplicate_durations_error),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
             }
         }
     }

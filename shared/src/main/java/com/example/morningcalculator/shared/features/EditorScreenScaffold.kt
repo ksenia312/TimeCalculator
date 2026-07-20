@@ -166,17 +166,13 @@ fun AddDurationButton(
 fun SaveTaskButton(
     enabled: Boolean,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
 ) {
     ElevatedButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(40.dp),
         enabled = enabled,
-        onClick = {
-            onConfirm()
-            onDismiss()
-        },
+        onClick = onConfirm,
         colors = ButtonDefaults.elevatedButtonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,

@@ -33,6 +33,9 @@ interface TasksDao {
     @Update
     suspend fun updateSubData(subData: List<SubDataEntity>)
 
+    @Query("SELECT * FROM sub_data WHERE taskId = :taskId")
+    suspend fun getSubDataForTask(taskId: String): List<SubDataEntity>
+
     @Query("DELETE FROM sub_data WHERE taskId = :taskId")
     suspend fun clearSubDataForTask(taskId: String)
 

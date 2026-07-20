@@ -6,6 +6,9 @@ import com.example.morningcalculator.domain.model.RoutineLink
 import com.example.morningcalculator.domain.model.TaskRequest
 import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.domain.repository.TasksRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -18,7 +21,15 @@ class CreateTaskViewModel(
 
     val hasRoutine = routineId != null
 
-    fun createTask(request: TaskRequest, selectedDurationIndex: Int?) {
+    private val _showDuplicateError = MutableStateFlow(false)
+    val showDuplicateError: StateFlow<Boolean> = _showDuplicateError.asStateFlow()
+
+    fun createTask(request: TaskRequest, selectedDurationIndex: Int?): Boolean {
+        if (request.durations.hasDuplicateDurations()) {
+            _showDuplicateError.value = true
+            return false
+        }
+        _showDuplicateError.value = false
         viewModelScope.launch {
             val task = tasksRepository.addTask(request)
             val scopedRoutineId = routineId ?: return@launch
@@ -34,5 +45,6 @@ class CreateTaskViewModel(
                 )
             )
         }
+        return true
     }
 }

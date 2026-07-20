@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
-import com.example.morningcalculator.domain.model.SubData
 import com.example.morningcalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.example.morningcalculator.features.taskeditor.presentation.EditTaskViewState
 import com.example.morningcalculator.shared.features.AddDurationButton
@@ -53,6 +52,7 @@ fun EditTaskScreen(
     val navigator = LocalNavigator.current
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val hasRoutine = viewModel.hasRoutine
+    val showDuplicateError by viewModel.showDuplicateError.collectAsStateWithLifecycle()
 
     when (val state = viewState) {
         EditTaskViewState.Loading -> {
@@ -79,8 +79,8 @@ fun EditTaskScreen(
             var selectedIndex by remember(task.id, hasRoutine) {
                 mutableStateOf(if (hasRoutine) state.initialSelectedIndex else null)
             }
-            val subData = remember(task.id) {
-                (task.data as List<SubData?>).toMutableStateList()
+            val durations = remember(task.id) {
+                task.data.map { it.duration.inWholeMinutes.toString() }.toMutableStateList()
             }
             var showDeleteConfirmation by remember(task.id) { mutableStateOf(false) }
 
@@ -123,9 +123,7 @@ fun EditTaskScreen(
                         )
                     }
 
-                    itemsIndexed(subData) { index, item ->
-                        val value = item?.duration?.inWholeMinutes?.toString() ?: ""
-
+                    itemsIndexed(durations) { index, value ->
                         DurationRow(
                             index = index,
                             value = value,
@@ -138,21 +136,16 @@ fun EditTaskScreen(
                             },
                             onValueChange = { new ->
                                 if (new.all { it.isDigit() }) {
-                                    val duration = new.toIntOrNull()?.minutes
-                                    if (duration != null) {
-                                        val current = subData[index]
-                                        subData[index] = current?.copy(duration = duration)
-                                            ?: SubData(duration = duration)
-                                    }
+                                    durations[index] = new
                                 }
                             },
                             onRemove = {
-                                subData.removeAt(index)
+                                durations.removeAt(index)
                                 if (hasRoutine) {
                                     selectedIndex = selectedIndexAfterRemove(
                                         current = selectedIndex,
                                         removedIndex = index,
-                                        newLastIndex = subData.lastIndex,
+                                        newLastIndex = durations.lastIndex,
                                     )
                                 }
                             },
@@ -163,9 +156,9 @@ fun EditTaskScreen(
                         AddDurationButton(
                             text = stringResource(R.string.task_add_more_durations),
                             onClick = {
-                                subData.add(null)
+                                durations.add("")
                                 if (hasRoutine) {
-                                    selectedIndex = subData.lastIndex
+                                    selectedIndex = durations.lastIndex
                                 }
                             },
                         )
@@ -173,16 +166,32 @@ fun EditTaskScreen(
 
                     item {
                         SaveTaskButton(
-                            enabled = subData.isNotEmpty() && subData.all { it != null },
+                            enabled = durations.isNotEmpty() && durations.all { it.isNotBlank() },
                             onConfirm = {
-                                viewModel.saveTask(
-                                    title = title,
-                                    subData = subData.filterNotNull(),
-                                    selectedDurationIndex = selectedIndex,
-                                )
+                                val durationsRes = runCatching {
+                                    durations.map { it.toInt().minutes }
+                                }.getOrNull()
+                                if (durationsRes != null) {
+                                    val saved = viewModel.saveTask(
+                                        title = title,
+                                        durations = durationsRes,
+                                        selectedDurationIndex = selectedIndex,
+                                    )
+                                    if (saved) {
+                                        navigator.navigateBack()
+                                    }
+                                }
                             },
-                            onDismiss = navigator::navigateBack,
                         )
+
+                        if (showDuplicateError) {
+                            Text(
+                                text = stringResource(R.string.task_duplicate_durations_error),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(top = 8.dp),
+                            )
+                        }
                     }
                 }
             }

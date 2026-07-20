@@ -12,5 +12,5 @@ data class TaskUpdateRequest(
     val taskId: String,
     val title: String,
     val description: String,
-    val subData: List<SubData>,
+    val durations: List<Duration>,
 )

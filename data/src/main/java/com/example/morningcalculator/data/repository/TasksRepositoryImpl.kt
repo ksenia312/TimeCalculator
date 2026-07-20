@@ -14,6 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
@@ -54,19 +55,29 @@ class TasksRepositoryImpl(
             modifiedAt = System.currentTimeMillis()
         )
 
-        val subDataEntities = request.subData.map {
-            SubDataEntity(id = it.id, taskId = request.taskId, duration = it.duration)
-        }
+        val subDataEntities = withContext(Dispatchers.IO) {
+            val existingIdsByDuration = dao.getSubDataForTask(request.taskId)
+                .groupBy { it.duration }
+                .mapValues { (_, entities) -> ArrayDeque(entities.map { it.id }) }
 
-        withContext(Dispatchers.IO) {
-            dao.updateTaskWithData(taskEntity, subDataEntities)
+            val reconciled = request.durations.map { duration ->
+                val reusedId = existingIdsByDuration[duration]?.removeFirstOrNull()
+                SubDataEntity(
+                    id = reusedId ?: UUID.randomUUID().toString(),
+                    taskId = request.taskId,
+                    duration = duration
+                )
+            }
+
+            dao.updateTaskWithData(taskEntity, reconciled)
+            reconciled
         }
 
         return Task(
             id = taskEntity.id,
             title = taskEntity.title,
             description = taskEntity.description,
-            data = request.subData,
+            data = subDataEntities.map { SubData(it.id, it.duration) },
             modifiedAt = taskEntity.modifiedAt
         )
     }
