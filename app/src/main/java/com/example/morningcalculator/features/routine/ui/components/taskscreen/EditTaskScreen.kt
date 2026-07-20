@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +52,7 @@ fun EditTaskScreen(
     val subData = remember {
         (initialTask.data as List<SubData?>).toMutableStateList()
     }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     EditorDialogScaffold(
         screenTitle = stringResource(R.string.task_update_title),
@@ -55,8 +60,7 @@ fun EditTaskScreen(
         headerActions = {
             IconButton(
                 onClick = {
-                    onDelete()
-                    onDismiss()
+                    showDeleteConfirmation = true
                 },
             ) {
                 deleteIcon()
@@ -143,5 +147,32 @@ fun EditTaskScreen(
                 )
             }
         }
+    }
+
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text(stringResource(R.string.task_delete_dialog_title)) },
+            text = { Text(stringResource(R.string.task_delete_dialog_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirmation = false
+                        onDelete()
+                        onDismiss()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 }

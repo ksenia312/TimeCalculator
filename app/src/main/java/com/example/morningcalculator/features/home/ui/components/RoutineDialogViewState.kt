@@ -11,6 +11,7 @@ import kotlin.time.Instant
 
 data class RoutineDialogViewState(
     val isVisible: Boolean = false,
+    val routineId: String? = null,
     val title: String = "",
     val anchor: RoutineScheduleAnchor = RoutineScheduleAnchor.END,
     val date: LocalDate = LocalDate.now(ZoneId.systemDefault()).plusDays(1),
@@ -25,6 +26,7 @@ fun Routine.toRoutineDialogViewState(zoneId: ZoneId = ZoneId.systemDefault()): R
 
     return RoutineDialogViewState(
         isVisible = true,
+        routineId = id,
         title = title,
         anchor = scheduledAtAnchor,
         date = initialDateTime.toLocalDate(),

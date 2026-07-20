@@ -14,6 +14,7 @@ fun RoutineTopBar(
     onRoutineDialogViewStateChange: (RoutineDialogViewState) -> Unit,
     onRoutineDialogConfirm: () -> Unit,
     onRoutineDialogDismiss: () -> Unit,
+    onRoutineDelete: () -> Unit,
 ) {
     when (viewState) {
         is RoutineViewState.Success -> {
@@ -25,6 +26,7 @@ fun RoutineTopBar(
                     onStateChange = onRoutineDialogViewStateChange,
                     onConfirm = onRoutineDialogConfirm,
                     onDismiss = onRoutineDialogDismiss,
+                    onDelete = onRoutineDelete,
                 )
             }
             RoutineSuccessTopAppBar(

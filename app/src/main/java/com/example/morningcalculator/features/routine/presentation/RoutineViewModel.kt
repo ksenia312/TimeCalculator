@@ -201,6 +201,12 @@ class RoutineViewModel(
         }
     }
 
+    fun deleteRoutine() {
+        viewModelScope.launch {
+            routineRepository.deleteRoutine(id)
+        }
+    }
+
     fun loadRoutine() {
         viewModelScope.launch {
             tasksRepository.tasksFlow.collect {

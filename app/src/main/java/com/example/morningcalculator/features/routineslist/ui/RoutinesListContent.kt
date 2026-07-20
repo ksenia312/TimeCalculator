@@ -30,6 +30,7 @@ import com.example.morningcalculator.shared.preview.PreviewTheme
 fun RoutinesListContent(
     viewState: RoutinesListState,
     onEditRoutine: (Routine) -> Unit,
+    onDeleteRoutine: (String) -> Unit,
     onCreateRoutineClick: () -> Unit = {},
 ) {
     Box(
@@ -65,9 +66,11 @@ fun RoutinesListContent(
                         item { Spacer(Modifier.height(16.dp)) }
                         routines.forEach { routine ->
                             item(key = routine.id) {
-                                RoutineListItem(routine) {
-                                    onEditRoutine(it)
-                                }
+                                RoutineListItem(
+                                    routine = routine,
+                                    onEdit = onEditRoutine,
+                                    onDelete = onDeleteRoutine,
+                                )
                             }
                         }
                         item { Box(Modifier.bottomIndent()) }
@@ -99,6 +102,7 @@ fun RoutineListContentPreview() {
                 sort = RoutinesListState.Sort.DEFAULT
             ),
             onEditRoutine = {},
+            onDeleteRoutine = {},
             onCreateRoutineClick = {},
         )
     }

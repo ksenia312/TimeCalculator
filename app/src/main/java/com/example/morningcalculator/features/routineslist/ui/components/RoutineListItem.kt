@@ -46,7 +46,8 @@ import kotlin.time.Instant
 @Composable
 fun RoutineListItem(
     routine: Routine,
-    onEdit: (Routine) -> Unit = {}
+    onEdit: (Routine) -> Unit = {},
+    onDelete: (String) -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
     val editingRoutineDialogState = remember { mutableStateOf<RoutineDialogViewState?>(null) }
@@ -69,6 +70,10 @@ fun RoutineListItem(
             onDismiss = {
                 editingRoutineDialogState.value = null
             },
+            onDelete = {
+                onDelete(routine.id)
+                editingRoutineDialogState.value = null
+            }
         )
     }
 

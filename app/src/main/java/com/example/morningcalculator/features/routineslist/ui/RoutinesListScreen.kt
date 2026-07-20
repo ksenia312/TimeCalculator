@@ -18,6 +18,7 @@ fun RoutinesListScreen(
     RoutinesListContent(
         viewState = viewState.value,
         onEditRoutine = routinesViewModel::editRoutine,
+        onDeleteRoutine = routinesViewModel::deleteRoutine,
         onCreateRoutineClick = onCreateRoutineClick,
     )
 }

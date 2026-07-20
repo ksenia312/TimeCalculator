@@ -3,6 +3,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
 
     <string name="content_desc_delete">Delete</string>
     <string name="content_desc_back">Back</string>
@@ -30,6 +31,8 @@
     <string name="routine_anchor_end_at">End at</string>
     <string name="routine_dialog_add_title">Add new routine</string>
     <string name="routine_dialog_edit_title">Edit routine</string>
+    <string name="routine_delete_dialog_title">Delete routine?</string>
+    <string name="routine_delete_dialog_message">This action cannot be undone.</string>
     <string name="routine_start_time">Start time</string>
     <string name="routine_end_time">End time</string>
     <string name="routine_status_running">Running</string>
@@ -60,6 +63,8 @@
     <string name="task_durations">Durations: %1$s</string>
     <string name="task_set_duration">Set duration</string>
     <string name="task_duration_left">%1$s left</string>
+    <string name="task_delete_dialog_title">Delete task?</string>
+    <string name="task_delete_dialog_message">This action cannot be undone.</string>
 
     <string name="tasks_manage_title">Manage tasks</string>
     <string name="tasks_create_new">Create a new task</string>

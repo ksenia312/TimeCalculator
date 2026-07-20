@@ -19,6 +19,7 @@ import com.example.morningcalculator.features.routine.ui.components.RoutineColor
 import com.example.morningcalculator.features.routine.ui.components.TasksListView
 import com.example.morningcalculator.features.routine.ui.components.topbar.RoutineTopBar
 import com.example.morningcalculator.shared.components.AppScaffold
+import com.example.morningcalculator.shared.navigator.LocalNavigator
 import org.koin.compose.getKoin
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +29,7 @@ fun RoutineScreen(
     viewModel: RoutineViewModel? = null,
 ) {
     val koin = getKoin()
+    val navigator = LocalNavigator.current
     val resolvedViewModel = viewModel ?: remember(id) {
         RoutineViewModel(
             id = id,
@@ -45,6 +47,10 @@ fun RoutineScreen(
                     onRoutineDialogViewStateChange = resolvedViewModel::onRoutineDialogViewStateChange,
                     onRoutineDialogConfirm = resolvedViewModel::onRoutineDialogConfirm,
                     onRoutineDialogDismiss = resolvedViewModel::onRoutineDialogDismiss,
+                    onRoutineDelete = {
+                        resolvedViewModel.deleteRoutine()
+                        navigator.navigateBack()
+                    },
                 )
             },
             floatingActionButton = {

@@ -30,6 +30,13 @@ class RoutinesListViewModel(
         }
     }
 
+    fun deleteRoutine(id: String) {
+        viewModelScope.launch {
+            routineRepository.deleteRoutine(id)
+            loadRoutines()
+        }
+    }
+
 
     private fun loadRoutines() {
         viewModelScope.launch {
