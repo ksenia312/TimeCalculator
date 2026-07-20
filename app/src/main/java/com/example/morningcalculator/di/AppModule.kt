@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.example.morningcalculator.core.repository.RoutineRepository
 import com.example.morningcalculator.core.repository.TasksRepository
 import com.example.morningcalculator.data.db.AppDatabase
-import com.example.morningcalculator.data.manager.RoutineWorkManagerScheduler
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
@@ -26,8 +25,6 @@ object AppModule {
         single { db.tasksDao() }
         single { db.routinesDao() }
 
-        single { RoutineWorkManagerScheduler(context.applicationContext) }
-
         single<TasksRepository> {
             TasksRepositoryImpl(get())
         }
@@ -35,7 +32,6 @@ object AppModule {
         single<RoutineRepository> {
             RoutineRepositoryImpl(
                 dao = get(),
-                context = context.applicationContext,
             )
         }
 

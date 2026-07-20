@@ -1,7 +1,5 @@
 package com.example.morningcalculator.data.repository
 
-import android.content.Context
-import com.example.morningcalculator.app.notifications.RoutineNotificationPublisher
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.repository.RoutineRepository
@@ -9,7 +7,6 @@ import com.example.morningcalculator.data.db.RoutinesDao
 import com.example.morningcalculator.data.mapper.toDomain
 import com.example.morningcalculator.data.model.RoutineEntity
 import com.example.morningcalculator.data.model.RoutineItemEntity
-import com.example.morningcalculator.shared.extensions.getCurrentTaskIndex
 import com.example.morningcalculator.shared.extensions.withZeroSeconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,14 +16,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import kotlin.time.Duration.Companion.seconds
 
 class RoutineRepositoryImpl(
     private val dao: RoutinesDao,
-    private val context: Context,
 ) : RoutineRepository {
 
     private val populatedFlow = dao.getRoutinesPopulated()
@@ -39,30 +33,6 @@ class RoutineRepositoryImpl(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-    private val notificationChecker by lazy {
-        scope.launch {
-            routinesFlow.collect { routines ->
-                routines.forEach { routine ->
-                    showNotificationIfActive(routine)
-                }
-            }
-        }
-
-        scope.launch {
-            while (true) {
-                kotlinx.coroutines.delay(15.seconds)
-                val routines = routinesFlow.value
-                routines.forEach { routine ->
-                    showNotificationIfActive(routine)
-                }
-            }
-        }
-    }
-
-    init {
-        notificationChecker
-    }
 
     override fun getRoutineFlow(id: String): Flow<Routine?> =
         routinesFlow.map { routines -> routines.firstOrNull { it.id == id } }
@@ -81,12 +51,6 @@ class RoutineRepositoryImpl(
 
         withContext(Dispatchers.IO) {
             dao.insertRoutine(routineEntity)
-        }
-
-        val routine = dao.getRoutinePopulated(routineEntity.id)
-        if (routine != null) {
-            val domainRoutine = routine.toDomain()
-            showNotificationIfActive(domainRoutine)
         }
     }
 
@@ -115,30 +79,11 @@ class RoutineRepositoryImpl(
         withContext(Dispatchers.IO) {
             dao.updateRoutineWithItems(routineEntity, itemsEntities)
         }
-
-        showNotificationIfActive(normalized)
     }
 
     override suspend fun deleteRoutine(id: String) {
-        RoutineNotificationPublisher.dismiss(context, id)
-
         withContext(Dispatchers.IO) {
             dao.deleteRoutine(id)
-        }
-    }
-
-    private fun showNotificationIfActive(routine: Routine) {
-        if (routine.data.isEmpty()) return
-
-        val currentTaskIndex = routine.getCurrentTaskIndex()
-        if (currentTaskIndex != null) {
-            RoutineNotificationPublisher.showTask(
-                context = context,
-                routine = routine,
-                taskIndex = currentTaskIndex
-            )
-        } else {
-            RoutineNotificationPublisher.dismiss(context, routine.id)
         }
     }
 }

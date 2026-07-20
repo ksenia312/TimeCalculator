@@ -65,14 +65,6 @@
     <string name="app_bar_preview_title">app bar</string>
     <string name="sample_morning_routine">Morning Routine</string>
 
-    <string name="notification_channel_routine_status">Routines (Status)</string>
-    <string name="notification_ends_at">Ends at %1$s</string>
-    <string name="notification_ends_at_in">Ends at %1$s (in %2$dm)</string>
-    <string name="notification_now">Now: %1$s</string>
-    <string name="notification_next">Next: %1$s</string>
-    <string name="notification_subtext_next">Next: %1$s</string>
-    <string name="notification_until">%1$s · until %2$s</string>
-    <string name="notification_task_fallback">—</string>
 
     <string name="relative_day_today">Today</string>
     <string name="relative_day_yesterday">Yesterday</string>
