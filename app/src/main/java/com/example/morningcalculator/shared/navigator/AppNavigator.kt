@@ -29,13 +29,15 @@ import com.example.morningcalculator.features.taskeditor.ui.CreateTaskScreen
 import com.example.morningcalculator.features.taskeditor.ui.EditTaskScreen
 import com.example.morningcalculator.shared.animation.LocalCardAnimatedContentScope
 import com.example.morningcalculator.shared.animation.LocalSharedTransitionScope
+import com.example.morningcalculator.shared.theme.SetStatusBarForBrightTopBar
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigator() {
     AppNavigatorProvider {
         val backStack = LocalNavigationBackStack.current
-
+        val currentRoute = backStack.lastOrNull() as? AppRoute
+        SetStatusBarForBrightTopBar(hasBrightTopBar = currentRoute?.hasBrightTopBar ?: false)
         SharedTransitionLayout {
             CompositionLocalProvider(LocalSharedTransitionScope provides this) {
                 NavDisplay(

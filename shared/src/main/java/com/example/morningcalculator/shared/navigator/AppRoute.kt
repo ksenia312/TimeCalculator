@@ -5,11 +5,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface AppRoute : NavKey {
+    /**
+     * Whether this destination shows a bright/accent top bar that reaches under the status bar.
+     * When true the status bar icons are forced to light (white); otherwise the app default is
+     * kept, so a new screen with an ordinary bar needs no extra wiring.
+     */
+    val hasBrightTopBar: Boolean get() = false
+
     @Serializable
     data object Home : AppRoute
 
     @Serializable
-    data class Routine(val routineId: String) : AppRoute
+    data class Routine(val routineId: String) : AppRoute {
+        override val hasBrightTopBar: Boolean get() = true
+    }
 
     @Serializable
     data class CreateTask(val routineId: String? = null) : AppRoute

@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.home.ui.components.HomeAppBar
+import com.example.morningcalculator.features.home.ui.components.HomeBottomNavigationBar
 import com.example.morningcalculator.shared.components.AppScaffold
 import com.example.morningcalculator.shared.components.FabItem
 import com.example.morningcalculator.shared.components.FabMenu
@@ -36,6 +37,12 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
         floatingActionButtonModifier = Modifier.padding(
             bottom = 64.dp
         ),
+        bottomBar = {
+            HomeBottomNavigationBar(
+                selectedTab = viewState.value.selectedTab,
+                onTabSelected = homeViewModel::onTabSelected,
+            )
+        },
         floatingActionButton = {
             FabMenu(
                 isExpanded = isBarExpanded.value,
@@ -67,7 +74,6 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
         HomeContent(
             paddingValues = it,
             current = viewState.value.selectedTab,
-            onTabSelected = homeViewModel::onTabSelected,
             onCreateRoutineClick = { navigator.navigateTo(AppRoute.CreateRoutine) },
             onCreateTaskClick = { navigator.navigateTo(AppRoute.CreateTask()) },
         )

@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.morningcalculator"
         minSdk = 30
         targetSdk = 36
-        versionCode = 9
-        versionName = "2.5"
+        versionCode = 12
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

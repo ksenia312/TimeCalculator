@@ -17,7 +17,6 @@ import com.example.morningcalculator.shared.components.CustomTopBar
 import com.example.morningcalculator.shared.features.routineCard
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
-import com.example.morningcalculator.shared.theme.SetStatusBarLightIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,8 +24,6 @@ fun RoutineSuccessTopAppBar(
     viewState: RoutineViewState.Success,
     onShowEditDialog: () -> Unit = { },
 ) {
-    SetStatusBarLightIcons(enabled = false)
-
     val viewItem = viewState.cardViewItem
 
     CustomTopBar(

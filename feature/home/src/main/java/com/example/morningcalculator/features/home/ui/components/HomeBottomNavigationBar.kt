@@ -3,8 +3,6 @@ package com.example.morningcalculator.features.home.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,55 +42,53 @@ fun HomeBottomNavigationBar(
     onTabSelected: (HomeTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth()
+    val shape = RoundedCornerShape(
+        topStart = 50.dp,
+        topEnd = 50.dp
+    )
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = shape,
+                clip = false,
+            )
+            .clip(shape)
     ) {
-        Surface(
-            modifier = Modifier
-                .padding(horizontal = 20.dp /*vertical = 40.dp*/)
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .shadow(
-                    elevation = 4.dp,
-                    shape = RoundedCornerShape(50.dp),
-                    clip = false,
-                )
-                .clip(RoundedCornerShape(50.dp))
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surface,
         ) {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ) {
-                HomeTab.entries.forEach { tab ->
-                    val selected = tab == selectedTab
-                    val label = stringResource(tab.labelResId)
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = { onTabSelected(tab) },
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = tab.iconRes),
-                                contentDescription = label,
+            HomeTab.entries.forEach { tab ->
+                val selected = tab == selectedTab
+                val label = stringResource(tab.labelResId)
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { onTabSelected(tab) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = tab.iconRes),
+                            contentDescription = label,
+                        )
+                    },
+                    label = {
+                        Text(
+                            label,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = if (selected)
+                                    FontWeight.Bold
+                                else
+                                    FontWeight.Normal
                             )
-                        },
-                        label = {
-                            Text(
-                                label,
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = if (selected)
-                                        FontWeight.Bold
-                                    else
-                                        FontWeight.Normal
-                                )
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = LocalCustomColorScheme.current.accent,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
-                    )
-                }
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = LocalCustomColorScheme.current.accent,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+                )
             }
         }
     }

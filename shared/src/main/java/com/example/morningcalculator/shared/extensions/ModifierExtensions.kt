@@ -6,4 +6,4 @@ import androidx.compose.ui.unit.dp
 
 private const val BOTTOM_BAR_MAX_HEIGHT = 120
 
-fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 24.dp + BOTTOM_BAR_MAX_HEIGHT.dp)
+fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 24.dp)
