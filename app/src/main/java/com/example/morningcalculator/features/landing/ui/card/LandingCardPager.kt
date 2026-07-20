@@ -13,15 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.features.landing.presentation.LandingRoutineState
 
 @Composable
 fun LandingCardPager(
     modifier: Modifier = Modifier,
-    routines: List<Routine>,
-    onNavigate: (routine: Routine) -> Unit,
+    routineStates: List<LandingRoutineState>,
+    onNavigate: (routineId: String) -> Unit,
 ) {
-    val pagerState = rememberPagerState(pageCount = { routines.size })
+    val pagerState = rememberPagerState(pageCount = { routineStates.size })
 
     Column(modifier = modifier.fillMaxWidth()) {
         HorizontalPager(
@@ -33,14 +33,14 @@ fun LandingCardPager(
                 .weight(1f)
         ) { page ->
             LandingCard(
-                routine = routines[page], onNavigate = onNavigate, modifier = Modifier.fillMaxSize()
+                routineState = routineStates[page], onNavigate = onNavigate, modifier = Modifier.fillMaxSize()
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
         LandingCardPagerDots(
-            count = routines.size,
+            count = routineStates.size,
             activeIndex = pagerState.currentPage,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)

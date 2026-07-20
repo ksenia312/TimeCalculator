@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 
 @Composable
 fun Modifier.routineCard(

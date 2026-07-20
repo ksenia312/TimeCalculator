@@ -16,29 +16,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.features.landing.ui.currentTaskIndex
-import com.example.morningcalculator.features.landing.ui.viewitem.LandingCardTaskViewItem
-import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.features.landing.presentation.LandingRoutineState
 import com.example.morningcalculator.shared.features.RoutineCardStatusRow
 import com.example.morningcalculator.shared.features.RoutineCardTimeInfo
 import com.example.morningcalculator.shared.features.routineCard
-import kotlin.time.Instant
 
 @Composable
 fun LandingCard(
-    routine: Routine,
-    onNavigate: (routine: Routine) -> Unit,
+    routineState: LandingRoutineState,
+    onNavigate: (routineId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-    val viewItem = RoutineCardViewItem.create(routine = routine)
+    val viewItem = routineState.cardViewItem
 
     Column(
         modifier
             .fillMaxWidth()
             .routineCard(viewItem = viewItem) {
-                onNavigate(routine)
+                onNavigate(routineState.routineId)
             }
             .verticalScroll(rememberScrollState()),
     ) {
@@ -47,7 +42,7 @@ fun LandingCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = routine.title, style = MaterialTheme.typography.titleLarge.copy(
+                    text = viewItem.title, style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold
                     ), maxLines = 3, color = MaterialTheme.colorScheme.surface
                 )
@@ -71,50 +66,34 @@ fun LandingCard(
             modifier = modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom
         ) {
-            val taskCount = routine.data.size
-            val isOngoing = viewItem.isOngoing
-            val currentIndex = when {
-                taskCount == 0 -> null
-                isOngoing -> currentTaskIndex(routine, now)
-                else -> 0
-            }
+            val current = routineState.currentTaskViewItem
+            val next = routineState.nextTaskViewItem
 
-            val nextIndex = when {
-                taskCount == 0 -> null
-                isOngoing -> currentIndex?.plus(1)
-                else -> 1
-            }?.takeIf { it in 0 until taskCount }
-
-            if (currentIndex != null) {
-                val current = LandingCardTaskViewItem.create(
-                    routine = routine, index = currentIndex, now = now
-                )
-
+            if (current != null) {
                 LandingCardTaskItem(
-                    header = current.header,
+                    headerRes = current.headerRes,
+                    remaining = current.remaining,
                     title = current.title,
                     start = current.start,
                     end = current.end,
                     progress = current.progress,
-                    isOngoing = isOngoing,
+                    isOngoing = viewItem.isOngoing,
                     isFirst = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            if (nextIndex != null) {
+            if (next != null) {
                 Spacer(Modifier.height(12.dp))
 
-                val next =
-                    LandingCardTaskViewItem.create(routine = routine, index = nextIndex, now = now)
-
                 LandingCardTaskItem(
-                    header = next.header,
+                    headerRes = next.headerRes,
+                    remaining = next.remaining,
                     title = next.title,
                     start = next.start,
                     end = next.end,
                     progress = next.progress,
-                    isOngoing = isOngoing,
+                    isOngoing = viewItem.isOngoing,
                     isFirst = false,
                     modifier = Modifier.fillMaxWidth()
                 )

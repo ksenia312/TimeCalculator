@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.features.landing.ui.viewitem.rememberNow
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.shared.extensions.isOngoing
@@ -37,7 +38,12 @@ fun TasksListView(
     routine: Routine,
     viewModel: RoutineViewModel,
 ) {
-    val now = rememberNow(tickMillis = 1000L)
+    val now by produceState(initialValue = Instant.fromEpochMilliseconds(System.currentTimeMillis())) {
+        while (true) {
+            kotlinx.coroutines.delay(1000)
+            value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+        }
+    }
 
     val whenToGetUp = routine.whenToStart().stringTime()
     val fullLinks = remember(routine) { routine.data.toMutableStateList() }

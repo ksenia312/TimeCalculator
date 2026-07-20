@@ -12,6 +12,9 @@ import com.example.morningcalculator.core.repository.TasksRepository
 import com.example.morningcalculator.features.home.ui.components.RoutineDialogViewState
 import com.example.morningcalculator.features.home.ui.components.toScheduledAtInstant
 import com.example.morningcalculator.features.home.ui.components.toRoutineDialogViewState
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlin.time.Instant
 
 class RoutineViewModel(
     val id: String,
@@ -29,6 +33,7 @@ class RoutineViewModel(
 
     private val _viewState = MutableStateFlow<RoutineViewState>(RoutineViewState.Loading)
     private val _tasksState = MutableStateFlow<List<Task>>(emptyList())
+    private val _now = MutableStateFlow(Instant.fromEpochMilliseconds(System.currentTimeMillis()))
 
     val viewState: StateFlow<RoutineViewState> = _viewState
     val tasks: StateFlow<List<Task>> = combine(
@@ -42,7 +47,17 @@ class RoutineViewModel(
     )
 
     init {
+        startTimer()
         loadRoutine()
+    }
+
+    private fun startTimer() {
+        viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                _now.value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+            }
+        }
     }
 
     fun addNewTask(request: TaskRequest, selectedDurationIndex: Int) {
@@ -198,18 +213,21 @@ class RoutineViewModel(
         }
 
         viewModelScope.launch {
-            routineRepository.getRoutineFlow(id)
-                .dropWhile { it == null }
-                .collect { routine ->
-                    val currentDialogState = (_viewState.value as? RoutineViewState.Success)
-                        ?.routineDialogViewState
-                    _viewState.value =
-                        if (routine == null) RoutineViewState.Error
-                        else RoutineViewState.Success(
-                            routine = routine,
-                            routineDialogViewState = currentDialogState
-                        )
-                }
+            combine(
+                routineRepository.getRoutineFlow(id).dropWhile { it == null },
+                _now
+            ) { routine, now -> Pair(routine, now) }
+            .collect { (routine, now) ->
+                val currentDialogState = (_viewState.value as? RoutineViewState.Success)
+                    ?.routineDialogViewState
+                _viewState.value =
+                    if (routine == null) RoutineViewState.Error
+                    else RoutineViewState.Success(
+                        routine = routine,
+                        cardViewItem = routine.toRoutineCardViewItem(now),
+                        routineDialogViewState = currentDialogState
+                    )
+            }
         }
     }
 }
@@ -224,6 +242,7 @@ sealed interface RoutineViewState {
     object Loading : RoutineViewState
     data class Success(
         val routine: Routine,
+        val cardViewItem: RoutineCardViewItem,
         val routineDialogViewState: RoutineDialogViewState? = null,
     ) : RoutineViewState
 

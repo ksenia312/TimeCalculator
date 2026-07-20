@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.features.RoutineCardStatusRow
 import com.example.morningcalculator.shared.features.RoutineCardTimeInfo
 

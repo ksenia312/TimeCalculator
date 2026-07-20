@@ -9,7 +9,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
 import com.example.morningcalculator.shared.components.CustomTopBar
 import com.example.morningcalculator.shared.features.routineCard
@@ -25,8 +26,7 @@ fun RoutineSuccessTopAppBar(
 ) {
     SetStatusBarLightIcons(enabled = false)
 
-    val routine = viewState.routine
-    val viewItem = RoutineCardViewItem.create(routine = routine)
+    val viewItem = viewState.cardViewItem
 
     CustomTopBar(
         onAccentColor = Color.White,
@@ -61,6 +61,7 @@ fun RoutineSuccessTopAppBarPreview() {
     )
     val viewState = RoutineViewState.Success(
         routine = routine,
+        cardViewItem = routine.toRoutineCardViewItem(),
     )
     PreviewTheme {
         RoutineSuccessTopAppBar(

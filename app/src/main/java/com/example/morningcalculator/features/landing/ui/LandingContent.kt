@@ -19,6 +19,7 @@ import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.home.ui.bottomIndent
+import com.example.morningcalculator.features.landing.presentation.LandingRoutineState
 import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.features.landing.ui.card.LandingCardPager
 import com.example.morningcalculator.shared.extensions.endAtInstant
@@ -28,6 +29,7 @@ import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
 import com.example.morningcalculator.shared.preview.PreviewTheme
+import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -37,8 +39,8 @@ fun LandingContent(
     viewState: LandingState,
 ) {
     val navigator = LocalNavigator.current
-    val onNavigate: (routine: Routine) -> Unit = {
-        navigator.navigateTo(AppRoute.Routine(routineId = it.id))
+    val onNavigate: (routineId: String) -> Unit = {
+        navigator.navigateTo(AppRoute.Routine(routineId = it))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -52,11 +54,11 @@ fun LandingContent(
             }
 
             is LandingState.Success -> {
-                val routines = viewState.routines
+                val routineStates = viewState.routineStates
                 Column(modifier = Modifier.fillMaxSize()) {
                     Spacer(Modifier.height(16.dp))
 
-                    if (routines.isEmpty()) {
+                    if (routineStates.isEmpty()) {
                         Text(
                             text = stringResource(R.string.routines_list_no_routines_scheduled),
                             style = MaterialTheme.typography.bodyMedium,
@@ -65,7 +67,7 @@ fun LandingContent(
                     } else {
                         LandingCardPager(
                             modifier = Modifier.weight(5f),
-                            routines = routines,
+                            routineStates = routineStates,
                             onNavigate = onNavigate,
                         )
                     }
@@ -125,10 +127,18 @@ fun linkDuration(link: RoutineLink): Duration {
 @PreviewAll
 @Composable
 fun LandingContentPreview() {
+    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
     PreviewTheme {
         LandingContent(
             viewState = LandingState.Success(
-                routines = PreviewConstants.routinesFull,
+                routineStates = PreviewConstants.routinesFull.take(3).map { routine ->
+                    LandingRoutineState(
+                        routineId = routine.id,
+                        cardViewItem = routine.toRoutineCardViewItem(now),
+                        currentTaskViewItem = null,
+                        nextTaskViewItem = null,
+                    )
+                }
             )
         )
     }
