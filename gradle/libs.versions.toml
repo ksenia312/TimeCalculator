@@ -22,6 +22,7 @@ roomCompiler = "2.8.4"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
 
+[libraries]
 
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
