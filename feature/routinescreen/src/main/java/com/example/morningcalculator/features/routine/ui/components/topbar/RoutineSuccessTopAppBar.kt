@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState

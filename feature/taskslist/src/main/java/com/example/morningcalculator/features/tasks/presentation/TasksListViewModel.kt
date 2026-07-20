@@ -2,9 +2,9 @@ package com.example.morningcalculator.features.tasks.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.model.Task
-import com.example.morningcalculator.core.model.TaskUpdateRequest
-import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.domain.model.Task
+import com.example.morningcalculator.domain.model.TaskUpdateRequest
+import com.example.morningcalculator.domain.repository.TasksRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

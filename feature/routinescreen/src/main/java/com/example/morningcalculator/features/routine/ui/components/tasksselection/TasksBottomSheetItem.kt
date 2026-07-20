@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.Task
 
 @Composable
 fun TasksBottomSheetItem(

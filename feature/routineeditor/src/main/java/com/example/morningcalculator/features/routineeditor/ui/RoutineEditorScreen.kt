@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.RoutineScheduleAnchor
+import com.example.morningcalculator.domain.model.RoutineScheduleAnchor
 import com.example.morningcalculator.features.routineeditor.presentation.CreateRoutineViewModel
 import com.example.morningcalculator.features.routineeditor.presentation.EditRoutineViewModel
 import com.example.morningcalculator.features.routineeditor.presentation.EditRoutineViewState

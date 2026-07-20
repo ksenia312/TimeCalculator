@@ -28,7 +28,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":domain"))
     implementation(project(":shared"))
     implementation(project(":feature:routineslist"))
     implementation(libs.androidx.lifecycle.runtime.ktx)

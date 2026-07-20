@@ -1,7 +1,7 @@
 package com.example.morningcalculator.shared.extensions
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineScheduleAnchor
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineScheduleAnchor
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
 import java.time.ZoneId
@@ -63,7 +63,7 @@ private fun Routine.totalDuration(): Duration {
     }
 }
 
-private fun taskDuration(task: com.example.morningcalculator.core.model.Task): Duration {
+private fun taskDuration(task: com.example.morningcalculator.domain.model.Task): Duration {
     return task.data.fold(Duration.ZERO) { acc, subData ->
         acc + subData.duration
     }

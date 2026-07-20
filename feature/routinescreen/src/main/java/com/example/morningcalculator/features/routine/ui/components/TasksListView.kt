@@ -13,7 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.extensions.stringTime
 import com.example.morningcalculator.shared.extensions.whenToStart

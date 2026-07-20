@@ -2,10 +2,10 @@ package com.example.morningcalculator.features.taskeditor.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.TaskRequest
-import com.example.morningcalculator.core.repository.RoutineRepository
-import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.TaskRequest
+import com.example.morningcalculator.domain.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.TasksRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.UUID

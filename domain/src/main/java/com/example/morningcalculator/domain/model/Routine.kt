@@ -1,4 +1,4 @@
-package com.example.morningcalculator.core.model
+package com.example.morningcalculator.domain.model
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

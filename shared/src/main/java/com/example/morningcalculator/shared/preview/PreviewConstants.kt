@@ -1,9 +1,9 @@
 package com.example.morningcalculator.shared.preview
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.SubData
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.SubData
+import com.example.morningcalculator.domain.model.Task
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 

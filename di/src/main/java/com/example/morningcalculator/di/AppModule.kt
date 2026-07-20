@@ -2,8 +2,8 @@ package com.example.morningcalculator.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.morningcalculator.core.repository.RoutineRepository
-import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.domain.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.TasksRepository
 import com.example.morningcalculator.data.db.AppDatabase
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl

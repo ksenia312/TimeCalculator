@@ -1,8 +1,8 @@
 package com.example.morningcalculator.data.repository
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineRequest
-import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineRequest
+import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.data.db.RoutinesDao
 import com.example.morningcalculator.data.mapper.toDomain
 import com.example.morningcalculator.data.model.RoutineEntity

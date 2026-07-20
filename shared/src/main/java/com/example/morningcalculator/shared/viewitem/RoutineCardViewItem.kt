@@ -2,7 +2,7 @@ package com.example.morningcalculator.shared.viewitem
 
 import androidx.annotation.StringRes
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.shared.extensions.endAtInstant
 import com.example.morningcalculator.shared.extensions.startAtInstant
 import com.example.morningcalculator.shared.extensions.willStartIn

@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineLink
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineLink
 import com.example.morningcalculator.shared.components.HomeEmptyState
 import com.example.morningcalculator.shared.extensions.bottomIndent
 import com.example.morningcalculator.features.landing.presentation.LandingRoutineState

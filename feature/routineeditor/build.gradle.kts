@@ -28,7 +28,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":domain"))
     implementation(project(":shared"))
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.koin.androidx.compose)

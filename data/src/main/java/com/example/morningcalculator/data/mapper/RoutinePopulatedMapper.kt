@@ -1,10 +1,10 @@
 package com.example.morningcalculator.data.mapper
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.RoutineScheduleAnchor
-import com.example.morningcalculator.core.model.SubData
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.RoutineScheduleAnchor
+import com.example.morningcalculator.domain.model.SubData
+import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.data.db.RoutinePopulated
 import kotlin.time.Instant
 

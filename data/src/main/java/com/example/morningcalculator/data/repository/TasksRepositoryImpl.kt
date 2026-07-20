@@ -1,10 +1,10 @@
 package com.example.morningcalculator.data.repository
 
-import com.example.morningcalculator.core.model.SubData
-import com.example.morningcalculator.core.model.Task
-import com.example.morningcalculator.core.model.TaskRequest
-import com.example.morningcalculator.core.model.TaskUpdateRequest
-import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.domain.model.SubData
+import com.example.morningcalculator.domain.model.Task
+import com.example.morningcalculator.domain.model.TaskRequest
+import com.example.morningcalculator.domain.model.TaskUpdateRequest
+import com.example.morningcalculator.domain.repository.TasksRepository
 import com.example.morningcalculator.data.db.TasksDao
 import com.example.morningcalculator.data.model.SubDataEntity
 import com.example.morningcalculator.data.model.TaskEntity

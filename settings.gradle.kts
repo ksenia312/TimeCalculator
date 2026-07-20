@@ -26,7 +26,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "MorningCalculator"
 include(":app")
-include(":core")
+include(":domain")
 include(":data")
 include(":shared")
 include(":di")

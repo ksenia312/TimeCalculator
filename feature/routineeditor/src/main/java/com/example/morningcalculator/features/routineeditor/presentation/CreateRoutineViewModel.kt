@@ -2,8 +2,8 @@ package com.example.morningcalculator.features.routineeditor.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.model.RoutineRequest
-import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.domain.model.RoutineRequest
+import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.features.routineeditor.ui.RoutineEditorFormState
 import com.example.morningcalculator.features.routineeditor.ui.toScheduledAtInstant
 import com.example.morningcalculator.shared.extensions.toHexString

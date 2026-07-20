@@ -1,7 +1,7 @@
 package com.example.morningcalculator.features.routineeditor.ui
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineScheduleAnchor
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineScheduleAnchor
 import com.example.morningcalculator.shared.extensions.withZeroSeconds
 import kotlinx.datetime.LocalTime
 import java.time.LocalDate

@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.TaskRequest
+import com.example.morningcalculator.domain.model.TaskRequest
 import com.example.morningcalculator.features.taskeditor.presentation.CreateTaskViewModel
 import com.example.morningcalculator.shared.features.AddDurationButton
 import com.example.morningcalculator.shared.features.DurationRow

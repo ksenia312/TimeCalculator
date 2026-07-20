@@ -2,8 +2,8 @@ package com.example.morningcalculator.features.routineslist.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.shared.extensions.endAtInstant
 import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing

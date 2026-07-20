@@ -2,7 +2,7 @@ package com.example.morningcalculator.features.landing.presentation
 
 import androidx.annotation.StringRes
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.features.landing.ui.linkDuration
 import com.example.morningcalculator.shared.extensions.startAtInstant
 import kotlin.time.Duration

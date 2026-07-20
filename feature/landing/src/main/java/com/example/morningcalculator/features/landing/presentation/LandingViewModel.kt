@@ -2,7 +2,7 @@ package com.example.morningcalculator.features.landing.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.features.landing.ui.currentTaskIndex
 import com.example.morningcalculator.features.routineslist.presentation.RoutinesListState
 import com.example.morningcalculator.features.routineslist.presentation.sortRoutines

@@ -1,7 +1,7 @@
-package com.example.morningcalculator.core.mapper
+package com.example.morningcalculator.domain.mapper
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineRequest
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineRequest
 
 fun Routine.copyWithRequest(request: RoutineRequest): Routine {
     return this.copy(

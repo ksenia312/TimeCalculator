@@ -2,11 +2,11 @@ package com.example.morningcalculator.features.routine.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.Task
-import com.example.morningcalculator.core.repository.RoutineRepository
-import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.Task
+import com.example.morningcalculator.domain.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.TasksRepository
 import com.example.morningcalculator.shared.extensions.startAtInstant
 import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem

@@ -1,7 +1,7 @@
-package com.example.morningcalculator.core.repository
+package com.example.morningcalculator.domain.repository
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineRequest
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

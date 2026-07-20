@@ -25,7 +25,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":domain"))
     implementation(project(":shared"))
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.room.runtime)

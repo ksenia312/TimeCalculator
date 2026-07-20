@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 

@@ -24,7 +24,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Routine
+import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.shared.extensions.endAt
 import com.example.morningcalculator.shared.extensions.isCompleted
 import com.example.morningcalculator.shared.extensions.isOngoing

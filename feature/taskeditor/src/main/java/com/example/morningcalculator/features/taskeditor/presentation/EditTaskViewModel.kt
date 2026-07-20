@@ -2,12 +2,12 @@ package com.example.morningcalculator.features.taskeditor.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.SubData
-import com.example.morningcalculator.core.model.Task
-import com.example.morningcalculator.core.model.TaskUpdateRequest
-import com.example.morningcalculator.core.repository.RoutineRepository
-import com.example.morningcalculator.core.repository.TasksRepository
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.SubData
+import com.example.morningcalculator.domain.model.Task
+import com.example.morningcalculator.domain.model.TaskUpdateRequest
+import com.example.morningcalculator.domain.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.TasksRepository
 import com.example.morningcalculator.shared.navigator.EditTaskArguments
 import com.example.morningcalculator.shared.navigator.EditTaskSource
 import kotlinx.coroutines.flow.MutableStateFlow

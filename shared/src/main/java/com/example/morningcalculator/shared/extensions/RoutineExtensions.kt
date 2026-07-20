@@ -1,8 +1,8 @@
 package com.example.morningcalculator.shared.extensions
 
-import com.example.morningcalculator.core.model.Routine
-import com.example.morningcalculator.core.model.RoutineLink
-import com.example.morningcalculator.core.model.RoutineScheduleAnchor
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.RoutineScheduleAnchor
 import kotlin.time.Duration
 
 fun Routine.getCurrentTaskIndex(): Int? {

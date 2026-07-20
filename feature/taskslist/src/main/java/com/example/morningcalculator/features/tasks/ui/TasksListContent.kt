@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.features.tasks.presentation.TasksListViewState
 import com.example.morningcalculator.features.tasks.ui.components.TaskListItem
 import com.example.morningcalculator.shared.components.HomeEmptyState

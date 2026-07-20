@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.SubData
+import com.example.morningcalculator.domain.model.SubData
 import com.example.morningcalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.example.morningcalculator.features.taskeditor.presentation.EditTaskViewState
 import com.example.morningcalculator.shared.features.AddDurationButton

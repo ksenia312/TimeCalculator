@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
-import com.example.morningcalculator.core.model.Task
+import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
 import com.example.morningcalculator.shared.preview.PreviewTheme
