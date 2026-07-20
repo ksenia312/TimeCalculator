@@ -16,6 +16,8 @@ class CreateTaskViewModel(
     private val routineRepository: RoutineRepository,
 ) : ViewModel() {
 
+    val hasRoutine = routineId != null
+
     fun createTask(request: TaskRequest, selectedDurationIndex: Int?) {
         viewModelScope.launch {
             val task = tasksRepository.addTask(request)

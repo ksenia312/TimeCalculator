@@ -52,7 +52,7 @@ fun EditTaskScreen(
 ) {
     val navigator = LocalNavigator.current
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-    val canSelectCurrentTask = viewModel.canSelectCurrentTask
+    val hasRoutine = viewModel.hasRoutine
 
     when (val state = viewState) {
         EditTaskViewState.Loading -> {
@@ -76,8 +76,8 @@ fun EditTaskScreen(
         is EditTaskViewState.Success -> {
             val task = state.task
             var title by remember(task.id) { mutableStateOf(task.title) }
-            var selectedIndex by remember(task.id, canSelectCurrentTask) {
-                mutableStateOf(if (canSelectCurrentTask) state.initialSelectedIndex else null)
+            var selectedIndex by remember(task.id, hasRoutine) {
+                mutableStateOf(if (hasRoutine) state.initialSelectedIndex else null)
             }
             val subData = remember(task.id) {
                 (task.data as List<SubData?>).toMutableStateList()
@@ -93,7 +93,7 @@ fun EditTaskScreen(
                             showDeleteConfirmation = true
                         },
                     ) {
-                        if (canSelectCurrentTask) {
+                        if (hasRoutine) {
                             Image(
                                 painter = painterResource(R.drawable.unlink),
                                 contentDescription = stringResource(R.string.content_desc_delete),
@@ -129,10 +129,10 @@ fun EditTaskScreen(
                         DurationRow(
                             index = index,
                             value = value,
-                            selectable = canSelectCurrentTask,
+                            selectable = hasRoutine,
                             selected = selectedIndex == index,
                             onSelect = {
-                                if (canSelectCurrentTask) {
+                                if (hasRoutine) {
                                     selectedIndex = index
                                 }
                             },
@@ -148,7 +148,7 @@ fun EditTaskScreen(
                             },
                             onRemove = {
                                 subData.removeAt(index)
-                                if (canSelectCurrentTask) {
+                                if (hasRoutine) {
                                     selectedIndex = selectedIndexAfterRemove(
                                         current = selectedIndex,
                                         removedIndex = index,
@@ -164,7 +164,7 @@ fun EditTaskScreen(
                             text = stringResource(R.string.task_add_more_durations),
                             onClick = {
                                 subData.add(null)
-                                if (canSelectCurrentTask) {
+                                if (hasRoutine) {
                                     selectedIndex = subData.lastIndex
                                 }
                             },
@@ -190,8 +190,22 @@ fun EditTaskScreen(
             if (showDeleteConfirmation) {
                 AlertDialog(
                     onDismissRequest = { showDeleteConfirmation = false },
-                    title = { Text(stringResource(R.string.task_delete_dialog_title)) },
-                    text = { Text(stringResource(R.string.task_delete_dialog_message)) },
+                    title = {
+                        Text(
+                            stringResource(
+                                if (hasRoutine) R.string.task_unlink_dialog_title
+                                else R.string.task_delete_dialog_title
+                            )
+                        )
+                    },
+                    text = {
+                        Text(
+                            stringResource(
+                                if (hasRoutine) R.string.task_unlink_dialog_message
+                                else R.string.task_delete_dialog_message
+                            )
+                        )
+                    },
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -201,7 +215,10 @@ fun EditTaskScreen(
                             }
                         ) {
                             Text(
-                                text = stringResource(R.string.action_delete),
+                                text = stringResource(
+                                    if (hasRoutine) R.string.action_remove
+                                    else R.string.action_delete
+                                ),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }

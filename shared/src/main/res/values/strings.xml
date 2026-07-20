@@ -65,6 +65,9 @@
     <string name="task_duration_left">%1$s left</string>
     <string name="task_delete_dialog_title">Delete task?</string>
     <string name="task_delete_dialog_message">This action cannot be undone.</string>
+    <string name="task_unlink_dialog_title">Remove from routine?</string>
+    <string name="task_unlink_dialog_message">The task will be removed from this routine.</string>
+    <string name="action_remove">Remove</string>
 
     <string name="tasks_manage_title">Manage tasks</string>
     <string name="tasks_create_new">Create a new task</string>

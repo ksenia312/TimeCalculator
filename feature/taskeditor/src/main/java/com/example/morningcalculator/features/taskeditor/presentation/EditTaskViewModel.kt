@@ -26,7 +26,8 @@ class EditTaskViewModel(
     val viewState: StateFlow<EditTaskViewState> = _viewState.asStateFlow()
     private val source = arguments.source
     private val taskId: String = arguments.taskId
-    val canSelectCurrentTask: Boolean = source is EditTaskSource.Routine
+
+    val hasRoutine: Boolean = source is EditTaskSource.Routine
 
     init {
         viewModelScope.launch {
@@ -34,7 +35,7 @@ class EditTaskViewModel(
                 _viewState.value = if (task == null) {
                     EditTaskViewState.Error
                 } else {
-                    val selectedIndex = if (canSelectCurrentTask) {
+                    val selectedIndex = if (hasRoutine) {
                         val selectedSubDataId = (source as EditTaskSource.Routine).selectedSubDataId
                         if (selectedSubDataId == null) {
                             0
@@ -67,7 +68,7 @@ class EditTaskViewModel(
                     subData = subData,
                 )
             )
-            if (canSelectCurrentTask) {
+            if (hasRoutine) {
                 updateRoutineLinkWithTask(updatedTask, selectedDurationIndex)
             }
         }
@@ -75,7 +76,7 @@ class EditTaskViewModel(
 
     fun delete() {
         viewModelScope.launch {
-            if (canSelectCurrentTask) {
+            if (hasRoutine) {
                 val routineSource = source as EditTaskSource.Routine
                 val routine = routineRepository.getRoutineFlow(routineSource.routineId).first() ?: return@launch
                 routineRepository.updateRoutine(
