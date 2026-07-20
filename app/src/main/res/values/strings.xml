@@ -1,3 +1,95 @@
 <resources>
     <string name="app_name">MorningCalculator</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+
+    <string name="content_desc_delete">Delete</string>
+    <string name="content_desc_back">Back</string>
+    <string name="content_desc_close">Close</string>
+    <string name="content_desc_open_menu">Open menu</string>
+    <string name="content_desc_close_menu">Close menu</string>
+
+    <string name="label_name">Name</string>
+    <string name="label_date">Date</string>
+    <string name="label_anchor">Anchor</string>
+    <string name="label_when_to_leave">When to leave?</string>
+    <string name="label_duration_number">Duration №%1$d</string>
+
+    <string name="home_tab_home">Home</string>
+    <string name="home_tab_routines">Routines</string>
+    <string name="home_tab_tasks">Tasks</string>
+
+    <string name="fab_task">Task</string>
+    <string name="fab_routine">Routine</string>
+    <string name="fab_add_task">Add Task</string>
+    <string name="fab_manage_tasks">Manage Tasks</string>
+    <string name="fab_add_item">Add Item</string>
+
+    <string name="routine_anchor_start_at">Start at</string>
+    <string name="routine_anchor_end_at">End at</string>
+    <string name="routine_dialog_add_title">Add new routine</string>
+    <string name="routine_dialog_edit_title">Edit routine</string>
+    <string name="routine_start_time">Start time</string>
+    <string name="routine_end_time">End time</string>
+    <string name="routine_status_running">Running</string>
+    <string name="routine_status_completed">Completed</string>
+    <string name="routine_status_planned">Planned</string>
+    <string name="routine_time_will_start_in">Will start in</string>
+
+    <string name="routines_list_status_completed_on">completed on</string>
+    <string name="routines_list_status_running_ends_on">running now, ends on</string>
+    <string name="routines_list_status_planned_for">planned for</string>
+    <string name="routines_list_no_routines_scheduled">No routines scheduled</string>
+
+    <string name="routine_card_started_at">Started at</string>
+    <string name="routine_card_will_start">Will start</string>
+    <string name="routine_card_ends_at">Ends at</string>
+    <string name="routine_card_completed_at">Completed at</string>
+    <string name="routine_card_will_end">Will end</string>
+
+    <string name="task_create_title">Create task</string>
+    <string name="task_update_title">Update task</string>
+    <string name="task_add_more_durations">Add more durations</string>
+    <string name="task_durations">Durations: %1$s</string>
+    <string name="task_set_duration">Set duration</string>
+    <string name="task_duration_left">%1$s left</string>
+
+    <string name="tasks_manage_title">Manage tasks</string>
+    <string name="tasks_create_new">Create a new task</string>
+
+    <string name="top_bar_error">Error</string>
+    <string name="top_bar_loading">Loading</string>
+    <string name="routine_not_found">Routine not found</string>
+    <string name="modified_at">Modified at</string>
+    <string name="app_bar_preview_title">app bar</string>
+    <string name="sample_morning_routine">Morning Routine</string>
+
+    <string name="notification_channel_routine_status">Routines (Status)</string>
+    <string name="notification_ends_at">Ends at %1$s</string>
+    <string name="notification_ends_at_in">Ends at %1$s (in %2$dm)</string>
+    <string name="notification_now">Now: %1$s</string>
+    <string name="notification_next">Next: %1$s</string>
+    <string name="notification_subtext_next">Next: %1$s</string>
+    <string name="notification_until">%1$s · until %2$s</string>
+    <string name="notification_task_fallback">—</string>
+
+    <string name="relative_day_today">Today</string>
+    <string name="relative_day_yesterday">Yesterday</string>
+    <string name="relative_day_tomorrow">Tomorrow</string>
+    <string name="datetime_with_comma">%1$s, %2$s</string>
+    <string name="duration_list_separator">, </string>
+
+    <plurals name="duration_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="duration_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
 </resources>

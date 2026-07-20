@@ -1,5 +1,9 @@
 package com.example.morningcalculator.features.landing.ui.viewitem
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.landing.ui.linkDuration
 import com.example.morningcalculator.shared.extensions.startAtInstant
@@ -15,11 +19,13 @@ data class LandingCardTaskViewItem(
     val progress: Float,
 ) {
     companion object Companion {
+        @Composable
         fun create(
             routine: Routine,
             index: Int,
             now: Instant,
         ): LandingCardTaskViewItem {
+            val context = LocalContext.current
             val link = routine.data[index]
             val title = link.task.title
 
@@ -48,7 +54,10 @@ data class LandingCardTaskViewItem(
                 else -> endInstant - now
             }.coerceAtLeast(Duration.Companion.ZERO)
 
-            val header = "${remaining.stringValue()} left"
+            val header = stringResource(
+                R.string.task_duration_left,
+                remaining.stringValue(context)
+            )
 
             return LandingCardTaskViewItem(
                 title = title,
@@ -74,4 +83,3 @@ data class LandingCardTaskViewItem(
         }
     }
 }
-

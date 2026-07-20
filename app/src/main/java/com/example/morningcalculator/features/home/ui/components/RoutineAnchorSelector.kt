@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.RoutineScheduleAnchor
 import com.example.morningcalculator.shared.components.AppTextField
 
@@ -23,7 +25,8 @@ fun RoutineAnchorSelector(
     onChanged: (RoutineScheduleAnchor) -> Unit,
 ) {
     var anchorExpanded by remember { mutableStateOf(false) }
-    val anchorLabel = options.firstOrNull { it.first == anchor }?.second ?: "Start at"
+    val anchorLabel = options.firstOrNull { it.first == anchor }?.second
+        ?: stringResource(R.string.routine_anchor_start_at)
 
     ExposedDropdownMenuBox(
         expanded = anchorExpanded,
@@ -35,7 +38,7 @@ fun RoutineAnchorSelector(
             onValueChange = {},
             readOnly = true,
             interactionSource = null,
-            label = { Text("Anchor") },
+            label = { Text(stringResource(R.string.label_anchor)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = anchorExpanded

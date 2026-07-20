@@ -3,6 +3,7 @@ package com.example.morningcalculator.app.notifications
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import com.example.morningcalculator.R
 
 object RoutineNotificationChannels {
     const val CHANNEL_ID = "routine_status"
@@ -13,7 +14,7 @@ object RoutineNotificationChannels {
 
         val statusChannel = NotificationChannel(
             CHANNEL_ID,
-            "Routines (Status)",
+            context.getString(R.string.notification_channel_routine_status),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
             setSound(null, null)

@@ -13,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.home.ui.bottomIndent
@@ -57,7 +59,7 @@ fun LandingContent(
 
                     if (routines.isEmpty()) {
                         Text(
-                            text = "No routines scheduled",
+                            text = stringResource(R.string.routines_list_no_routines_scheduled),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(16.dp)
                         )

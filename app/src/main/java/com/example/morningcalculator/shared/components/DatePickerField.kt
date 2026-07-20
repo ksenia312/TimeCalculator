@@ -13,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -20,10 +22,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DatePickerField(
     modifier: Modifier = Modifier,
-    label: String = "When to leave?",
+    label: String? = null,
     initialDate: LocalDate = LocalDate.now(),
     onDateChange: (LocalDate) -> Unit
 ) {
+    val resolvedLabel = label ?: stringResource(R.string.label_when_to_leave)
     val fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     val date = remember(initialDate) {
         mutableStateOf(initialDate)
@@ -58,10 +61,12 @@ fun DatePickerField(
                         }
                         showDialog.value = false
                     }
-                ) { Text("Ok") }
+                ) { Text(stringResource(R.string.action_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog.value = false }) { Text("Cancel") }
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             }
         ) {
             DatePicker(state = datePickerState)
@@ -73,7 +78,7 @@ fun DatePickerField(
         onValueChange = {},
         readOnly = true,
         interactionSource = null,
-        label = { Text(label) },
+        label = { Text(resolvedLabel) },
         modifier = modifier
             .fillMaxWidth()
             .pointerInteropFilter { event ->

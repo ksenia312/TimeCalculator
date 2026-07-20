@@ -13,7 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.SubData
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.core.model.TaskUpdateRequest
@@ -46,7 +48,7 @@ fun EditTaskScreen(
     }
 
     EditorDialogScaffold(
-        screenTitle = "Update task",
+        screenTitle = stringResource(R.string.task_update_title),
         onDismiss = onDismiss,
         headerActions = {
             IconButton(
@@ -105,7 +107,7 @@ fun EditTaskScreen(
 
             item {
                 AddDurationButton(
-                    text = "Add more durations",
+                    text = stringResource(R.string.task_add_more_durations),
                     onClick = {
                         subData.add(null)
                         selectedIndex = subData.lastIndex

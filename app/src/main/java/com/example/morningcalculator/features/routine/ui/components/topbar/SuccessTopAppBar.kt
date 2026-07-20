@@ -5,7 +5,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
@@ -48,7 +50,7 @@ fun SuccessTopAppBar(
 fun SuccessTopAppBarPreview() {
     val routine = Routine(
         id = "1",
-        title = "Morning Routine",
+        title = stringResource(R.string.sample_morning_routine),
         modifiedAt = System.currentTimeMillis(),
         color = "0xFF599AC9",
         scheduledAt = kotlin.time.Instant.fromEpochMilliseconds(System.currentTimeMillis()),

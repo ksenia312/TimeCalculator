@@ -1,10 +1,12 @@
 package com.example.morningcalculator.shared.extensions
 
+import android.content.Context
 import kotlinx.datetime.toKotlinLocalDateTime
 import java.util.Locale
 import kotlin.time.Instant
 
 fun Instant.stringDateTime(
+    context: Context,
     locale: Locale = Locale.getDefault()
 ): String {
     val zone = deviceZoneId()
@@ -13,7 +15,7 @@ fun Instant.stringDateTime(
         .atZone(zone)
         .toLocalDateTime()
         .toKotlinLocalDateTime()
-        .stringDateTime(locale)
+        .stringDateTime(context, locale)
 }
 
 fun Instant.stringTime(): String {

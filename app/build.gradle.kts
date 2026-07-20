@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.morningcalculator.dev"
+        applicationId = "com.example.morningcalculator"
         minSdk = 30
         targetSdk = 36
         versionCode = 9

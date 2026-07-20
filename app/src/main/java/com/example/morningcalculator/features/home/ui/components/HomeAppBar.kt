@@ -7,7 +7,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.ChangeSystemTopBarTheme
@@ -23,8 +25,8 @@ fun HomeAppBar(selectedTab: HomeTab) {
         title = {
             Text(
                 text = when (selectedTab) {
-                    HomeTab.ROUTINES -> "Routines"
-                    HomeTab.TASKS -> "Tasks"
+                    HomeTab.ROUTINES -> stringResource(R.string.home_tab_routines)
+                    HomeTab.TASKS -> stringResource(R.string.home_tab_tasks)
                     HomeTab.LANDING -> ""
                 },
                 style = MaterialTheme.typography.titleLarge,

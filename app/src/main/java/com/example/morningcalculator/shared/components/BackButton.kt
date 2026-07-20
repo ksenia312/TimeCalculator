@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.navigator.LocalNavHostController
 
@@ -19,7 +20,7 @@ fun BackButton(
     IconButton(onClick = { if (overrideOnBack != null) overrideOnBack() else navigator.popBackStack() }) {
         Image(
             painterResource(R.drawable.back_arrow),
-            contentDescription = "back",
+            contentDescription = stringResource(R.string.content_desc_back),
             colorFilter = ColorFilter.tint(color)
         )
     }

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -84,7 +85,7 @@ fun TaskNameField(
         value = title,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text("Name") },
+        label = { Text(stringResource(R.string.label_name)) },
     )
 }
 
@@ -115,7 +116,7 @@ fun DurationRow(
 
         DurationField(
             value = value,
-            label = "Duration №${index + 1}",
+            label = stringResource(R.string.label_duration_number, index + 1),
             onValueChange = onValueChange,
         )
 
@@ -148,7 +149,7 @@ fun RemoveDurationButton(onClick: () -> Unit) {
     SmallIconButton(onClick = onClick) {
         Image(
             painter = painterResource(R.drawable.close),
-            contentDescription = "close",
+            contentDescription = stringResource(R.string.content_desc_close),
         )
     }
 }
@@ -187,7 +188,7 @@ fun SaveTaskButton(
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
     ) {
-        Text("Save")
+        Text(stringResource(R.string.action_save))
     }
 }
 

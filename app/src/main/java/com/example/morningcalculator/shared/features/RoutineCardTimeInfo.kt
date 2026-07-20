@@ -8,9 +8,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.features.landing.ui.viewitem.RoutineCardViewItem
 
 @Composable
@@ -24,7 +26,7 @@ fun RoutineCardTimeInfo(
     ) {
         if (!viewItem.isOngoing && !viewItem.isCompleted) {
             Text(
-                text = "Will start in",
+                text = stringResource(R.string.routine_time_will_start_in),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
                 textAlign = TextAlign.End

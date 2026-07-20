@@ -14,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toJavaLocalTime
 import java.time.format.DateTimeFormatter
@@ -21,10 +23,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TimePickerField(
     modifier: Modifier = Modifier,
-    label: String = "When to leave?",
+    label: String? = null,
     initialTime: LocalTime = LocalTime(9, 0),
     onTimeChange: (LocalTime) -> Unit
 ) {
+    val resolvedLabel = label ?: stringResource(R.string.label_when_to_leave)
     val fmt = DateTimeFormatter.ofPattern("HH:mm")
     val time = remember(initialTime) {
         mutableStateOf(initialTime)
@@ -51,7 +54,7 @@ fun TimePickerField(
         onValueChange = {},
         readOnly = true,
         interactionSource = null,
-        label = { Text(label) },
+        label = { Text(resolvedLabel) },
         modifier = modifier
             .fillMaxWidth()
             .pointerInteropFilter { event ->
@@ -84,11 +87,11 @@ private fun TimePickerDialogCompose(
         confirmButton = {
             TextButton(onClick = {
                 onConfirm(LocalTime(state.hour, state.minute))
-            }) { Text("OK") }
+            }) { Text(stringResource(R.string.action_ok)) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
         },
         text = {

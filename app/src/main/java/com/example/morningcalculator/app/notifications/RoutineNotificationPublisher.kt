@@ -39,16 +39,20 @@ object RoutineNotificationPublisher {
 
         val remainingMinutes = ((endsAtMillis - nowMillis).coerceAtLeast(0L)) / 60000L
         val endsLine = if (remainingMinutes > 0) {
-            "Ends at $endsAtText (in ${remainingMinutes}m)"
+            context.getString(
+                R.string.notification_ends_at_in,
+                endsAtText,
+                remainingMinutes.toInt()
+            )
         } else {
-            "Ends at $endsAtText"
+            context.getString(R.string.notification_ends_at, endsAtText)
         }
 
         val nextTitle = routine.data
             .getOrNull(taskIndex + 1)
             ?.task
             ?.title
-            ?: "—"
+            ?: context.getString(R.string.notification_task_fallback)
 
         val contentIntent = PendingIntent.getActivity(
             context,
@@ -60,8 +64,8 @@ object RoutineNotificationPublisher {
         )
 
         val style = NotificationCompat.InboxStyle()
-            .addLine("Now: ${task.title}")
-            .addLine("Next: $nextTitle")
+            .addLine(context.getString(R.string.notification_now, task.title))
+            .addLine(context.getString(R.string.notification_next, nextTitle))
             .addLine(endsLine)
 
         manager.cancel(notificationId)
@@ -70,8 +74,8 @@ object RoutineNotificationPublisher {
             NotificationCompat.Builder(context, RoutineNotificationChannels.CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(routine.title)
-                .setContentText("${task.title} · until $endsAtText")
-                .setSubText("Next: $nextTitle")
+                .setContentText(context.getString(R.string.notification_until, task.title, endsAtText))
+                .setSubText(context.getString(R.string.notification_subtext_next, nextTitle))
                 .setStyle(style)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

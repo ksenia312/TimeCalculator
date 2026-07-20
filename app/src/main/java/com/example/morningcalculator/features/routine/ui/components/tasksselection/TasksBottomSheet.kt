@@ -23,8 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.SecureFlagPolicy
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.core.model.SubData
@@ -72,7 +74,7 @@ fun TasksBottomSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                "Manage tasks", style = MaterialTheme.typography.titleLarge
+                stringResource(R.string.tasks_manage_title), style = MaterialTheme.typography.titleLarge
             )
             LazyColumn(
                 modifier = Modifier.weight(1f)
@@ -96,7 +98,7 @@ fun TasksBottomSheet(
                 }
             }
             AddNewButton(
-                text = "Create a new task",
+                text = stringResource(R.string.tasks_create_new),
             ) {
                 onShowAddTasksDialog()
                 onDismiss()

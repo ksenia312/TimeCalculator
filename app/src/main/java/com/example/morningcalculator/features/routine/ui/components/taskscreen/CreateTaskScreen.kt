@@ -11,7 +11,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.TaskRequest
 import kotlin.time.Duration.Companion.minutes
 
@@ -29,7 +31,7 @@ fun CreateTaskScreen(
     }
 
     EditorDialogScaffold(
-        screenTitle = "Create task",
+        screenTitle = stringResource(R.string.task_create_title),
         onDismiss = onDismiss,
     ) { padding ->
         LazyColumn(
@@ -73,7 +75,7 @@ fun CreateTaskScreen(
 
             item {
                 AddDurationButton(
-                    text = "Add more durations",
+                    text = stringResource(R.string.task_add_more_durations),
                     onClick = {
                         durations.add("")
                         if (linkedToRoutine) {

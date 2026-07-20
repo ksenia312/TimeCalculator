@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Task
 import com.example.morningcalculator.features.routine.ui.components.taskscreen.EditTaskScreen
 import com.example.morningcalculator.features.tasks.presentation.TasksListViewModel
@@ -31,7 +33,7 @@ fun TasksListScreen(viewModel: TasksListViewModel = koinViewModel()) {
             deleteIcon = {
                 Image(
                     Icons.Default.DeleteOutline,
-                    contentDescription = "delete",
+                    contentDescription = stringResource(R.string.content_desc_delete),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.error)
                 )
             },

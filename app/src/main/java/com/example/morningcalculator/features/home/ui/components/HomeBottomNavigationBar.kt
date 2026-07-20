@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -30,12 +31,12 @@ import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 const val BOTTOM_BAR_MAX_HEIGHT = 120
 
 enum class HomeTab(
-    val label: String,
+    val labelResId: Int,
     val iconRes: Int,
 ) {
-    LANDING("Home", R.drawable.home),
-    ROUTINES("Routines", R.drawable.routine),
-    TASKS("Tasks", R.drawable.task),
+    LANDING(R.string.home_tab_home, R.drawable.home),
+    ROUTINES(R.string.home_tab_routines, R.drawable.routine),
+    TASKS(R.string.home_tab_tasks, R.drawable.task),
 }
 
 @Composable
@@ -64,18 +65,19 @@ fun HomeBottomNavigationBar(
             ) {
                 HomeTab.entries.forEach { tab ->
                     val selected = tab == selectedTab
+                    val label = stringResource(tab.labelResId)
                     NavigationBarItem(
                         selected = selected,
                         onClick = { onTabSelected(tab) },
                         icon = {
                             Icon(
                                 painter = painterResource(id = tab.iconRes),
-                                contentDescription = tab.label,
+                                contentDescription = label,
                             )
                         },
                         label = {
                             Text(
-                                tab.label,
+                                label,
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = if (selected)
                                         FontWeight.Bold

@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.morningcalculator.R
@@ -63,21 +64,21 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
                 fabItems = listOf(
                     FabItem(
                         iconRes = R.drawable.task,
-                        title = "Task",
+                        title = stringResource(R.string.fab_task),
                         onClick = {
                             isBarExpanded.value = false
                             showAddTaskDialog.value = true
                         },
-                        contentDescription = ""
+                        contentDescription = stringResource(R.string.fab_task)
                     ),
                     FabItem(
                         iconRes = R.drawable.routine,
-                        title = "Routine",
+                        title = stringResource(R.string.fab_routine),
                         onClick = {
                             isBarExpanded.value = false
                             showAddRoutineDialog.value = true
                         },
-                        contentDescription = ""
+                        contentDescription = stringResource(R.string.fab_routine)
                     )
                 )
             )

@@ -16,9 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.shared.extensions.stringDateTime
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
@@ -67,6 +70,7 @@ fun CustomTopBar(
 @Composable
 fun CustomTopBarPreview() {
     val routine = PreviewConstants.routinesFull.first()
+    val context = LocalContext.current
     PreviewTheme {
         CustomTopBar(
             onAccentColor = Color.White,
@@ -76,12 +80,12 @@ fun CustomTopBarPreview() {
                     modifier = Modifier.padding(end = 12.dp)
                 ) {
                     Text(
-                        "Modified at",
+                        stringResource(R.string.modified_at),
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.End
                     )
                     Text(
-                        routine.modifiedAt.stringDateTime(),
+                        routine.modifiedAt.stringDateTime(context),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End
@@ -90,7 +94,7 @@ fun CustomTopBarPreview() {
             },
             showNavigationIcon = true,
         ) {
-            Text("app bar")
+            Text(stringResource(R.string.app_bar_preview_title))
         }
     }
 }

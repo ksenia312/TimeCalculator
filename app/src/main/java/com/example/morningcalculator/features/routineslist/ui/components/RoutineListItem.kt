@@ -19,10 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.mapper.copyWithRequest
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
@@ -83,11 +86,15 @@ private fun RoutineListItem(
 ) {
     val isCompleted = routine.isCompleted()
     val isOngoing = routine.isOngoing()
+    val context = LocalContext.current
 
     val (statusPrefix, statusText) = when {
-        isCompleted -> "completed on" to routine.endAt().stringDateTime()
-        isOngoing -> "running now, ends on" to routine.endAt().stringDateTime()
-        else -> "planned for" to routine.whenToStart().stringDateTime()
+        isCompleted -> stringResource(R.string.routines_list_status_completed_on) to
+            routine.endAt().stringDateTime(context = context)
+        isOngoing -> stringResource(R.string.routines_list_status_running_ends_on) to
+            routine.endAt().stringDateTime(context = context)
+        else -> stringResource(R.string.routines_list_status_planned_for) to
+            routine.whenToStart().stringDateTime(context = context)
     }
 
     val color = when {
@@ -148,7 +155,7 @@ fun RoutineListItemPreview() {
     PreviewTheme {
         val routine = Routine(
             id = "1",
-            title = "Morning Routine",
+            title = stringResource(R.string.sample_morning_routine),
             color = "0xFFE57373",
             scheduledAt = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
             modifiedAt = System.currentTimeMillis(),

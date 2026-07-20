@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
 import com.example.morningcalculator.features.routine.ui.components.EditRoutineFloatingButton
@@ -45,7 +47,7 @@ fun RoutineScreen(
                     }
 
                     is RoutineViewState.Error -> {
-                        Text(text = viewState.error)
+                        Text(text = stringResource(R.string.top_bar_error))
                     }
                 }
             }

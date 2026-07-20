@@ -35,9 +35,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineLink
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
@@ -138,7 +140,7 @@ fun RoutineTaskItem(
                 ) {
                     Box {
                         Text(
-                            current?.duration?.toString() ?: "Set duration",
+                            current?.duration?.toString() ?: stringResource(R.string.task_set_duration),
                             color = if (current != null) {
                                 MaterialTheme.colorScheme.onBackground
                             } else {

@@ -161,7 +161,7 @@ class RoutineViewModel(
                 .dropWhile { it == null }
                 .collect { routine ->
                     _viewState.value =
-                        if (routine == null) RoutineViewState.Error("Routine not found")
+                        if (routine == null) RoutineViewState.Error
                         else RoutineViewState.Success(routine)
                 }
         }
@@ -177,5 +177,5 @@ fun MutableStateFlow<RoutineViewState>.asSuccess(
 sealed interface RoutineViewState {
     object Loading : RoutineViewState
     data class Success(val full: Routine) : RoutineViewState
-    data class Error(val error: String) : RoutineViewState
+    object Error : RoutineViewState
 }

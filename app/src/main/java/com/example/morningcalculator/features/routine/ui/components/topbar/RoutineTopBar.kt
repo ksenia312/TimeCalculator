@@ -5,6 +5,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.mapper.copyWithRequest
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.home.ui.components.RoutineDialog
@@ -40,7 +42,7 @@ fun RoutineTopBar(viewModel: RoutineViewModel) {
             )
         }
 
-        is RoutineViewState.Error -> NonSuccessTopAppBar("Error")
-        is RoutineViewState.Loading -> NonSuccessTopAppBar("Loading")
+        is RoutineViewState.Error -> NonSuccessTopAppBar(stringResource(R.string.top_bar_error))
+        is RoutineViewState.Loading -> NonSuccessTopAppBar(stringResource(R.string.top_bar_loading))
     }
 }

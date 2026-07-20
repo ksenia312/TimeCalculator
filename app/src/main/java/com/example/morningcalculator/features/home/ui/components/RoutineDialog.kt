@@ -18,7 +18,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.core.model.RoutineRequest
 import com.example.morningcalculator.core.model.RoutineScheduleAnchor
@@ -68,15 +70,17 @@ fun RoutineDialog(
         )
     }
 
-    val options = remember {
-        listOf(
-            RoutineScheduleAnchor.START to "Start at",
-            RoutineScheduleAnchor.END to "End at"
-        )
-    }
+    val options = listOf(
+        RoutineScheduleAnchor.START to stringResource(R.string.routine_anchor_start_at),
+        RoutineScheduleAnchor.END to stringResource(R.string.routine_anchor_end_at)
+    )
 
     EditorDialogScaffold(
-        screenTitle = if (initialRoutine == null) "Add new routine" else "Edit routine",
+        screenTitle = if (initialRoutine == null) {
+            stringResource(R.string.routine_dialog_add_title)
+        } else {
+            stringResource(R.string.routine_dialog_edit_title)
+        },
         onDismiss = onDismiss,
         content = { paddingValues ->
             Column(
@@ -91,7 +95,7 @@ fun RoutineDialog(
                     autofocus = title.isEmpty(),
                     onValueChange = { title = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Name") }
+                    label = { Text(stringResource(R.string.label_name)) }
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -105,7 +109,7 @@ fun RoutineDialog(
                 Spacer(Modifier.height(12.dp))
 
                 DatePickerField(
-                    label = "Date",
+                    label = stringResource(R.string.label_date),
                     initialDate = date,
                     onDateChange = { date = it }
                 )
@@ -114,9 +118,9 @@ fun RoutineDialog(
 
                 TimePickerField(
                     label = if (anchor == RoutineScheduleAnchor.START) {
-                        "Start time"
+                        stringResource(R.string.routine_start_time)
                     } else {
-                        "End time"
+                        stringResource(R.string.routine_end_time)
                     },
                     initialTime = time,
                     onTimeChange = { picked ->
@@ -152,7 +156,7 @@ fun RoutineDialog(
                         )
                         onDismiss()
                     }
-                ) { Text("Ok") }
+                ) { Text(stringResource(R.string.action_ok)) }
             }
         }
     )

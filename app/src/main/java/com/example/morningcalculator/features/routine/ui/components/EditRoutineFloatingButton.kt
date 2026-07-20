@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.res.stringResource
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
@@ -50,16 +51,16 @@ fun EditRoutineFloatingButton(
         mainImageVector = Icons.Default.Edit,
         fabItems = listOf(
             FabItem(
-                title = "Add Task",
+                title = stringResource(R.string.fab_add_task),
                 iconRes = R.drawable.task,
-                contentDescription = "Add Task",
+                contentDescription = stringResource(R.string.fab_add_task),
                 onClick = {
                     showAddTaskDialog.value = true
                 }),
             FabItem(
-                title = "Manage Tasks",
+                title = stringResource(R.string.fab_manage_tasks),
                 iconRes = R.drawable.search,
-                contentDescription = "Manage Tasks",
+                contentDescription = stringResource(R.string.fab_manage_tasks),
                 onClick = {
                     showTasksSheet.value = true
                 }),

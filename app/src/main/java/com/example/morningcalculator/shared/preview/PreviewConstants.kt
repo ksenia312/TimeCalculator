@@ -12,8 +12,8 @@ object PreviewConstants {
         get() = List(10) {
             Task(
                 id = it.toString(),
-                title = "Task #$it",
-                description = "This is a description for task #$it",
+                title = it.toString(),
+                description = "",
                 data = listOf(
                     SubData(
                         duration = 23.minutes
@@ -25,7 +25,7 @@ object PreviewConstants {
     val routinesFull = List(10) {
         Routine(
             id = it.toString(),
-            title = "Morning Routine",
+            title = it.toString(),
             color = "0xFFE57373",
             scheduledAt = Instant.fromEpochMilliseconds(
                 System.currentTimeMillis() + it * 60L * 60L * 1000L

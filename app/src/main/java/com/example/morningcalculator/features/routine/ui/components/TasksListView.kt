@@ -16,6 +16,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
@@ -64,7 +65,7 @@ fun TasksListView(
             deleteIcon = {
                 Image(
                     painterResource(R.drawable.unlink),
-                    contentDescription = "delete",
+                    contentDescription = stringResource(R.string.content_desc_delete),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.error),
                 )
             },

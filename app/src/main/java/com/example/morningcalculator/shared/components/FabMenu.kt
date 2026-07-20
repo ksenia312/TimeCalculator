@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
@@ -71,7 +72,11 @@ fun FabMenu(
             ) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.Add else mainImageVector,
-                    contentDescription = if (isExpanded) "Close menu" else "Open menu",
+                    contentDescription = if (isExpanded) {
+                        stringResource(R.string.content_desc_close_menu)
+                    } else {
+                        stringResource(R.string.content_desc_open_menu)
+                    },
                     modifier = Modifier.rotate(rotation)
                 )
             }
@@ -128,14 +133,14 @@ fun FabMenuPreview() {
             fabItems = listOf(
                 FabItem(
                     iconRes = R.drawable.home,
-                    title = "Add Item",
-                    contentDescription = "Add Item",
+                    title = stringResource(R.string.fab_add_item),
+                    contentDescription = stringResource(R.string.fab_add_item),
                     onClick = {}
                 ),
                 FabItem(
                     iconRes = R.drawable.home,
-                    title = "Add Item",
-                    contentDescription = "Add Item",
+                    title = stringResource(R.string.fab_add_item),
+                    contentDescription = stringResource(R.string.fab_add_item),
                     onClick = {}
                 ),
             )
@@ -155,14 +160,14 @@ fun FabMenuPreviewExpanded() {
             fabItems = listOf(
                 FabItem(
                     iconRes = R.drawable.home,
-                    title = "Add Item",
-                    contentDescription = "Add Item",
+                    title = stringResource(R.string.fab_add_item),
+                    contentDescription = stringResource(R.string.fab_add_item),
                     onClick = {}
                 ),
                 FabItem(
                     iconRes = R.drawable.home,
-                    title = "Add Item",
-                    contentDescription = "Add Item",
+                    title = stringResource(R.string.fab_add_item),
+                    contentDescription = stringResource(R.string.fab_add_item),
                     onClick = {}
                 ),
             )

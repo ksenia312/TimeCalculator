@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.morningcalculator.R
 import com.example.morningcalculator.core.model.Routine
 import com.example.morningcalculator.shared.extensions.willStartIn
 import com.example.morningcalculator.shared.extensions.endAt
@@ -29,22 +32,23 @@ data class RoutineCardViewItem(
         @Composable
         fun create(routine: Routine): RoutineCardViewItem {
             rememberNow(tickMillis = 1000L)
+            val context = LocalContext.current
 
             val isOngoing = routine.isOngoing()
             val isCompleted = routine.isCompleted()
             val startLabel = when {
-                isOngoing || isCompleted -> "Started at"
-                else -> "Will start"
+                isOngoing || isCompleted -> stringResource(R.string.routine_card_started_at)
+                else -> stringResource(R.string.routine_card_will_start)
             }
 
             val endLabel = when {
-                isOngoing -> "Ends at"
-                isCompleted -> "Completed at"
-                else -> "Will end"
+                isOngoing -> stringResource(R.string.routine_card_ends_at)
+                isCompleted -> stringResource(R.string.routine_card_completed_at)
+                else -> stringResource(R.string.routine_card_will_end)
             }
 
-            val startText = routine.whenToStart().stringDateTime()
-            val endText = routine.endAt().stringDateTime()
+            val startText = routine.whenToStart().stringDateTime(context = context)
+            val endText = routine.endAt().stringDateTime(context = context)
             val willStartIn = routine.willStartIn()
 
             return RoutineCardViewItem(
@@ -54,7 +58,7 @@ data class RoutineCardViewItem(
                 endLabel = endLabel,
                 startText = startText,
                 endText = endText,
-                willStartIn = willStartIn.stringValue(),
+                willStartIn = willStartIn.stringValue(context),
                 title = routine.title
             )
         }
