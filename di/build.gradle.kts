@@ -1,0 +1,39 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "com.example.morningcalculator.di"
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 30
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+}
+
+dependencies {
+    implementation(project(":core"))
+    implementation(project(":data"))
+    implementation(project(":shared"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:landing"))
+    implementation(project(":feature:routinescreen"))
+    implementation(project(":feature:routineeditor"))
+    implementation(project(":feature:routineslist"))
+    implementation(project(":feature:taskeditor"))
+    implementation(project(":feature:taskslist"))
+    implementation(libs.koin.core)
+    implementation(libs.androidx.room.runtime)
+}

@@ -2,12 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "2.0.21"
-    id("com.google.devtools.ksp") version "2.3.4"
 }
 
 android {
-    namespace = "com.example.morningcalculator"
+    namespace = "com.example.morningcalculator.apphost"
     compileSdk = 36
 
     defaultConfig {
@@ -34,11 +32,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
 
@@ -46,33 +47,22 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.core)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.material3)
-    implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.material.icons.extended)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.haze)
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
+    implementation(project(":di"))
+    implementation(project(":shared"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:routinescreen"))
+    implementation(project(":feature:routineeditor"))
+    implementation(project(":feature:taskeditor"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
