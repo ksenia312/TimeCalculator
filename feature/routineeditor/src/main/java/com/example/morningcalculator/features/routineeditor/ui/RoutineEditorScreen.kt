@@ -33,11 +33,12 @@ import com.example.morningcalculator.features.routineeditor.presentation.CreateR
 import com.example.morningcalculator.features.routineeditor.presentation.EditRoutineViewModel
 import com.example.morningcalculator.features.routineeditor.presentation.EditRoutineViewState
 import com.example.morningcalculator.features.routineeditor.ui.components.RoutineAnchorSelector
-import com.example.morningcalculator.shared.features.EditorScreenScaffold
 import com.example.morningcalculator.shared.components.AppTextField
 import com.example.morningcalculator.shared.components.DatePickerField
 import com.example.morningcalculator.shared.components.SmallIconButton
 import com.example.morningcalculator.shared.components.TimePickerField
+import com.example.morningcalculator.shared.features.EditorScreenScaffold
+import com.example.morningcalculator.shared.navigator.AppRoute
 import com.example.morningcalculator.shared.navigator.LocalNavigator
 import kotlinx.datetime.LocalTime
 import org.koin.androidx.compose.koinViewModel
@@ -64,7 +65,6 @@ fun CreateRoutineScreen(
 @Composable
 fun EditRoutineScreen(
     routineId: String,
-    fromRoutineScreen: Boolean,
     viewModel: EditRoutineViewModel = koinViewModel(
         parameters = { parametersOf(routineId) }
     ),
@@ -80,7 +80,9 @@ fun EditRoutineScreen(
             ) { padding ->
                 Text(
                     text = stringResource(R.string.top_bar_error),
-                    modifier = Modifier.padding(padding).padding(16.dp),
+                    modifier = Modifier
+                        .padding(padding)
+                        .padding(16.dp),
                 )
             }
         }
@@ -97,10 +99,7 @@ fun EditRoutineScreen(
                 onDismiss = navigator::navigateBack,
                 onDelete = {
                     viewModel.deleteRoutine()
-                    navigator.navigateBack()
-                    if (fromRoutineScreen) {
-                        navigator.navigateBack()
-                    }
+                    navigator.navigateTo(AppRoute.Home)
                 },
             )
         }

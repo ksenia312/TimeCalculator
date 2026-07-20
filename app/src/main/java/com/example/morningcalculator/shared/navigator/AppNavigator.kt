@@ -15,10 +15,10 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
-import com.example.morningcalculator.features.routineeditor.ui.CreateRoutineScreen
-import com.example.morningcalculator.features.routineeditor.ui.EditRoutineScreen
 import com.example.morningcalculator.features.home.ui.HomeScreen
 import com.example.morningcalculator.features.routine.ui.RoutineScreen
+import com.example.morningcalculator.features.routineeditor.ui.CreateRoutineScreen
+import com.example.morningcalculator.features.routineeditor.ui.EditRoutineScreen
 import com.example.morningcalculator.features.taskeditor.ui.CreateTaskScreen
 import com.example.morningcalculator.features.taskeditor.ui.EditTaskScreen
 
@@ -70,7 +70,6 @@ fun AppNavigator() {
                         NavEntry(key = key) {
                             EditRoutineScreen(
                                 routineId = key.routineId,
-                                fromRoutineScreen = key.fromRoutineScreen,
                             )
                         }
                     }
