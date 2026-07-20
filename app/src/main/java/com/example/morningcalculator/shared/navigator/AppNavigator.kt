@@ -85,10 +85,10 @@ fun AppNavigator() {
 private fun transitionSpec(): AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform =
     {
         slideInHorizontally(
-            animationSpec = tween(500),
+            animationSpec = tween(200),
             initialOffsetX = { it },
         ) + fadeIn() togetherWith slideOutHorizontally(
-            animationSpec = tween(500),
+            animationSpec = tween(200),
             targetOffsetX = { -it },
         ) + fadeOut()
     }
@@ -96,10 +96,10 @@ private fun transitionSpec(): AnimatedContentTransitionScope<Scene<NavKey>>.() -
 private fun popTransitionSpec(): AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform =
     {
         slideInHorizontally(
-            animationSpec = tween(500),
+            animationSpec = tween(200),
             initialOffsetX = { -it },
         ) + fadeIn() togetherWith slideOutHorizontally(
-            animationSpec = tween(500),
+            animationSpec = tween(200),
             targetOffsetX = { it },
         ) + fadeOut()
     }
@@ -107,10 +107,10 @@ private fun popTransitionSpec(): AnimatedContentTransitionScope<Scene<NavKey>>.(
 private fun predictivePopTransitionSpec(): AnimatedContentTransitionScope<Scene<NavKey>>.(Int) -> ContentTransform =
     {
         slideInHorizontally(
-            animationSpec = tween(500),
+            animationSpec = tween(200),
             initialOffsetX = { -it },
         ) + fadeIn() togetherWith slideOutHorizontally(
-            animationSpec = tween(500),
+            animationSpec = tween(200),
             targetOffsetX = { it },
         ) + fadeOut()
     }
