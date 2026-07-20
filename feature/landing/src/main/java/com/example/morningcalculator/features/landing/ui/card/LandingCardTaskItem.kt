@@ -1,6 +1,8 @@
 package com.example.morningcalculator.features.landing.ui.card
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +17,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -94,8 +97,14 @@ fun LandingCardTaskItem(
 
         Spacer(Modifier.height(8.dp))
 
+        val animatedProgress by animateFloatAsState(
+            targetValue = progress.coerceIn(0f, 1f),
+            animationSpec = tween(durationMillis = 500),
+            label = "progress"
+        )
+
         LinearProgressIndicator(
-            progress = { progress.coerceIn(0f, 1f) },
+            progress = { animatedProgress },
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
             trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.20f),
             modifier = Modifier

@@ -6,6 +6,15 @@ import kotlin.time.Duration
 
 fun Duration.stringValue(context: Context): String {
     val totalSeconds = inWholeSeconds.coerceAtLeast(0)
+
+    if (totalSeconds < 60) {
+        return context.resources.getQuantityString(
+            R.plurals.duration_seconds,
+            totalSeconds.toInt(),
+            totalSeconds.toInt()
+        )
+    }
+
     val totalMinutes = ((totalSeconds + 59) / 60).coerceAtLeast(0)
 
     if (totalMinutes <= 60) {

@@ -90,6 +90,10 @@
     <string name="datetime_with_comma">%1$s, %2$s</string>
     <string name="duration_list_separator">,\u0020</string>
 
+    <plurals name="duration_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
     <plurals name="duration_minutes">
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>
