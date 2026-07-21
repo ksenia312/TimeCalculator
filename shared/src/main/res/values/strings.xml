@@ -97,16 +97,16 @@
     <string name="duration_list_separator">,\u0020</string>
 
     <plurals name="duration_seconds">
-        <item quantity="one">%d second</item>
-        <item quantity="other">%d seconds</item>
+        <item quantity="one">%d sec</item>
+        <item quantity="other">%d secs</item>
     </plurals>
     <plurals name="duration_minutes">
-        <item quantity="one">%d minute</item>
-        <item quantity="other">%d minutes</item>
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d mins</item>
     </plurals>
     <plurals name="duration_hours">
-        <item quantity="one">%d hour</item>
-        <item quantity="other">%d hours</item>
+        <item quantity="one">%d hr</item>
+        <item quantity="other">%d hrs</item>
     </plurals>
     <plurals name="duration_days">
         <item quantity="one">%d day</item>

@@ -36,7 +36,7 @@ fun TasksListView(
     val fullLinks = remember(routine) { routine.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
-
+    val currentLinkId = currentTaskIndex?.let { routine.data.getOrNull(it)?.id }
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -77,7 +77,7 @@ fun TasksListView(
                         )
                     )
                 },
-                isCurrent = currentTaskIndex == index,
+                isCurrent = link.id == currentLinkId,
             )
         }
         item { Spacer(Modifier.height(100.dp)) }
