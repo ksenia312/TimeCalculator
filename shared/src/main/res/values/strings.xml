@@ -39,6 +39,7 @@
     <string name="routine_status_completed">Completed</string>
     <string name="routine_status_planned">Planned</string>
     <string name="routine_time_will_start_in">Will start in</string>
+    <string name="routine_time_ends_in">Ends in</string>
 
     <string name="routines_list_status_completed_on">completed on</string>
     <string name="routines_list_status_running_ends_on">running now, ends on</string>

@@ -24,19 +24,31 @@ fun RoutineCardTimeInfo(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val ongoingRemaining = (viewItem.endInstant - viewItem.startInstant + viewItem.willStartIn)
+        .coerceAtLeast(kotlin.time.Duration.ZERO)
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End
     ) {
-        if (!viewItem.isOngoing && !viewItem.isCompleted) {
+        if (!viewItem.isCompleted) {
             Text(
-                text = stringResource(R.string.routine_time_will_start_in),
+                text = stringResource(
+                    if (viewItem.isOngoing) {
+                        R.string.routine_time_ends_in
+                    } else {
+                        R.string.routine_time_will_start_in
+                    }
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
                 textAlign = TextAlign.End
             )
             Text(
-                text = viewItem.willStartIn.stringValue(context),
+                text = if (viewItem.isOngoing) {
+                    ongoingRemaining.stringValue(context)
+                } else {
+                    viewItem.willStartIn.stringValue(context)
+                },
                 color = MaterialTheme.colorScheme.surface,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold
