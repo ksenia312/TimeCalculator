@@ -25,8 +25,6 @@ import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 
-const val BOTTOM_BAR_MAX_HEIGHT = 120
-
 enum class HomeTab(
     val labelResId: Int,
     val iconRes: Int,

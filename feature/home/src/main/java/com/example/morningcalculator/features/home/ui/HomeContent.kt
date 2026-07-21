@@ -21,10 +21,11 @@ fun HomeContent(
     current: HomeTab,
     onCreateRoutineClick: () -> Unit,
     onCreateTaskClick: () -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        Modifier
+        modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {

@@ -1,5 +1,6 @@
 package com.example.morningcalculator.features.home.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,6 +73,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
         }
     ) {
         HomeContent(
+            modifier = Modifier,
             paddingValues = it,
             current = viewState.value.selectedTab,
             onCreateRoutineClick = { navigator.navigateTo(AppRoute.CreateRoutine) },

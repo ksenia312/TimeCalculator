@@ -2,14 +2,15 @@ package com.example.morningcalculator.shared.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.FloatingActionButtonMenuScope
@@ -17,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,8 +30,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
+import com.example.morningcalculator.shared.theme.MorningCalculatorTheme
 
 data class FabItem(
     val iconRes: Int,
@@ -51,10 +54,11 @@ fun FabMenu(
     mainImageVector: ImageVector = Icons.Default.Add,
     horizontalAlignment: Alignment.Horizontal = Alignment.End,
 ) {
-    val rotation: Float by animateFloatAsState(if (isExpanded) 225f else 0f)
+    val rotation: Float by animateFloatAsState(if (isExpanded) 180f else 0f)
     val colors = ButtonDefaults.elevatedButtonColors(
         containerColor = itemContainerColor, contentColor = itemContentColor
     )
+    val largeContainerSize = ToggleFloatingActionButtonDefaults.containerSizeLarge()(0f)
 
     BackHandler(isExpanded) { onChangeExpanded(false) }
     FloatingActionButtonMenu(
@@ -62,22 +66,27 @@ fun FabMenu(
         expanded = isExpanded,
         horizontalAlignment = horizontalAlignment,
         button = {
-            FloatingActionButton(
-                onClick = {
-                    onChangeExpanded(!isExpanded)
-                },
-                containerColor = mainContainerColor,
-                contentColor = mainContentColor,
-                shape = RoundedCornerShape(size = 100.dp),
+            ToggleFloatingActionButton(
+                checked = isExpanded,
+                onCheckedChange = onChangeExpanded,
+                containerColor = { mainContainerColor },
+                containerSize = ToggleFloatingActionButtonDefaults.containerSize(
+                    initialSize = largeContainerSize,
+                    finalSize = largeContainerSize
+                ),
+                containerCornerRadius = ToggleFloatingActionButtonDefaults.containerCornerRadiusLarge(),
             ) {
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.Add else mainImageVector,
+                    imageVector = if (isExpanded) Icons.Default.Close else mainImageVector,
                     contentDescription = if (isExpanded) {
                         stringResource(R.string.content_desc_close_menu)
                     } else {
                         stringResource(R.string.content_desc_open_menu)
                     },
-                    modifier = Modifier.rotate(rotation)
+                    tint = mainContentColor,
+                    modifier = Modifier
+                        .size(FloatingActionButtonDefaults.LargeIconSize)
+                        .rotate(rotation)
                 )
             }
         }
@@ -126,25 +135,27 @@ fun FloatingActionButtonMenuScope.ElevatedButtonWithIconM3(
 @Preview
 @Composable
 fun FabMenuPreview() {
-    Surface {
-        FabMenu(
-            isExpanded = false,
-            onChangeExpanded = {},
-            fabItems = listOf(
-                FabItem(
-                    iconRes = R.drawable.home,
-                    title = stringResource(R.string.fab_add_item),
-                    contentDescription = stringResource(R.string.fab_add_item),
-                    onClick = {}
-                ),
-                FabItem(
-                    iconRes = R.drawable.home,
-                    title = stringResource(R.string.fab_add_item),
-                    contentDescription = stringResource(R.string.fab_add_item),
-                    onClick = {}
-                ),
+    MorningCalculatorTheme {
+        Surface {
+            FabMenu(
+                isExpanded = false,
+                onChangeExpanded = {},
+                fabItems = listOf(
+                    FabItem(
+                        iconRes = R.drawable.home,
+                        title = stringResource(R.string.fab_add_item),
+                        contentDescription = stringResource(R.string.fab_add_item),
+                        onClick = {}
+                    ),
+                    FabItem(
+                        iconRes = R.drawable.home,
+                        title = stringResource(R.string.fab_add_item),
+                        contentDescription = stringResource(R.string.fab_add_item),
+                        onClick = {}
+                    ),
+                )
             )
-        )
+        }
     }
 }
 
@@ -152,25 +163,27 @@ fun FabMenuPreview() {
 @Preview
 @Composable
 fun FabMenuPreviewExpanded() {
-    Surface {
-        FabMenu(
-            isExpanded = true,
-            onChangeExpanded = {},
-            horizontalAlignment = Alignment.CenterHorizontally,
-            fabItems = listOf(
-                FabItem(
-                    iconRes = R.drawable.home,
-                    title = stringResource(R.string.fab_add_item),
-                    contentDescription = stringResource(R.string.fab_add_item),
-                    onClick = {}
-                ),
-                FabItem(
-                    iconRes = R.drawable.home,
-                    title = stringResource(R.string.fab_add_item),
-                    contentDescription = stringResource(R.string.fab_add_item),
-                    onClick = {}
-                ),
+    com.example.morningcalculator.shared.theme.MorningCalculatorTheme {
+        Surface {
+            FabMenu(
+                isExpanded = true,
+                onChangeExpanded = {},
+                horizontalAlignment = Alignment.CenterHorizontally,
+                fabItems = listOf(
+                    FabItem(
+                        iconRes = R.drawable.home,
+                        title = stringResource(R.string.fab_add_item),
+                        contentDescription = stringResource(R.string.fab_add_item),
+                        onClick = {}
+                    ),
+                    FabItem(
+                        iconRes = R.drawable.home,
+                        title = stringResource(R.string.fab_add_item),
+                        contentDescription = stringResource(R.string.fab_add_item),
+                        onClick = {}
+                    ),
+                )
             )
-        )
+        }
     }
 }
