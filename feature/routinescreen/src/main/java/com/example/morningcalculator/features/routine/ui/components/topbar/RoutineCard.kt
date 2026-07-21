@@ -1,5 +1,6 @@
 package com.example.morningcalculator.features.routine.ui.components.topbar
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.features.RoutineCardStatusRow
 import com.example.morningcalculator.shared.features.RoutineCardTimeInfo
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 
 @Composable
 fun RoutineCard(
@@ -24,7 +25,9 @@ fun RoutineCard(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .animateContentSize(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

@@ -13,28 +13,26 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import kotlin.math.roundToInt
 
 private const val BOTTOM_BAR_MAX_HEIGHT = 120
 
 fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 24.dp)
-// shared/.../ModifierExtensions.kt (или как называется твой файл)
-
 
 /**
  * Makes an item in a reorderable list draggable via long-press.
  *
- * The modifier owns none of the domain state. The caller provides:
+ * The modifier owns none of the domain state — it only reports intent:
  *  - [itemCount]: total number of items, used to clamp the drag target.
- *  - [onMove]: called during drag when the item crosses into a new slot.
- *    The caller is responsible for actually mutating its backing list.
- *  - [onDrop]: called once when the drag finishes successfully.
+ *  - [onMove]: item crossed into a new slot (from -> to). The caller is
+ *    responsible for producing the new order (e.g. mutating a list or
+ *    updating a draft in a ViewModel).
+ *  - [onDrop]: drag finished successfully — persist the current order.
+ *  - [onCancel]: drag was interrupted — revert to the last committed order.
  *
- * @param itemHeight the height of a single row, used to translate pixel
- *   offsets into index deltas.
+ * @param itemHeight height of a single row, used to translate pixel offsets
+ *   into index deltas.
  */
-
 @Composable
 fun Modifier.draggableItem(
     index: Int,
@@ -44,22 +42,21 @@ fun Modifier.draggableItem(
     itemHeight: Dp = 72.dp,
     onMove: (from: Int, to: Int) -> Unit,
     onDrop: () -> Unit,
+    onCancel: () -> Unit = {},
 ): Modifier {
     val isDragging = draggingIndex.value == index
     val density = LocalDensity.current
     val itemHeightPx = with(density) { itemHeight.toPx() }
-
-    // Свежие значения без перезапуска жест-детектора во время перетаскивания.
     val currentIndex by rememberUpdatedState(index)
     val currentItemCount by rememberUpdatedState(itemCount)
     val currentOnMove by rememberUpdatedState(onMove)
     val currentOnDrop by rememberUpdatedState(onDrop)
+    val currentOnCancel by rememberUpdatedState(onCancel)
 
     return this
         .offset {
             IntOffset(0, if (isDragging) dragOffsetY.value.roundToInt() else 0)
         }
-        .zIndex(if (isDragging) 1f else 0f)
         .pointerInput(Unit) {
             detectDragGesturesAfterLongPress(
                 onDragStart = {
@@ -87,6 +84,7 @@ fun Modifier.draggableItem(
                     dragOffsetY.value = 0f
                 },
                 onDragCancel = {
+                    currentOnCancel()
                     draggingIndex.value = null
                     dragOffsetY.value = 0f
                 },

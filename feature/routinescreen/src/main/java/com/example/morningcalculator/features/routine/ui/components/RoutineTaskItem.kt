@@ -27,13 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.morningcalculator.R
 import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.domain.model.RoutineLink
@@ -47,22 +47,22 @@ import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutineTaskItem(
-    linkFull: RoutineLink,
+    link: RoutineLink,
     routine: Routine,
     index: Int,
+    itemCount: Int,
     draggingIndex: MutableState<Int?>,
     dragOffsetY: MutableState<Float>,
-    routineLinks: SnapshotStateList<RoutineLink>,
     viewModel: RoutineViewModel,
     schedule: RoutineSchedule,
     onEditClick: () -> Unit,
     isCurrent: Boolean,
+    isCompleted: Boolean,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
-
     val scheduledTask = schedule.tasks[index]
     val timeFormatted = scheduledTask.end.stringTime()
-    val selectedDuration = linkFull.subData?.duration ?: kotlin.time.Duration.ZERO
+    val selectedDuration = link.subData?.duration ?: kotlin.time.Duration.ZERO
     val shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp)
     val bgColor = if (isCurrent) {
         LocalCustomColorScheme.current.accentLight
@@ -79,7 +79,8 @@ fun RoutineTaskItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Max),
+            .height(IntrinsicSize.Max)
+            .zIndex(if (draggingIndex.value == index) 1f else 0f),
     ) {
         TimeSegment(
             timeFormatted,
@@ -94,9 +95,10 @@ fun RoutineTaskItem(
                     index = index,
                     draggingIndex = draggingIndex,
                     dragOffsetY = dragOffsetY,
-                    itemCount = routineLinks.size,
-                    onMove = { from, to -> routineLinks.move(from, to) },
-                    onDrop = { viewModel.reorderTasks(routineLinks.map { it.id }) },
+                    itemCount = itemCount,
+                    onMove = { from, to -> viewModel.previewReorder(from, to) },
+                    onDrop = { viewModel.commitReorder() },
+                    onCancel = { viewModel.cancelReorder() },
                 )
                 .clip(shape)
                 .background(
@@ -108,9 +110,11 @@ fun RoutineTaskItem(
                 }
                 .padding(24.dp, 12.dp, 8.dp, 12.dp),
         ) {
+            val accentColor = LocalRoutineColor.current
+            val onAccentColor = LocalRoutineColor.current.copy(alpha = 0.05f)
             AppCircleIndicator(
-                backgroundColor = LocalRoutineColor.current.copy(alpha = 0.05f),
-                foregroundColor = LocalRoutineColor.current,
+                backgroundColor = if (isCompleted) accentColor else onAccentColor,
+                foregroundColor = if (isCompleted) MaterialTheme.colorScheme.onPrimary else accentColor,
             )
             Box(
                 modifier = Modifier
@@ -118,7 +122,7 @@ fun RoutineTaskItem(
                     .fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
             ) {
-                Text(linkFull.task.title)
+                Text(link.task.title)
             }
 
             ExposedDropdownMenuBox(
@@ -155,7 +159,7 @@ fun RoutineTaskItem(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
-                    linkFull.task.dataSortedByDuration.forEach { sub ->
+                    link.task.dataSortedByDuration.forEach { sub ->
                         DropdownMenuItem(
                             text = {
                                 Text("${sub.duration}")
@@ -163,7 +167,7 @@ fun RoutineTaskItem(
                             onClick = {
                                 menuExpanded = false
                                 viewModel.addOrEditTaskInRoutine(
-                                    linkFull.copy(
+                                    link.copy(
                                         subData = sub,
                                     ),
                                 )
@@ -174,10 +178,4 @@ fun RoutineTaskItem(
             }
         }
     }
-}
-
-private fun <T> MutableList<T>.move(fromIndex: Int, toIndex: Int) {
-    if (fromIndex == toIndex) return
-    val element = removeAt(fromIndex)
-    add(toIndex, element)
 }

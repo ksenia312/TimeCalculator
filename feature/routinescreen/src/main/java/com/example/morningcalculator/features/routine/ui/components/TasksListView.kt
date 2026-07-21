@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.domain.model.Routine
@@ -33,15 +32,14 @@ fun TasksListView(
     val navigator = LocalNavigator.current
 
     val whenToGetUp = schedule.effectiveStart.stringTime()
-    val fullLinks = remember(routine) { routine.data.toMutableStateList() }
+    val links = routine.data
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
-    val currentLinkId = currentTaskIndex?.let { routine.data.getOrNull(it)?.id }
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         item { Spacer(Modifier.height(12.dp)) }
-        if (fullLinks.isNotEmpty()) {
+        if (links.isNotEmpty()) {
             item(key = "wakeUp") {
                 TimeSegment(
                     whenToGetUp,
@@ -51,18 +49,20 @@ fun TasksListView(
             }
         }
         itemsIndexed(
-            items = fullLinks,
+            items = links,
             key = { _, link -> link.id },
         ) { index, link ->
             RoutineTaskItem(
-                routineLinks = fullLinks,
                 index = index,
-                linkFull = link,
+                itemCount = links.size,
+                link = link,
                 routine = routine,
                 viewModel = viewModel,
                 schedule = schedule,
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,
+                isCurrent = currentTaskIndex == index,
+                isCompleted = currentTaskIndex != null && index < currentTaskIndex,
                 onEditClick = {
                     navigator.navigateTo(
                         AppRoute.EditTask(
@@ -77,7 +77,6 @@ fun TasksListView(
                         )
                     )
                 },
-                isCurrent = link.id == currentLinkId,
             )
         }
         item { Spacer(Modifier.height(100.dp)) }
