@@ -15,8 +15,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
-private const val BOTTOM_BAR_MAX_HEIGHT = 120
-
 fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 24.dp)
 
 /**
