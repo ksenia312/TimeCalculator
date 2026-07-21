@@ -11,17 +11,16 @@ import androidx.navigation3.runtime.rememberNavBackStack
 
 @Composable
 fun AppNavigatorProvider(
-    startAppRoute: AppRoute? = null,
+    initialBackStack: List<NavKey> = listOf(AppRoute.Home),
+    onBackStackCreated: (NavBackStack<NavKey>) -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    val backStack = rememberNavBackStack(startAppRoute ?: AppRoute.Home)
+    val backStack = rememberNavBackStack(*initialBackStack.toTypedArray())
     val navigator = remember(backStack) {
         NavigatorImpl(backStack)
     }
-    LaunchedEffect(startAppRoute) {
-        if (startAppRoute != null) {
-            navigator.navigateTo(startAppRoute, BackstackBehavior.Clear)
-        }
+    LaunchedEffect(backStack) {
+        onBackStackCreated(backStack)
     }
     CompositionLocalProvider(
         LocalNavigator provides navigator,

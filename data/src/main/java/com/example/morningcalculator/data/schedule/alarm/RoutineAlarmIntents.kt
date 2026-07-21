@@ -5,14 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.example.morningcalculator.domain.model.RoutineAlarmKind
+import com.example.morningcalculator.shared.extensions.buildRoutineDeepLinkIntent
 
 internal const val ACTION_ROUTINE_ALARM = "com.example.morningcalculator.action.ROUTINE_ALARM"
 const val EXTRA_ROUTINE_ID = "extra_routine_id"
 internal const val EXTRA_ALARM_KIND = "extra_alarm_kind"
 internal const val EXTRA_BOUNDARY_INDEX = "extra_boundary_index"
 internal const val EXTRA_TRIGGER_AT_MILLIS = "extra_trigger_at_millis"
-
-private const val MAIN_ACTIVITY_CLASS_NAME = "com.example.morningcalculator.app.MainActivity"
 private const val ROUTINE_SCHEME = "morningcalculator"
 
 fun stableAlarmRequestCode(
@@ -64,13 +63,7 @@ fun buildRoutineDetailIntent(
     context: Context,
     routineId: String,
 ): Intent {
-    return Intent().apply {
-        setClassName(context.packageName, MAIN_ACTIVITY_CLASS_NAME)
-        action = Intent.ACTION_VIEW
-        data = Uri.parse("$ROUTINE_SCHEME://routine/$routineId")
-        putExtra(EXTRA_ROUTINE_ID, routineId)
-        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    return context.buildRoutineDeepLinkIntent(routineId)
 }
 
 fun buildRoutineDetailPendingIntent(

@@ -17,7 +17,12 @@ fun BackButton(
     overrideOnBack: (() -> Unit)? = null,
 ) {
     val navigator = LocalNavigator.current
-    IconButton(onClick = { if (overrideOnBack != null) overrideOnBack() else navigator.navigateBack() }) {
+    val canHandleBack = overrideOnBack != null || navigator.canNavigateBack
+
+    IconButton(
+        enabled = canHandleBack,
+        onClick = { if (overrideOnBack != null) overrideOnBack() else navigator.navigateBack() }
+    ) {
         Image(
             painterResource(R.drawable.back_arrow),
             contentDescription = stringResource(R.string.content_desc_back),

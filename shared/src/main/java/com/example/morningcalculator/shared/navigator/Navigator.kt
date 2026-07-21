@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 interface Navigator {
     val currentAppRoute: AppRoute?
     val backstack: List<AppRoute>
+    val canNavigateBack: Boolean
     fun navigateTo(appRoute: AppRoute, backstackBehavior: BackstackBehavior = BackstackBehavior.Default)
     fun navigateBack()
 }
@@ -19,6 +20,9 @@ class NavigatorImpl(
 
     override val backstack: List<AppRoute>
         get() = navigationBackStack.mapNotNull { it as? AppRoute }
+
+    override val canNavigateBack: Boolean
+        get() = navigationBackStack.size > 1
 
     override fun navigateTo(appRoute: AppRoute, backstackBehavior: BackstackBehavior) {
         when (backstackBehavior) {

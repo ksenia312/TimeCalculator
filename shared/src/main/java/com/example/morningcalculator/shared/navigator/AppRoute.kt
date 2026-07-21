@@ -16,8 +16,9 @@ sealed interface AppRoute : NavKey {
     data object Home : AppRoute
 
     @Serializable
-    data class Routine(val routineId: String) : AppRoute {
+    data class Routine(val routineId: String) : AppRoute, DeepLinkKey {
         override val hasBrightTopBar: Boolean get() = true
+        override val parent: NavKey get() = Home
     }
 
     @Serializable

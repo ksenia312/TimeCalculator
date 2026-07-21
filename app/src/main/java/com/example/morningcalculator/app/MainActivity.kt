@@ -10,24 +10,34 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.example.morningcalculator.shared.extensions.toAppRoute
+import com.example.morningcalculator.shared.navigator.DeepLinkKey
+import com.example.morningcalculator.shared.navigator.syntheticBackStack
 import com.example.morningcalculator.shared.navigator.AppNavigator
 import com.example.morningcalculator.shared.navigator.AppRoute
 import com.example.morningcalculator.shared.theme.MorningCalculatorTheme
 
 class MainActivity : ComponentActivity() {
 
-    private var startAppRoute by mutableStateOf<AppRoute?>(null)
+    private var navigationBackStack: NavBackStack<NavKey>? = null
+    private var pendingDeepLinkRoute: AppRoute? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        startAppRoute = intent.toAppRoute()
+
+        val isNewTask = intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0
+        val startRoute = intent.toAppRoute()
+        val initialBackStack: List<NavKey> = when {
+            isNewTask && startRoute is DeepLinkKey -> startRoute.syntheticBackStack()
+
+            else -> listOf(AppRoute.Home)
+        }
+        pendingDeepLinkRoute = null
 
         setContent {
             val requestPermission = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -55,7 +65,18 @@ class MainActivity : ComponentActivity() {
             }
 
             MorningCalculatorTheme {
-                AppNavigator(startAppRoute = startAppRoute)
+                AppNavigator(
+                    initialBackStack = initialBackStack,
+                    onBackStackCreated = { backStack ->
+                        navigationBackStack = backStack
+                        pendingDeepLinkRoute?.let {
+                            if (backStack.lastOrNull() != it) {
+                                backStack.add(it)
+                            }
+                            pendingDeepLinkRoute = null
+                        }
+                    },
+                )
             }
         }
     }
@@ -63,7 +84,14 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        startAppRoute = intent.toAppRoute()
+        val appRoute = intent.toAppRoute() ?: return
+        navigationBackStack?.let { backStack ->
+            if (backStack.lastOrNull() != appRoute) {
+                backStack.add(appRoute)
+            }
+        } ?: run {
+            pendingDeepLinkRoute = appRoute
+        }
     }
 
     companion object {

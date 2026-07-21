@@ -17,6 +17,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -33,8 +34,14 @@ import com.example.morningcalculator.shared.theme.SetStatusBarForBrightTopBar
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun AppNavigator(startAppRoute: AppRoute? = null) {
-    AppNavigatorProvider(startAppRoute = startAppRoute) {
+fun AppNavigator(
+    initialBackStack: List<NavKey> = listOf(AppRoute.Home),
+    onBackStackCreated: (NavBackStack<NavKey>) -> Unit = {},
+) {
+    AppNavigatorProvider(
+        initialBackStack = initialBackStack,
+        onBackStackCreated = onBackStackCreated,
+    ) {
         val backStack = LocalNavigationBackStack.current
         val currentRoute = backStack.lastOrNull() as? AppRoute
         SetStatusBarForBrightTopBar(hasBrightTopBar = currentRoute?.hasBrightTopBar ?: false)
