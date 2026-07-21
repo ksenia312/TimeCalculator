@@ -25,36 +25,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.domain.model.Routine
-import com.example.morningcalculator.shared.extensions.endAt
-import com.example.morningcalculator.shared.extensions.isCompleted
-import com.example.morningcalculator.shared.extensions.isOngoing
-import com.example.morningcalculator.shared.extensions.stringDateTime
-import com.example.morningcalculator.shared.extensions.whenToStart
+import com.example.morningcalculator.features.routineslist.presentation.RoutineListItemState
 import com.example.morningcalculator.shared.navigator.AppRoute
 import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewTheme
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
+import com.example.morningcalculator.shared.extensions.stringDateTime
 import kotlin.time.Instant
 
 @Composable
 fun RoutineListItem(
-    routine: Routine,
+    item: RoutineListItemState,
 ) {
     val navigator = LocalNavigator.current
     val onNavigate: () -> Unit = {
         navigator.navigateTo(
-            AppRoute.Routine(routineId = routine.id),
+            AppRoute.Routine(routineId = item.routine.id),
         )
     }
 
     RoutineListItem(
-        routine = routine,
+        item = item,
         onNavigate = onNavigate,
         onEditClick = {
             navigator.navigateTo(
                 AppRoute.EditRoutine(
-                    routineId = routine.id,
+                    routineId = item.routine.id,
                     fromRoutineScreen = false,
                 )
             )
@@ -64,21 +61,22 @@ fun RoutineListItem(
 
 @Composable
 private fun RoutineListItem(
-    routine: Routine,
+    item: RoutineListItemState,
     onNavigate: () -> Unit,
     onEditClick: () -> Unit,
 ) {
-    val isCompleted = routine.isCompleted()
-    val isOngoing = routine.isOngoing()
     val context = LocalContext.current
+    val routine = item.routine
+    val isCompleted = item.cardViewItem.isCompleted
+    val isOngoing = item.cardViewItem.isOngoing
 
     val (statusPrefix, statusText) = when {
         isCompleted -> stringResource(R.string.routines_list_status_completed_on) to
-            routine.endAt().stringDateTime(context = context)
+            item.cardViewItem.endInstant.stringDateTime(context = context)
         isOngoing -> stringResource(R.string.routines_list_status_running_ends_on) to
-            routine.endAt().stringDateTime(context = context)
+            item.cardViewItem.endInstant.stringDateTime(context = context)
         else -> stringResource(R.string.routines_list_status_planned_for) to
-            routine.whenToStart().stringDateTime(context = context)
+            item.cardViewItem.startInstant.stringDateTime(context = context)
     }
 
     val color = when {
@@ -145,8 +143,30 @@ fun RoutineListItemPreview() {
             modifiedAt = System.currentTimeMillis(),
             data = listOf()
         )
-        RoutineListItem(
+        val item = com.example.morningcalculator.features.routineslist.presentation.RoutineListItemState(
             routine = routine,
+            schedule = com.example.morningcalculator.domain.model.RoutineSchedule(
+                routineId = routine.id,
+                routineTitle = routine.title,
+                effectiveStart = routine.scheduledAt,
+                end = routine.scheduledAt,
+                totalDuration = kotlin.time.Duration.ZERO,
+                tasks = emptyList(),
+                signature = "",
+            ),
+            cardViewItem = com.example.morningcalculator.shared.viewitem.RoutineCardViewItem(
+                isOngoing = false,
+                isCompleted = false,
+                startLabelRes = R.string.routine_card_will_start,
+                endLabelRes = R.string.routine_card_will_end,
+                startInstant = routine.scheduledAt,
+                endInstant = routine.scheduledAt,
+                title = routine.title,
+                willStartIn = kotlin.time.Duration.ZERO,
+            ),
+        )
+        RoutineListItem(
+            item = item,
             onNavigate = {},
             onEditClick = {}
         )

@@ -33,8 +33,8 @@ import com.example.morningcalculator.shared.theme.SetStatusBarForBrightTopBar
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun AppNavigator() {
-    AppNavigatorProvider {
+fun AppNavigator(startAppRoute: AppRoute? = null) {
+    AppNavigatorProvider(startAppRoute = startAppRoute) {
         val backStack = LocalNavigationBackStack.current
         val currentRoute = backStack.lastOrNull() as? AppRoute
         SetStatusBarForBrightTopBar(hasBrightTopBar = currentRoute?.hasBrightTopBar ?: false)

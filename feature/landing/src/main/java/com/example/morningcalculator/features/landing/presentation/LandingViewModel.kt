@@ -3,10 +3,9 @@ package com.example.morningcalculator.features.landing.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.domain.repository.RoutineRepository
-import com.example.morningcalculator.features.landing.ui.currentTaskIndex
+import com.example.morningcalculator.domain.repository.RoutineScheduleRepository
 import com.example.morningcalculator.features.routineslist.presentation.RoutinesListState
 import com.example.morningcalculator.features.routineslist.presentation.sortRoutines
-import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +15,7 @@ import kotlin.time.Instant
 
 class LandingViewModel(
     val routineRepository: RoutineRepository,
+    private val routineScheduleRepository: RoutineScheduleRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<LandingState>(LandingState.Loading)
@@ -44,18 +44,20 @@ class LandingViewModel(
             }.collect { (routines, now) ->
                 val sorted = sortRoutines(
                     routines = routines,
+                    now = now,
+                    routineScheduleRepository = routineScheduleRepository,
                     sort = RoutinesListState.Sort(
                         RoutinesListState.Sort.SortType.DATE,
                         RoutinesListState.Sort.SortOrder.DESCENDING
                     )
                 )
-                val routineStates = sorted.take(3).map { routine ->
-                    val cardViewItem = routine.toRoutineCardViewItem(now)
-                    val taskCount = routine.data.size
-                    val isOngoing = cardViewItem.isOngoing
+                val routineStates = sorted.take(3).map { item ->
+                    val schedule = item.schedule
+                    val taskCount = item.routine.data.size
+                    val isOngoing = item.cardViewItem.isOngoing
                     val currentIndex = when {
                         taskCount == 0 -> null
-                        isOngoing -> currentTaskIndex(routine, now)
+                        isOngoing -> schedule.taskIndexAt(now)
                         else -> 0
                     }
                     val nextIndex = when {
@@ -64,10 +66,10 @@ class LandingViewModel(
                         else -> 1
                     }?.takeIf { it in 0 until taskCount }
                     LandingRoutineState(
-                        routineId = routine.id,
-                        cardViewItem = cardViewItem,
-                        currentTaskViewItem = currentIndex?.let { createLandingCardTaskViewItem(routine, it, now) },
-                        nextTaskViewItem = nextIndex?.let { createLandingCardTaskViewItem(routine, it, now) },
+                        routineId = item.routine.id,
+                        cardViewItem = item.cardViewItem,
+                        currentTaskViewItem = currentIndex?.let { schedule.tasks.getOrNull(it)?.let { task -> createLandingCardTaskViewItem(task, now) } },
+                        nextTaskViewItem = nextIndex?.let { schedule.tasks.getOrNull(it)?.let { task -> createLandingCardTaskViewItem(task, now) } },
                     )
                 }
                 _viewState.value = LandingState.Success(routineStates = routineStates)

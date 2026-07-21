@@ -42,10 +42,10 @@ import androidx.compose.ui.zIndex
 import com.example.morningcalculator.R
 import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.RoutineSchedule
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.components.AppCircleIndicator
 import com.example.morningcalculator.shared.extensions.stringTime
-import com.example.morningcalculator.shared.extensions.timeOnMoment
 import com.example.morningcalculator.shared.theme.LocalCustomColorScheme
 import kotlin.math.roundToInt
 
@@ -59,16 +59,14 @@ fun RoutineTaskItem(
     dragOffsetY: MutableState<Float>,
     routineLinks: SnapshotStateList<RoutineLink>,
     viewModel: RoutineViewModel,
+    schedule: RoutineSchedule,
     onEditClick: () -> Unit,
     isCurrent: Boolean,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
-    var current by remember(linkFull.subData) {
-        mutableStateOf(linkFull.subData)
-    }
 
-    val time = routine.timeOnMoment(index)
-    val timeFormatted = time.stringTime()
+    val scheduledTask = schedule.tasks[index]
+    val timeFormatted = scheduledTask.end.stringTime()
 
     val shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp)
     val bgColor = if (isCurrent) {
@@ -140,8 +138,9 @@ fun RoutineTaskItem(
                 ) {
                     Box {
                         Text(
-                            current?.duration?.toString() ?: stringResource(R.string.task_set_duration),
-                            color = if (current != null) {
+                            scheduledTask.duration.takeIf { it > kotlin.time.Duration.ZERO }?.toString()
+                                ?: stringResource(R.string.task_set_duration),
+                            color = if (scheduledTask.duration > kotlin.time.Duration.ZERO) {
                                 MaterialTheme.colorScheme.onBackground
                             } else {
                                 MaterialTheme.colorScheme.error
@@ -166,7 +165,6 @@ fun RoutineTaskItem(
                                 Text("${sub.duration}")
                             },
                             onClick = {
-                                current = sub
                                 menuExpanded = false
                                 viewModel.addOrEditTaskInRoutine(
                                     linkFull.copy(

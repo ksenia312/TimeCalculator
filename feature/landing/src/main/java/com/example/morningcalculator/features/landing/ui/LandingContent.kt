@@ -16,21 +16,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.domain.model.Routine
-import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.RoutineSchedule
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 import com.example.morningcalculator.shared.components.HomeEmptyState
 import com.example.morningcalculator.shared.extensions.bottomIndent
 import com.example.morningcalculator.features.landing.presentation.LandingRoutineState
 import com.example.morningcalculator.features.landing.presentation.LandingState
 import com.example.morningcalculator.features.landing.ui.card.LandingCardPager
-import com.example.morningcalculator.shared.extensions.endAtInstant
-import com.example.morningcalculator.shared.extensions.startAtInstant
 import com.example.morningcalculator.shared.navigator.AppRoute
 import com.example.morningcalculator.shared.navigator.LocalNavigator
 import com.example.morningcalculator.shared.preview.PreviewAll
 import com.example.morningcalculator.shared.preview.PreviewConstants
 import com.example.morningcalculator.shared.preview.PreviewTheme
-import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
-import kotlin.time.Duration
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,41 +91,6 @@ fun LandingContent(
     }
 }
 
-fun currentTaskIndex(routine: Routine, now: Instant): Int? {
-    val tasks = routine.data
-    if (tasks.isEmpty()) return null
-
-    val start = routine.startAtInstant()
-    val end = routine.endAtInstant()
-
-    if (now <= start) return 0
-    if (now >= end) return tasks.lastIndex
-
-    var cursor = start
-
-    tasks.forEachIndexed { index, link ->
-        val d = linkDuration(link).coerceAtLeast(Duration.ZERO)
-        val next = cursor + d
-
-        if (d == Duration.ZERO) {
-            if (now == cursor) return index
-        } else {
-            if (now < next) return index
-        }
-
-        cursor = next
-    }
-
-    return tasks.lastIndex
-}
-
-fun linkDuration(link: RoutineLink): Duration {
-    return link.subData?.duration ?: link.task.data.fold(Duration.ZERO) { acc, subData ->
-        acc + subData.duration
-    }
-}
-
-
 @PreviewAll
 @Composable
 fun LandingContentPreview() {
@@ -137,9 +99,27 @@ fun LandingContentPreview() {
         LandingContent(
             viewState = LandingState.Success(
                 routineStates = PreviewConstants.routinesFull.take(3).map { routine ->
+                    val schedule = RoutineSchedule(
+                        routineId = routine.id,
+                        routineTitle = routine.title,
+                        effectiveStart = routine.scheduledAt,
+                        end = routine.scheduledAt,
+                        totalDuration = kotlin.time.Duration.ZERO,
+                        tasks = emptyList(),
+                        signature = "",
+                    )
                     LandingRoutineState(
                         routineId = routine.id,
-                        cardViewItem = routine.toRoutineCardViewItem(now),
+                        cardViewItem = RoutineCardViewItem(
+                            isOngoing = false,
+                            isCompleted = false,
+                            startLabelRes = R.string.routine_card_will_start,
+                            endLabelRes = R.string.routine_card_will_end,
+                            startInstant = schedule.effectiveStart,
+                            endInstant = schedule.end,
+                            title = routine.title,
+                            willStartIn = kotlin.time.Duration.ZERO,
+                        ),
                         currentTaskViewItem = null,
                         nextTaskViewItem = null,
                     )

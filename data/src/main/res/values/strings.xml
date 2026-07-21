@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_routine_progress">Routine progress</string>
+    <string name="notification_channel_routine_progress_description">Shows the active routine and current task countdown</string>
+    <string name="notification_channel_task_alerts">Task alerts</string>
+    <string name="notification_channel_task_alerts_description">Notifies when a routine or task starts</string>
+</resources>

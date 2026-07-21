@@ -1,12 +1,12 @@
 package com.example.morningcalculator.data.repository
 
-import com.example.morningcalculator.domain.model.Routine
-import com.example.morningcalculator.domain.model.RoutineRequest
-import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.data.db.RoutinesDao
 import com.example.morningcalculator.data.mapper.toDomain
 import com.example.morningcalculator.data.model.RoutineEntity
 import com.example.morningcalculator.data.model.RoutineItemEntity
+import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineRequest
+import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.shared.extensions.withZeroSeconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,6 @@ class RoutineRepositoryImpl(
 
     override suspend fun addRoutine(request: RoutineRequest) {
         val scheduledAt = request.scheduledAt.withZeroSeconds()
-
         val routineEntity = RoutineEntity(
             id = UUID.randomUUID().toString(),
             title = request.title,

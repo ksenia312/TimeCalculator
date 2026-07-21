@@ -43,8 +43,8 @@ fun RoutinesListContent(
             }
 
             is RoutinesListState.Success -> {
-                val routines = viewState.sorted
-                if (routines.isEmpty()) {
+                val items = viewState.items
+                if (items.isEmpty()) {
                     HomeEmptyState(
                         title = stringResource(R.string.routines_empty_title),
                         subtitle = stringResource(R.string.routines_empty_subtitle),
@@ -61,10 +61,10 @@ fun RoutinesListContent(
                         modifier = Modifier.padding(horizontal = 12.dp)
                     ) {
                         item { Spacer(Modifier.height(16.dp)) }
-                        routines.forEach { routine ->
-                            item(key = routine.id) {
+                        items.forEach { routineItem ->
+                            item(key = routineItem.routine.id) {
                                 RoutineListItem(
-                                    routine = routine,
+                                    item = routineItem,
                                 )
                             }
                         }
@@ -92,8 +92,30 @@ fun RoutineListContentPreview() {
     PreviewTheme {
         RoutinesListContent(
             viewState = RoutinesListState.Success(
-                routines = PreviewConstants.routinesFull,
-                sorted = PreviewConstants.routinesFull,
+                items = PreviewConstants.routinesFull.map {
+                    com.example.morningcalculator.features.routineslist.presentation.RoutineListItemState(
+                        routine = it,
+                        schedule = com.example.morningcalculator.domain.model.RoutineSchedule(
+                            routineId = it.id,
+                            routineTitle = it.title,
+                            effectiveStart = it.scheduledAt,
+                            end = it.scheduledAt,
+                            totalDuration = kotlin.time.Duration.ZERO,
+                            tasks = emptyList(),
+                            signature = "",
+                        ),
+                        cardViewItem = com.example.morningcalculator.shared.viewitem.RoutineCardViewItem(
+                            isOngoing = false,
+                            isCompleted = false,
+                            startLabelRes = R.string.routine_card_will_start,
+                            endLabelRes = R.string.routine_card_will_end,
+                            startInstant = it.scheduledAt,
+                            endInstant = it.scheduledAt,
+                            title = it.title,
+                            willStartIn = kotlin.time.Duration.ZERO,
+                        ),
+                    )
+                },
                 sort = RoutinesListState.Sort.DEFAULT
             ),
             onCreateRoutineClick = {},

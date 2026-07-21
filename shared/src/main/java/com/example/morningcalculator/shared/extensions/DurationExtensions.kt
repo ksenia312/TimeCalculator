@@ -6,25 +6,31 @@ import kotlin.time.Duration
 
 fun Duration.stringValue(context: Context): String {
     val totalSeconds = inWholeSeconds.coerceAtLeast(0)
+    val separator = context.getString(R.string.duration_list_separator)
 
-    if (totalSeconds < 60) {
-        return context.resources.getQuantityString(
-            R.plurals.duration_seconds,
-            totalSeconds.toInt(),
-            totalSeconds.toInt()
-        )
+    // Less than an hour: show minutes AND seconds (no rounding up to whole minutes).
+    if (totalSeconds < 3600) {
+        val minutes = (totalSeconds / 60).toInt()
+        val seconds = (totalSeconds % 60).toInt()
+
+        val parts = mutableListOf<String>()
+        if (minutes > 0) {
+            parts += context.resources.getQuantityString(
+                R.plurals.duration_minutes, minutes, minutes
+            )
+        }
+        // Always show seconds under an hour; keep them even when minutes are present
+        // (e.g. "1 minute, 30 seconds"), but drop a trailing "0 seconds" like "2 minutes".
+        if (seconds > 0 || parts.isEmpty()) {
+            parts += context.resources.getQuantityString(
+                R.plurals.duration_seconds, seconds, seconds
+            )
+        }
+        return parts.joinToString(separator)
     }
 
-    val totalMinutes = ((totalSeconds + 59) / 60).coerceAtLeast(0)
-
-    if (totalMinutes <= 60) {
-        return context.resources.getQuantityString(
-            R.plurals.duration_minutes,
-            totalMinutes.toInt(),
-            totalMinutes.toInt()
-        )
-    }
-
+    // One hour or more: days / hours / minutes (seconds are not useful at this scale).
+    val totalMinutes = totalSeconds / 60
     val minutesInDay = 24L * 60L
     val days = totalMinutes / minutesInDay
     val hours = (totalMinutes % minutesInDay) / 60L
@@ -32,22 +38,14 @@ fun Duration.stringValue(context: Context): String {
 
     val parts = mutableListOf<String>()
     if (days > 0) parts += context.resources.getQuantityString(
-        R.plurals.duration_days,
-        days.toInt(),
-        days.toInt()
+        R.plurals.duration_days, days.toInt(), days.toInt()
     )
     if (hours > 0) parts += context.resources.getQuantityString(
-        R.plurals.duration_hours,
-        hours.toInt(),
-        hours.toInt()
+        R.plurals.duration_hours, hours.toInt(), hours.toInt()
     )
-    if (minutes > 0 || parts.isEmpty()) {
-        parts += context.resources.getQuantityString(
-            R.plurals.duration_minutes,
-            minutes.toInt(),
-            minutes.toInt()
-        )
-    }
+    if (minutes > 0 || parts.isEmpty()) parts += context.resources.getQuantityString(
+        R.plurals.duration_minutes, minutes.toInt(), minutes.toInt()
+    )
 
-    return parts.joinToString(context.getString(R.string.duration_list_separator))
+    return parts.joinToString(separator)
 }

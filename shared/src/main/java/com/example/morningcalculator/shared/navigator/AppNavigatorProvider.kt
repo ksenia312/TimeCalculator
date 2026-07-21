@@ -2,6 +2,7 @@ package com.example.morningcalculator.shared.navigator
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation3.runtime.NavBackStack
@@ -10,12 +11,17 @@ import androidx.navigation3.runtime.rememberNavBackStack
 
 @Composable
 fun AppNavigatorProvider(
-    startAppRoute: AppRoute = AppRoute.Home,
+    startAppRoute: AppRoute? = null,
     content: @Composable () -> Unit
 ) {
-    val backStack = rememberNavBackStack(startAppRoute)
+    val backStack = rememberNavBackStack(startAppRoute ?: AppRoute.Home)
     val navigator = remember(backStack) {
         NavigatorImpl(backStack)
+    }
+    LaunchedEffect(startAppRoute) {
+        if (startAppRoute != null) {
+            navigator.navigateTo(startAppRoute, BackstackBehavior.Clear)
+        }
     }
     CompositionLocalProvider(
         LocalNavigator provides navigator,

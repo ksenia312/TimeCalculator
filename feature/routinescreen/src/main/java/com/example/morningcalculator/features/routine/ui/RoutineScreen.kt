@@ -63,6 +63,7 @@ fun RoutineScreen(
                         val combined = viewState.routine
                         TasksListView(
                             routine = combined,
+                            schedule = viewState.schedule,
                             viewModel = viewModel,
                             currentTaskIndex = viewState.currentTaskIndex,
                         )

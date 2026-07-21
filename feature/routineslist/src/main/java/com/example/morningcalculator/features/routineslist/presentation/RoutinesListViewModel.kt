@@ -3,17 +3,20 @@ package com.example.morningcalculator.features.routineslist.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineSchedule
+import com.example.morningcalculator.domain.model.RoutineSchedulePhase
 import com.example.morningcalculator.domain.repository.RoutineRepository
-import com.example.morningcalculator.shared.extensions.endAtInstant
-import com.example.morningcalculator.shared.extensions.isCompleted
-import com.example.morningcalculator.shared.extensions.isOngoing
-import com.example.morningcalculator.shared.extensions.startAtInstant
+import com.example.morningcalculator.domain.repository.RoutineScheduleRepository
+import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.toViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Instant
 
 class RoutinesListViewModel(
     val routineRepository: RoutineRepository,
+    private val routineScheduleRepository: RoutineScheduleRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<RoutinesListState>(RoutinesListState.Loading)
@@ -28,7 +31,13 @@ class RoutinesListViewModel(
             routineRepository.routinesFlow.collect {
                 val sort = RoutinesListState.Sort.DEFAULT
                 _viewState.value = RoutinesListState.Success(
-                    routines = it, sorted = sortRoutines(sort, it), sort = sort
+                    items = sortRoutines(
+                        sort,
+                        it,
+                        Instant.fromEpochMilliseconds(System.currentTimeMillis()),
+                        routineScheduleRepository
+                    ),
+                    sort = sort
                 )
             }
         }
@@ -36,31 +45,48 @@ class RoutinesListViewModel(
 }
 
 fun sortRoutines(
-    sort: RoutinesListState.Sort, routines: List<Routine>
-): List<Routine> {
+    sort: RoutinesListState.Sort,
+    routines: List<Routine>,
+    now: Instant,
+    routineScheduleRepository: RoutineScheduleRepository,
+): List<RoutineListItemState> {
+    val items = routines.map { routine ->
+        val schedule = routineScheduleRepository.computeSchedule(routine, now)
+        RoutineListItemState(
+            routine = routine,
+            schedule = schedule,
+            cardViewItem = routine.toViewItem(schedule, now),
+        )
+    }
+
     return when (sort.sortType) {
-        RoutinesListState.Sort.SortType.DATE -> routines.sortedWith(compareBy({ routine ->
-            when {
-                routine.isOngoing() -> 0
-                routine.isCompleted() -> 2
-                else -> 1
+        RoutinesListState.Sort.SortType.DATE -> items.sortedWith(compareBy({ item ->
+            when (item.schedule.phaseAt(now)) {
+                RoutineSchedulePhase.ACTIVE -> 0
+                RoutineSchedulePhase.FUTURE -> 1
+                RoutineSchedulePhase.FINISHED -> 2
             }
-        }, { routine ->
-            when {
-                routine.isOngoing() -> routine.endAtInstant().toEpochMilliseconds()
-                routine.isCompleted() -> -routine.endAtInstant().toEpochMilliseconds()
-                else -> routine.startAtInstant().toEpochMilliseconds()
+        }, { item ->
+            when (item.schedule.phaseAt(now)) {
+                RoutineSchedulePhase.ACTIVE -> item.schedule.end.toEpochMilliseconds()
+                RoutineSchedulePhase.FINISHED -> -item.schedule.end.toEpochMilliseconds()
+                RoutineSchedulePhase.FUTURE -> item.schedule.effectiveStart.toEpochMilliseconds()
             }
         }))
     }
 }
 
+data class RoutineListItemState(
+    val routine: Routine,
+    val schedule: RoutineSchedule,
+    val cardViewItem: RoutineCardViewItem,
+)
+
 sealed interface RoutinesListState {
     object Loading : RoutinesListState
 
     data class Success(
-        val routines: List<Routine>,
-        val sorted: List<Routine>,
+        val items: List<RoutineListItemState>,
         val sort: Sort = Sort.DEFAULT,
     ) : RoutinesListState
 

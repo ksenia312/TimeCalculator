@@ -59,6 +59,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(project(":di"))
     implementation(project(":shared"))
+    implementation(project(":domain"))
     implementation(project(":feature:home"))
     implementation(project(":feature:routinescreen"))
     implementation(project(":feature:routineeditor"))

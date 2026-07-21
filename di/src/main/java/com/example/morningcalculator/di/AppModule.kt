@@ -4,9 +4,17 @@ import android.content.Context
 import androidx.room.Room
 import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.domain.repository.TasksRepository
+import com.example.morningcalculator.domain.repository.RoutineAlarmGateway
+import com.example.morningcalculator.domain.repository.RoutineNotificationGateway
+import com.example.morningcalculator.domain.repository.RoutineScheduleRepository
+import com.example.morningcalculator.domain.repository.ScheduleRecordDataSource
 import com.example.morningcalculator.data.db.AppDatabase
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
+import com.example.morningcalculator.data.schedule.alarm.AlarmManagerRoutineAlarmGateway
+import com.example.morningcalculator.data.schedule.notification.RoutineNotificationPresenter
+import com.example.morningcalculator.data.schedule.persistence.PreferencesScheduleRecordDataSource
+import com.example.morningcalculator.data.schedule.repository.RoutineScheduleRepositoryImpl
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.landing.presentation.LandingViewModel
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
@@ -41,6 +49,17 @@ object AppModule {
             )
         }
 
+        single<RoutineAlarmGateway> { AlarmManagerRoutineAlarmGateway(context) }
+        single<ScheduleRecordDataSource> { PreferencesScheduleRecordDataSource(context) }
+        single<RoutineNotificationGateway> { RoutineNotificationPresenter(context) }
+        single<RoutineScheduleRepository> {
+            RoutineScheduleRepositoryImpl(
+                alarmGateway = get(),
+                notificationGateway = get(),
+                scheduleRecordDataSource = get(),
+            )
+        }
+
         single {
             HomeViewModel()
         }
@@ -48,12 +67,14 @@ object AppModule {
         single {
             LandingViewModel(
                 routineRepository = get(),
+                routineScheduleRepository = get(),
             )
         }
 
         single {
             RoutinesListViewModel(
                 routineRepository = get(),
+                routineScheduleRepository = get(),
             )
         }
 
@@ -68,6 +89,7 @@ object AppModule {
                 id = id,
                 tasksRepository = get(),
                 routineRepository = get(),
+                routineScheduleRepository = get(),
             )
         }
 

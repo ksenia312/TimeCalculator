@@ -14,9 +14,9 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineSchedule
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
 import com.example.morningcalculator.shared.extensions.stringTime
-import com.example.morningcalculator.shared.extensions.whenToStart
 import com.example.morningcalculator.shared.navigator.AppRoute
 import com.example.morningcalculator.shared.navigator.EditTaskArguments
 import com.example.morningcalculator.shared.navigator.EditTaskSource
@@ -26,12 +26,13 @@ import com.example.morningcalculator.shared.navigator.LocalNavigator
 @Composable
 fun TasksListView(
     routine: Routine,
+    schedule: RoutineSchedule,
     viewModel: RoutineViewModel,
     currentTaskIndex: Int?,
 ) {
     val navigator = LocalNavigator.current
 
-    val whenToGetUp = routine.whenToStart().stringTime()
+    val whenToGetUp = schedule.effectiveStart.stringTime()
     val fullLinks = remember(routine) { routine.data.toMutableStateList() }
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
@@ -59,6 +60,7 @@ fun TasksListView(
                 linkFull = link,
                 routine = routine,
                 viewModel = viewModel,
+                schedule = schedule,
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,
                 onEditClick = {

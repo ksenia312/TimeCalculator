@@ -9,8 +9,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.morningcalculator.R
 import com.example.morningcalculator.domain.model.Routine
+import com.example.morningcalculator.domain.model.RoutineSchedule
 import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
-import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
 import com.example.morningcalculator.features.routine.presentation.RoutineViewState
 import com.example.morningcalculator.shared.animation.routineCardSharedKey
 import com.example.morningcalculator.shared.components.CustomTopBar
@@ -60,7 +60,25 @@ fun RoutineSuccessTopAppBarPreview() {
     )
     val viewState = RoutineViewState.Success(
         routine = routine,
-        cardViewItem = routine.toRoutineCardViewItem(),
+        schedule = RoutineSchedule(
+            routineId = routine.id,
+            routineTitle = routine.title,
+            effectiveStart = routine.scheduledAt,
+            end = routine.scheduledAt,
+            totalDuration = kotlin.time.Duration.ZERO,
+            tasks = emptyList(),
+            signature = "",
+        ),
+        cardViewItem = RoutineCardViewItem(
+            isOngoing = false,
+            isCompleted = false,
+            startLabelRes = R.string.routine_card_will_start,
+            endLabelRes = R.string.routine_card_will_end,
+            startInstant = routine.scheduledAt,
+            endInstant = routine.scheduledAt,
+            title = routine.title,
+            willStartIn = kotlin.time.Duration.ZERO,
+        ),
         currentTaskIndex = null,
     )
     PreviewTheme {

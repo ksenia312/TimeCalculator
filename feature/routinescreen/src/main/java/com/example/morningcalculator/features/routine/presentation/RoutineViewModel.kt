@@ -4,12 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.domain.model.RoutineLink
+import com.example.morningcalculator.domain.model.RoutineSchedule
 import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.domain.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.RoutineScheduleRepository
 import com.example.morningcalculator.domain.repository.TasksRepository
-import com.example.morningcalculator.shared.extensions.startAtInstant
 import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
-import com.example.morningcalculator.shared.viewitem.toRoutineCardViewItem
+import com.example.morningcalculator.shared.viewitem.toViewItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,13 +19,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
 import kotlin.time.Instant
 
 class RoutineViewModel(
     val id: String,
     val tasksRepository: TasksRepository,
-    val routineRepository: RoutineRepository
+    val routineRepository: RoutineRepository,
+    private val routineScheduleRepository: RoutineScheduleRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<RoutineViewState>(RoutineViewState.Loading)
@@ -126,52 +127,21 @@ class RoutineViewModel(
                 routineRepository.getRoutineFlow(id).dropWhile { it == null },
                 _now
             ) { routine, now -> Pair(routine, now) }
-            .collect { (routine, now) ->
-                _viewState.value =
-                    if (routine == null) RoutineViewState.Error
-                    else {
-                        val cardViewItem = routine.toRoutineCardViewItem(now)
-                        RoutineViewState.Success(
-                            routine = routine,
-                            cardViewItem = cardViewItem,
-                            currentTaskIndex = if (cardViewItem.isOngoing) currentTaskIndex(routine, now) else null,
-                        )
-                    }
-            }
+                .collect { (routine, now) ->
+                    _viewState.value =
+                        if (routine == null) RoutineViewState.Error
+                        else {
+                            val schedule = routineScheduleRepository.computeSchedule(routine, now)
+                            val cardViewItem = routine.toViewItem(schedule, now)
+                            RoutineViewState.Success(
+                                routine = routine,
+                                schedule = schedule,
+                                cardViewItem = cardViewItem,
+                                currentTaskIndex = schedule.taskIndexAt(now),
+                            )
+                        }
+                }
         }
-    }
-}
-
-private fun currentTaskIndex(
-    routine: Routine,
-    now: Instant,
-): Int? {
-    val tasks = routine.data
-    if (tasks.isEmpty()) return null
-
-    if (now <= routine.startAtInstant()) return 0
-
-    var cursor = routine.startAtInstant()
-
-    tasks.forEachIndexed { index, link ->
-        val d = linkDuration(link).coerceAtLeast(Duration.ZERO)
-        val next = cursor + d
-
-        if (d == Duration.ZERO) {
-            if (now == cursor) return index
-        } else {
-            if (now < next) return index
-        }
-
-        cursor = next
-    }
-
-    return tasks.lastIndex
-}
-
-private fun linkDuration(link: RoutineLink): Duration {
-    return link.subData?.duration ?: link.task.data.fold(Duration.ZERO) { acc, subData ->
-        acc + subData.duration
     }
 }
 
@@ -185,6 +155,7 @@ sealed interface RoutineViewState {
     object Loading : RoutineViewState
     data class Success(
         val routine: Routine,
+        val schedule: RoutineSchedule,
         val cardViewItem: RoutineCardViewItem,
         val currentTaskIndex: Int?,
     ) : RoutineViewState
