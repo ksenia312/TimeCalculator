@@ -32,5 +32,8 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(platform(libs.supabase.bom))
+    api(libs.supabase.auth)
+    implementation(libs.ktor.client.cio)
     testImplementation(libs.junit)
 }

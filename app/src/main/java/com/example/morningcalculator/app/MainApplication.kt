@@ -1,6 +1,8 @@
 package com.example.morningcalculator.app
 
 import android.app.Application
+import com.example.morningcalculator.apphost.BuildConfig
+import com.example.morningcalculator.app.di.appModule
 import com.example.morningcalculator.di.AppModule
 import com.example.morningcalculator.app.schedule.RoutineExactAlarmPermissionRequester
 import com.example.morningcalculator.app.schedule.RoutineScheduleInitializer
@@ -14,7 +16,14 @@ class MorningCalculatorApplication : Application() {
         super.onCreate()
 
         val koinApplication = startKoin {
-            modules(AppModule.registerModules(context = applicationContext))
+            modules(
+                AppModule.registerModules(
+                    context = applicationContext,
+                    supabaseUrl = BuildConfig.SUPABASE_URL,
+                    supabaseKey = BuildConfig.SUPABASE_KEY,
+                ),
+                appModule,
+            )
         }
         RoutineScheduleInitializer(
             routineRepository = koinApplication.koin.get<RoutineRepository>(),

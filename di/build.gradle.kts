@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":feature:routineslist"))
     implementation(project(":feature:taskeditor"))
     implementation(project(":feature:taskslist"))
+    implementation(project(":feature:auth"))
     implementation(libs.koin.core)
     implementation(libs.androidx.room.runtime)
 }

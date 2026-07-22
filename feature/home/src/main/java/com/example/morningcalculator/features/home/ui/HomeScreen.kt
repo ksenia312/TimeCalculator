@@ -1,6 +1,5 @@
 package com.example.morningcalculator.features.home.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +15,7 @@ import com.example.morningcalculator.R
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.home.ui.components.HomeAppBar
 import com.example.morningcalculator.features.home.ui.components.HomeBottomNavigationBar
+import com.example.morningcalculator.features.home.ui.components.HomeTab
 import com.example.morningcalculator.shared.components.AppScaffold
 import com.example.morningcalculator.shared.components.FabItem
 import com.example.morningcalculator.shared.components.FabMenu
@@ -28,6 +28,7 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
     val navigator = LocalNavigator.current
     val viewState = homeViewModel.uiState.collectAsStateWithLifecycle()
+    val showFab = viewState.value.selectedTab != HomeTab.SETTINGS
 
     val isBarExpanded = rememberSaveable { mutableStateOf(false) }
     AppScaffold(
@@ -45,31 +46,33 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
             )
         },
         floatingActionButton = {
-            FabMenu(
-                isExpanded = isBarExpanded.value,
-                onChangeExpanded = { isBarExpanded.value = it },
-                horizontalAlignment = Alignment.End,
-                fabItems = listOf(
-                    FabItem(
-                        iconRes = R.drawable.task,
-                        title = stringResource(R.string.fab_task),
-                        onClick = {
-                            isBarExpanded.value = false
-                            navigator.navigateTo(AppRoute.CreateTask())
-                        },
-                        contentDescription = stringResource(R.string.fab_task)
-                    ),
-                    FabItem(
-                        iconRes = R.drawable.routine,
-                        title = stringResource(R.string.fab_routine),
-                        onClick = {
-                            isBarExpanded.value = false
-                            navigator.navigateTo(AppRoute.CreateRoutine)
-                        },
-                        contentDescription = stringResource(R.string.fab_routine)
+            if (showFab) {
+                FabMenu(
+                    isExpanded = isBarExpanded.value,
+                    onChangeExpanded = { isBarExpanded.value = it },
+                    horizontalAlignment = Alignment.End,
+                    fabItems = listOf(
+                        FabItem(
+                            iconRes = R.drawable.task,
+                            title = stringResource(R.string.fab_task),
+                            onClick = {
+                                isBarExpanded.value = false
+                                navigator.navigateTo(AppRoute.CreateTask())
+                            },
+                            contentDescription = stringResource(R.string.fab_task)
+                        ),
+                        FabItem(
+                            iconRes = R.drawable.routine,
+                            title = stringResource(R.string.fab_routine),
+                            onClick = {
+                                isBarExpanded.value = false
+                                navigator.navigateTo(AppRoute.CreateRoutine)
+                            },
+                            contentDescription = stringResource(R.string.fab_routine)
+                        )
                     )
                 )
-            )
+            }
         }
     ) {
         HomeContent(
@@ -78,6 +81,8 @@ fun HomeScreen(homeViewModel: HomeViewModel = koinViewModel()) {
             current = viewState.value.selectedTab,
             onCreateRoutineClick = { navigator.navigateTo(AppRoute.CreateRoutine) },
             onCreateTaskClick = { navigator.navigateTo(AppRoute.CreateTask()) },
+            onLogoutClick = homeViewModel::logout,
+            isLoggingOut = viewState.value.isLoggingOut,
         )
     }
 }

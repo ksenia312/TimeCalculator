@@ -12,8 +12,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -22,6 +30,11 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
+import com.example.morningcalculator.app.presentation.AuthViewState
+import com.example.morningcalculator.app.presentation.MainViewModel
+import com.example.morningcalculator.features.auth.ui.LoginScreen
+import com.example.morningcalculator.features.auth.ui.RegisterScreen
+import com.example.morningcalculator.features.auth.ui.WelcomeScreen
 import com.example.morningcalculator.features.home.ui.HomeScreen
 import com.example.morningcalculator.features.routine.ui.RoutineScreen
 import com.example.morningcalculator.features.routineeditor.ui.CreateRoutineScreen
@@ -31,11 +44,12 @@ import com.example.morningcalculator.features.taskeditor.ui.EditTaskScreen
 import com.example.morningcalculator.shared.animation.LocalCardAnimatedContentScope
 import com.example.morningcalculator.shared.animation.LocalSharedTransitionScope
 import com.example.morningcalculator.shared.theme.SetStatusBarForBrightTopBar
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigator(
-    initialBackStack: List<NavKey> = listOf(AppRoute.Home),
+    initialBackStack: List<NavKey> = listOf(AppRoute.Welcome),
     onBackStackCreated: (NavBackStack<NavKey>) -> Unit = {},
 ) {
     AppNavigatorProvider(
@@ -45,65 +59,129 @@ fun AppNavigator(
         val backStack = LocalNavigationBackStack.current
         val currentRoute = backStack.lastOrNull() as? AppRoute
         SetStatusBarForBrightTopBar(hasBrightTopBar = currentRoute?.hasBrightTopBar ?: false)
-        SharedTransitionLayout {
-            CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-                NavDisplay(
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator(),
-                    ),
-                    backStack = backStack,
-                    transitionSpec = transitionSpec(),
-                    popTransitionSpec = popTransitionSpec(),
-                    predictivePopTransitionSpec = predictivePopTransitionSpec(),
-                    entryProvider = { key ->
-                        when (key) {
-                            AppRoute.Home -> {
-                                NavEntry(key = key) { SharedElementEntry { HomeScreen() } }
-                            }
 
-                            is AppRoute.Routine -> {
-                                NavEntry(
-                                    key = key,
-                                    metadata = noTransitionMetadata()
-                                ) {
-                                    SharedElementEntry { RoutineScreen(id = key.routineId) }
-                                }
-                            }
+        val mainViewModel: MainViewModel = koinViewModel()
+        val mainState by mainViewModel.uiState.collectAsStateWithLifecycle()
+        val pendingDeepLink by PendingDeepLink.route.collectAsStateWithLifecycle()
 
-                            is AppRoute.CreateTask -> {
-                                NavEntry(key = key) {
-                                    CreateTaskScreen(routineId = key.routineId)
-                                }
-                            }
+        LaunchedEffect(mainState.authViewState) {
+            val current = backStack.lastOrNull() as? AppRoute
+            when (mainState.authViewState) {
+                AuthViewState.Initializing -> Unit
 
-                            is AppRoute.EditTask -> {
-                                NavEntry(key = key) {
-                                    EditTaskScreen(arguments = key.arguments)
-                                }
-                            }
-
-                            AppRoute.CreateRoutine -> {
-                                NavEntry(key = key) {
-                                    CreateRoutineScreen()
-                                }
-                            }
-
-                            is AppRoute.EditRoutine -> {
-                                NavEntry(key = key) {
-                                    EditRoutineScreen(
-                                        routineId = key.routineId,
-                                    )
-                                }
-                            }
-
-                            else -> error("Unknown NavKey: $key")
-                        }
+                AuthViewState.LoggedOut -> {
+                    if (current == null || current.requiresAuthentication()) {
+                        backStack.resetTo(AppRoute.Welcome)
                     }
-                )
+                }
+
+                AuthViewState.LoggedIn -> {
+                    if (current == null ||
+                        current == AppRoute.Welcome ||
+                        current == AppRoute.Login ||
+                        current == AppRoute.Register
+                    ) {
+                        backStack.resetTo(AppRoute.Home)
+                    }
+                }
+            }
+        }
+
+        LaunchedEffect(mainState.authViewState, pendingDeepLink) {
+            if (mainState.authViewState == AuthViewState.LoggedIn) {
+                pendingDeepLink?.let { route ->
+                    if (backStack.lastOrNull() != route) {
+                        backStack.add(route)
+                    }
+                    PendingDeepLink.route.value = null
+                }
+            }
+        }
+
+        Box(Modifier.fillMaxSize()) {
+            SharedTransitionLayout {
+                CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                    NavDisplay(
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                            rememberViewModelStoreNavEntryDecorator(),
+                        ),
+                        backStack = backStack,
+                        transitionSpec = transitionSpec(),
+                        popTransitionSpec = popTransitionSpec(),
+                        predictivePopTransitionSpec = predictivePopTransitionSpec(),
+                        entryProvider = { key ->
+                            when (key) {
+                                AppRoute.Welcome -> {
+                                    NavEntry(key = key) { WelcomeScreen() }
+                                }
+
+                                AppRoute.Login -> {
+                                    NavEntry(key = key) { LoginScreen() }
+                                }
+
+                                AppRoute.Register -> {
+                                    NavEntry(key = key) { RegisterScreen() }
+                                }
+
+                                AppRoute.Home -> {
+                                    NavEntry(key = key) { SharedElementEntry { HomeScreen() } }
+                                }
+
+                                is AppRoute.Routine -> {
+                                    NavEntry(
+                                        key = key,
+                                        metadata = noTransitionMetadata()
+                                    ) {
+                                        SharedElementEntry { RoutineScreen(id = key.routineId) }
+                                    }
+                                }
+
+                                is AppRoute.CreateTask -> {
+                                    NavEntry(key = key) {
+                                        CreateTaskScreen(routineId = key.routineId)
+                                    }
+                                }
+
+                                is AppRoute.EditTask -> {
+                                    NavEntry(key = key) {
+                                        EditTaskScreen(arguments = key.arguments)
+                                    }
+                                }
+
+                                AppRoute.CreateRoutine -> {
+                                    NavEntry(key = key) {
+                                        CreateRoutineScreen()
+                                    }
+                                }
+
+                                is AppRoute.EditRoutine -> {
+                                    NavEntry(key = key) {
+                                        EditRoutineScreen(
+                                            routineId = key.routineId,
+                                        )
+                                    }
+                                }
+
+                                else -> error("Unknown NavKey: $key")
+                            }
+                        }
+                    )
+                }
+            }
+
+            if (mainState.authViewState == AuthViewState.Initializing) {
+                Box(Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
             }
         }
     }
+}
+
+private fun NavBackStack<NavKey>.resetTo(route: AppRoute) {
+    clear()
+    add(route)
 }
 
 /**

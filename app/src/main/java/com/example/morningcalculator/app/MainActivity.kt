@@ -12,32 +12,24 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.example.morningcalculator.shared.extensions.toAppRoute
-import com.example.morningcalculator.shared.navigator.DeepLinkKey
-import com.example.morningcalculator.shared.navigator.syntheticBackStack
 import com.example.morningcalculator.shared.navigator.AppNavigator
 import com.example.morningcalculator.shared.navigator.AppRoute
+import com.example.morningcalculator.shared.navigator.PendingDeepLink
 import com.example.morningcalculator.shared.theme.MorningCalculatorTheme
 
 class MainActivity : ComponentActivity() {
-
-    private var navigationBackStack: NavBackStack<NavKey>? = null
-    private var pendingDeepLinkRoute: AppRoute? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val isNewTask = intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0
-        val startRoute = intent.toAppRoute()
-        val initialBackStack: List<NavKey> = when {
-            isNewTask && startRoute is DeepLinkKey -> startRoute.syntheticBackStack()
-
-            else -> listOf(AppRoute.Home)
-        }
-        pendingDeepLinkRoute = null
+        // Neutral start: the auth gate in AppNavigator decides the real destination once the
+        // session status is known. A deep link (from a notification) is deferred and applied by
+        // the gate after the user is logged in.
+        intent.toAppRoute()?.let { PendingDeepLink.route.value = it }
+        val initialBackStack: List<NavKey> = listOf(AppRoute.Welcome)
 
         setContent {
             val requestPermission = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -67,15 +59,6 @@ class MainActivity : ComponentActivity() {
             MorningCalculatorTheme {
                 AppNavigator(
                     initialBackStack = initialBackStack,
-                    onBackStackCreated = { backStack ->
-                        navigationBackStack = backStack
-                        pendingDeepLinkRoute?.let {
-                            if (backStack.lastOrNull() != it) {
-                                backStack.add(it)
-                            }
-                            pendingDeepLinkRoute = null
-                        }
-                    },
                 )
             }
         }
@@ -85,13 +68,8 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         val appRoute = intent.toAppRoute() ?: return
-        navigationBackStack?.let { backStack ->
-            if (backStack.lastOrNull() != appRoute) {
-                backStack.add(appRoute)
-            }
-        } ?: run {
-            pendingDeepLinkRoute = appRoute
-        }
+        // Defer to the gate: it opens the deep link immediately if logged in, or after login.
+        PendingDeepLink.route.value = appRoute
     }
 
     companion object {

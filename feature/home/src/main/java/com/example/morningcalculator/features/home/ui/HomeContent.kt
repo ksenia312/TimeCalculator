@@ -21,6 +21,8 @@ fun HomeContent(
     current: HomeTab,
     onCreateRoutineClick: () -> Unit,
     onCreateTaskClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    isLoggingOut: Boolean,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -33,6 +35,10 @@ fun HomeContent(
             HomeTab.LANDING -> LandingScreen(onCreateRoutineClick = onCreateRoutineClick)
             HomeTab.ROUTINES -> RoutinesListScreen(onCreateRoutineClick = onCreateRoutineClick)
             HomeTab.TASKS -> TasksListScreen(onCreateTaskClick = onCreateTaskClick)
+            HomeTab.SETTINGS -> SettingsContent(
+                onLogoutClick = onLogoutClick,
+                isLoggingOut = isLoggingOut,
+            )
         }
     }
 }
@@ -45,6 +51,8 @@ fun HomeContentPreview() {
             current = HomeTab.ROUTINES,
             onCreateRoutineClick = {},
             onCreateTaskClick = {},
+            onLogoutClick = {},
+            isLoggingOut = false,
             paddingValues = PaddingValues(0.dp)
         )
     }

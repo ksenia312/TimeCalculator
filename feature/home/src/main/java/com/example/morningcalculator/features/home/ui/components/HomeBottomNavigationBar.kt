@@ -32,6 +32,7 @@ enum class HomeTab(
     LANDING(R.string.home_tab_home, R.drawable.home),
     ROUTINES(R.string.home_tab_routines, R.drawable.routine),
     TASKS(R.string.home_tab_tasks, R.drawable.task),
+    SETTINGS(R.string.home_tab_settings, R.drawable.settings),
 }
 
 @Composable

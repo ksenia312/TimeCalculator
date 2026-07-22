@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.morningcalculator.feature.home"
+    namespace = "com.example.morningcalculator.feature.auth"
     compileSdk = 36
 
     defaultConfig {
@@ -30,15 +30,10 @@ kotlin {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":shared"))
-    implementation(project(":feature:landing"))
-    implementation(project(":feature:routineslist"))
-    implementation(project(":feature:taskslist"))
     implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.constraintlayout.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

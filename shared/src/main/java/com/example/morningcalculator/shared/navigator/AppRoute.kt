@@ -16,6 +16,15 @@ sealed interface AppRoute : NavKey {
     data object Home : AppRoute
 
     @Serializable
+    data object Welcome : AppRoute
+
+    @Serializable
+    data object Login : AppRoute
+
+    @Serializable
+    data object Register : AppRoute
+
+    @Serializable
     data class Routine(val routineId: String) : AppRoute, DeepLinkKey {
         override val hasBrightTopBar: Boolean get() = true
         override val parent: NavKey get() = Home
@@ -35,4 +44,10 @@ sealed interface AppRoute : NavKey {
         val routineId: String,
         val fromRoutineScreen: Boolean = false,
     ) : AppRoute
+}
+
+/** Destinations that must not be shown without an active session. */
+fun AppRoute.requiresAuthentication(): Boolean = when (this) {
+    AppRoute.Welcome, AppRoute.Login, AppRoute.Register -> false
+    else -> true
 }
