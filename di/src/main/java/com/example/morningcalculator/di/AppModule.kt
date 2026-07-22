@@ -97,25 +97,25 @@ object AppModule {
             )
         }
 
-        single {
+        factory {
             HomeViewModel(authRepository = get())
         }
 
-        single {
+        factory {
             LandingViewModel(
                 routineRepository = get(),
                 routineScheduleRepository = get(),
             )
         }
 
-        single {
+        factory {
             RoutinesListViewModel(
                 routineRepository = get(),
                 routineScheduleRepository = get(),
             )
         }
 
-        single {
+        factory {
             TasksListViewModel(
                 repository = get()
             )
