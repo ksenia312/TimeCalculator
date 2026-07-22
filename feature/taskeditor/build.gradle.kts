@@ -30,7 +30,7 @@ kotlin {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":shared"))
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.kotlinx.datetime)

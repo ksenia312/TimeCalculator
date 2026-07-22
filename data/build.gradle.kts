@@ -28,10 +28,9 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":shared"))
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core)
     implementation(libs.koin.core)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
 }

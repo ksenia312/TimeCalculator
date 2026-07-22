@@ -32,7 +32,7 @@ dependencies {
     implementation(project(":feature:landing"))
     implementation(project(":feature:routineslist"))
     implementation(project(":feature:taskslist"))
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.kotlinx.datetime)
