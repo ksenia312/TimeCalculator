@@ -1,19 +1,22 @@
 package com.example.morningcalculator.data.auth
 
+import com.example.morningcalculator.data.db.RoutinesDao
+import com.example.morningcalculator.data.db.SyncDao
+import com.example.morningcalculator.data.db.TasksDao
+import com.example.morningcalculator.data.sync.SyncCursorStore
 import com.example.morningcalculator.domain.repository.RoutineAlarmGateway
 import com.example.morningcalculator.domain.repository.RoutineNotificationGateway
-import com.example.morningcalculator.domain.repository.RoutineRepository
 import com.example.morningcalculator.domain.repository.ScheduleRecordDataSource
-import com.example.morningcalculator.domain.repository.TasksRepository
-import kotlinx.coroutines.flow.first
 
 /**
  * Wipes all local user data. Called on explicit logout and when a different user signs in on the
  * same device. Cancels alarms/notifications, clears the schedule registry and the Room database.
  */
 class ClearLocalUserDataManager(
-    private val tasksRepository: TasksRepository,
-    private val routineRepository: RoutineRepository,
+    private val tasksDao: TasksDao,
+    private val routinesDao: RoutinesDao,
+    private val syncDao: SyncDao,
+    private val cursorStore: SyncCursorStore,
     private val alarmGateway: RoutineAlarmGateway,
     private val notificationGateway: RoutineNotificationGateway,
     private val scheduleRecordDataSource: ScheduleRecordDataSource,
@@ -27,9 +30,9 @@ class ClearLocalUserDataManager(
             scheduleRecordDataSource.removeRecord(routineId)
         }
 
-        routineRepository.routinesFlow.first().forEach { routine ->
-            routineRepository.deleteRoutine(routine.id)
-        }
-        tasksRepository.clearTasks()
+        routinesDao.clearRoutines()
+        tasksDao.clearTasks()
+        syncDao.clearAllPendingDeletions()
+        cursorStore.reset()
     }
 }

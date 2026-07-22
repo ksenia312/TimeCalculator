@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase
 import androidx.room.Transaction
 import androidx.room.TypeConverters
 import androidx.room.Update
+import com.example.morningcalculator.data.model.PendingDeletionEntity
 import com.example.morningcalculator.data.model.RoutineEntity
 import com.example.morningcalculator.data.model.RoutineItemEntity
 import com.example.morningcalculator.data.model.SubDataEntity
@@ -21,11 +22,18 @@ interface TasksDao {
     @Query("SELECT * FROM tasks")
     fun getTasks(): Flow<List<TaskWithSubData>>
 
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE pendingSync = 1")
+    suspend fun getPendingTasks(): List<TaskWithSubData>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTask(task: TaskEntity)
 
     @Update
     suspend fun updateTask(task: TaskEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertTask(task: TaskEntity)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertSubData(subData: List<SubDataEntity>)
@@ -91,6 +99,27 @@ interface TasksDao {
     @Query("DELETE FROM tasks WHERE id = :id")
     suspend fun deleteTask(id: String)
 
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    suspend fun getTaskById(id: String): TaskEntity?
+
+    @Query("UPDATE tasks SET pendingSync = 0 WHERE id IN (:ids)")
+    suspend fun clearTasksPending(ids: List<String>)
+
+    @Transaction
+    suspend fun applyRemoteTask(task: TaskEntity, subData: List<SubDataEntity>) {
+        upsertTask(task)
+
+        if (subData.isEmpty()) {
+            clearSubDataForTask(task.id)
+        } else {
+            insertSubData(subData)
+            updateSubData(subData)
+            deleteSubDataNotIn(task.id, subData.map { it.id })
+        }
+
+        nullifyInvalidRoutineItemSubDataForTask(task.id)
+    }
+
     @Query("DELETE FROM tasks")
     suspend fun clearTasks()
 }
@@ -100,6 +129,10 @@ interface RoutinesDao {
     @Transaction
     @Query("SELECT * FROM routines")
     fun getRoutinesPopulated(): Flow<List<RoutinePopulated>>
+
+    @Transaction
+    @Query("SELECT * FROM routines WHERE pendingSync = 1")
+    suspend fun getPendingRoutines(): List<RoutinePopulated>
 
     @Transaction
     @Query("SELECT * FROM routines WHERE id = :id")
@@ -151,6 +184,30 @@ interface RoutinesDao {
 
     @Query("DELETE FROM routines WHERE id = :id")
     suspend fun deleteRoutine(id: String)
+
+    @Query("SELECT * FROM routines WHERE id = :id")
+    suspend fun getRoutineById(id: String): RoutineEntity?
+
+    @Query("UPDATE routines SET pendingSync = 0 WHERE id IN (:ids)")
+    suspend fun clearRoutinesPending(ids: List<String>)
+
+    @Query("DELETE FROM routines")
+    suspend fun clearRoutines()
+}
+
+@Dao
+interface SyncDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addPendingDeletion(row: PendingDeletionEntity)
+
+    @Query("SELECT * FROM pending_deletions")
+    suspend fun getPendingDeletions(): List<PendingDeletionEntity>
+
+    @Query("DELETE FROM pending_deletions WHERE entityType = :type AND id IN (:ids)")
+    suspend fun clearPendingDeletions(type: String, ids: List<String>)
+
+    @Query("DELETE FROM pending_deletions")
+    suspend fun clearAllPendingDeletions()
 }
 
 @Database(
@@ -158,13 +215,16 @@ interface RoutinesDao {
         TaskEntity::class,
         SubDataEntity::class,
         RoutineEntity::class,
-        RoutineItemEntity::class
+        RoutineItemEntity::class,
+        PendingDeletionEntity::class,
     ],
-    version = 1
+    version = 2
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tasksDao(): TasksDao
 
     abstract fun routinesDao(): RoutinesDao
+
+    abstract fun syncDao(): SyncDao
 }

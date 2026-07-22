@@ -1,9 +1,14 @@
 package com.example.morningcalculator.data.repository
 
+import androidx.room.withTransaction
+import com.example.morningcalculator.data.db.AppDatabase
 import com.example.morningcalculator.data.db.RoutinesDao
+import com.example.morningcalculator.data.db.SyncDao
 import com.example.morningcalculator.data.mapper.toDomain
+import com.example.morningcalculator.data.model.PendingDeletionEntity
 import com.example.morningcalculator.data.model.RoutineEntity
 import com.example.morningcalculator.data.model.RoutineItemEntity
+import com.example.morningcalculator.data.sync.SyncTrigger
 import com.example.morningcalculator.domain.model.Routine
 import com.example.morningcalculator.domain.model.RoutineRequest
 import com.example.morningcalculator.domain.repository.RoutineRepository
@@ -19,10 +24,13 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class RoutineRepositoryImpl(
-    private val dao: RoutinesDao,
+    private val appDatabase: AppDatabase,
+    private val routinesDao: RoutinesDao,
+    private val syncDao: SyncDao,
+    private val syncTrigger: SyncTrigger,
 ) : RoutineRepository {
 
-    private val populatedFlow = dao.getRoutinesPopulated()
+    private val populatedFlow = routinesDao.getRoutinesPopulated()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override val routinesFlow: Flow<List<Routine>> = populatedFlow
@@ -48,7 +56,8 @@ class RoutineRepositoryImpl(
         )
 
         withContext(Dispatchers.IO) {
-            dao.insertRoutine(routineEntity)
+            routinesDao.insertRoutine(routineEntity)
+            syncTrigger.emit()
         }
     }
 
@@ -75,13 +84,28 @@ class RoutineRepositoryImpl(
         }
 
         withContext(Dispatchers.IO) {
-            dao.updateRoutineWithItems(routineEntity, itemsEntities)
+            routinesDao.updateRoutineWithItems(routineEntity, itemsEntities)
+            syncTrigger.emit()
         }
     }
 
     override suspend fun deleteRoutine(id: String) {
         withContext(Dispatchers.IO) {
-            dao.deleteRoutine(id)
+            appDatabase.withTransaction {
+                syncDao.addPendingDeletion(
+                    PendingDeletionEntity(
+                        entityType = TYPE_ROUTINE,
+                        id = id,
+                        modifiedAt = System.currentTimeMillis(),
+                    )
+                )
+                routinesDao.deleteRoutine(id)
+            }
+            syncTrigger.emit()
         }
+    }
+
+    private companion object {
+        const val TYPE_ROUTINE = "routine"
     }
 }

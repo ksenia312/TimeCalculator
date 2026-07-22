@@ -3,6 +3,7 @@ package com.example.morningcalculator.app
 import android.app.Application
 import com.example.morningcalculator.apphost.BuildConfig
 import com.example.morningcalculator.app.di.appModule
+import com.example.morningcalculator.data.sync.SyncManager
 import com.example.morningcalculator.di.AppModule
 import com.example.morningcalculator.app.schedule.RoutineExactAlarmPermissionRequester
 import com.example.morningcalculator.app.schedule.RoutineScheduleInitializer
@@ -25,6 +26,7 @@ class MorningCalculatorApplication : Application() {
                 appModule,
             )
         }
+        koinApplication.koin.get<SyncManager>().start()
         RoutineScheduleInitializer(
             routineRepository = koinApplication.koin.get<RoutineRepository>(),
             scheduleRepository = koinApplication.koin.get<RoutineScheduleRepository>(),

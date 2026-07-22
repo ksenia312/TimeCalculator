@@ -9,5 +9,6 @@ data class TaskEntity(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val title: String,
     val description: String,
-    val modifiedAt: Long? = null
+    val modifiedAt: Long? = null,
+    val pendingSync: Boolean = true,
 )

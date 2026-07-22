@@ -66,6 +66,7 @@ kotlin {
 dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
     implementation(libs.koin.androidx.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -78,6 +79,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(project(":di"))
+    implementation(project(":data"))
     implementation(project(":shared"))
     implementation(project(":domain"))
     implementation(project(":feature:home"))

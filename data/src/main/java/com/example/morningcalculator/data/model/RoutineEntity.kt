@@ -11,5 +11,6 @@ data class RoutineEntity(
     val color: String,
     val scheduledAtMillis: Long,
     val scheduledAtAnchor: String,
-    val modifiedAt: Long
+    val modifiedAt: Long,
+    val pendingSync: Boolean = true,
 )

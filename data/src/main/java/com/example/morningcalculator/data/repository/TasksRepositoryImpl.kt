@@ -1,13 +1,18 @@
 package com.example.morningcalculator.data.repository
 
+import com.example.morningcalculator.data.db.SyncDao
+import com.example.morningcalculator.data.db.TasksDao
+import com.example.morningcalculator.data.db.AppDatabase
+import com.example.morningcalculator.data.model.PendingDeletionEntity
 import com.example.morningcalculator.domain.model.SubData
 import com.example.morningcalculator.domain.model.Task
 import com.example.morningcalculator.domain.model.TaskRequest
 import com.example.morningcalculator.domain.model.TaskUpdateRequest
 import com.example.morningcalculator.domain.repository.TasksRepository
-import com.example.morningcalculator.data.db.TasksDao
 import com.example.morningcalculator.data.model.SubDataEntity
 import com.example.morningcalculator.data.model.TaskEntity
+import com.example.morningcalculator.data.sync.SyncTrigger
+import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,12 +24,15 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class TasksRepositoryImpl(
-    private val dao: TasksDao
+    private val appDatabase: AppDatabase,
+    private val tasksDao: TasksDao,
+    private val syncDao: SyncDao,
+    private val syncTrigger: SyncTrigger,
 ) : TasksRepository {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    override val tasksFlow: Flow<List<Task>> = dao.getTasks()
+    override val tasksFlow: Flow<List<Task>> = tasksDao.getTasks()
         .map { list ->
             list.map { populated ->
                 Task(
@@ -54,7 +62,7 @@ class TasksRepositoryImpl(
         )
 
         val subDataEntities = withContext(Dispatchers.IO) {
-            val existingIdsByDuration = dao.getSubDataForTask(request.taskId)
+            val existingIdsByDuration = tasksDao.getSubDataForTask(request.taskId)
                 .groupBy { it.duration }
                 .mapValues { (_, entities) -> ArrayDeque(entities.map { it.id }) }
 
@@ -67,7 +75,8 @@ class TasksRepositoryImpl(
                 )
             }
 
-            dao.updateTaskWithData(taskEntity, reconciled)
+            tasksDao.updateTaskWithData(taskEntity, reconciled)
+            syncTrigger.emit()
             reconciled
         }
 
@@ -100,7 +109,8 @@ class TasksRepositoryImpl(
         }
 
         withContext(Dispatchers.IO) {
-            dao.insertTaskWithData(taskEntity, subDataEntities)
+            tasksDao.insertTaskWithData(taskEntity, subDataEntities)
+            syncTrigger.emit()
         }
 
         return Task(
@@ -114,13 +124,27 @@ class TasksRepositoryImpl(
 
     override suspend fun deleteTask(id: String) {
         withContext(Dispatchers.IO) {
-            dao.deleteTask(id)
+            appDatabase.withTransaction {
+                syncDao.addPendingDeletion(
+                    PendingDeletionEntity(
+                        entityType = TYPE_TASK,
+                        id = id,
+                        modifiedAt = System.currentTimeMillis(),
+                    )
+                )
+                tasksDao.deleteTask(id)
+            }
+            syncTrigger.emit()
         }
     }
 
     override suspend fun clearTasks() {
         withContext(Dispatchers.IO) {
-            dao.clearTasks()
+            tasksDao.clearTasks()
         }
+    }
+
+    private companion object {
+        const val TYPE_TASK = "task"
     }
 }

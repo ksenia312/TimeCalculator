@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
@@ -34,6 +35,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(platform(libs.supabase.bom))
     api(libs.supabase.auth)
+    implementation(libs.supabase.postgrest)
     implementation(libs.ktor.client.cio)
     testImplementation(libs.junit)
 }

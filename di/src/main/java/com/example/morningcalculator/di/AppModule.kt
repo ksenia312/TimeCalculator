@@ -2,25 +2,31 @@ package com.example.morningcalculator.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.morningcalculator.domain.repository.RoutineRepository
-import com.example.morningcalculator.domain.repository.TasksRepository
-import com.example.morningcalculator.domain.repository.AuthRepository
+import com.example.morningcalculator.data.auth.AuthRepositoryImpl
+import com.example.morningcalculator.data.auth.AuthSessionStateMemoryDataSource
+import com.example.morningcalculator.data.auth.AuthUserPreferences
+import com.example.morningcalculator.data.auth.ClearLocalUserDataManager
+import com.example.morningcalculator.data.auth.SupabaseClientProvider
 import com.example.morningcalculator.domain.repository.RoutineAlarmGateway
 import com.example.morningcalculator.domain.repository.RoutineNotificationGateway
 import com.example.morningcalculator.domain.repository.RoutineScheduleRepository
 import com.example.morningcalculator.domain.repository.ScheduleRecordDataSource
-import com.example.morningcalculator.data.auth.ClearLocalUserDataManager
+import com.example.morningcalculator.domain.repository.AuthRepository
+import com.example.morningcalculator.domain.repository.RoutineRepository
+import com.example.morningcalculator.domain.repository.TasksRepository
 import com.example.morningcalculator.data.db.AppDatabase
-import com.example.morningcalculator.data.auth.AuthRepositoryImpl
-import com.example.morningcalculator.data.auth.AuthSessionStateMemoryDataSource
-import com.example.morningcalculator.data.auth.AuthUserPreferences
-import com.example.morningcalculator.data.auth.SupabaseClientProvider
+import com.example.morningcalculator.data.db.MIGRATION_1_2
 import com.example.morningcalculator.data.repository.RoutineRepositoryImpl
 import com.example.morningcalculator.data.repository.TasksRepositoryImpl
 import com.example.morningcalculator.data.schedule.alarm.AlarmManagerRoutineAlarmGateway
 import com.example.morningcalculator.data.schedule.notification.RoutineNotificationPresenter
 import com.example.morningcalculator.data.schedule.persistence.PreferencesScheduleRecordDataSource
 import com.example.morningcalculator.data.schedule.repository.RoutineScheduleRepositoryImpl
+import com.example.morningcalculator.data.sync.LogoutUseCase
+import com.example.morningcalculator.data.sync.SyncCursorStore
+import com.example.morningcalculator.data.sync.SyncEngine
+import com.example.morningcalculator.data.sync.SyncTrigger
+import com.example.morningcalculator.data.sync.remote.SupabaseRemoteDataSource
 import com.example.morningcalculator.features.home.presentation.HomeViewModel
 import com.example.morningcalculator.features.landing.presentation.LandingViewModel
 import com.example.morningcalculator.features.routine.presentation.RoutineViewModel
@@ -43,22 +49,39 @@ object AppModule {
         supabaseUrl: String,
         supabaseKey: String,
     ): Module = module {
-        val db = Room.databaseBuilder(
+        val appDatabase = Room.databaseBuilder(
             context = context,
             klass = AppDatabase::class.java,
             name = "morning-db"
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
 
-        single { db.tasksDao() }
-        single { db.routinesDao() }
+        single { appDatabase.tasksDao() }
+        single { appDatabase.routinesDao() }
+        single { appDatabase.syncDao() }
 
         single { SupabaseClientProvider.create(supabaseUrl, supabaseKey) }
         single { AuthSessionStateMemoryDataSource() }
         single { AuthUserPreferences(context) }
+        single { SyncCursorStore(context) }
+        single { SyncTrigger() }
+        single { SupabaseRemoteDataSource(get()) }
+        single {
+            SyncEngine(
+                tasksDao = get(),
+                routinesDao = get(),
+                syncDao = get(),
+                supabaseRemoteDataSource = get(),
+                syncCursorStore = get(),
+                authRepository = get(),
+            )
+        }
+        single { LogoutUseCase(syncEngine = get(), authRepository = get()) }
         single {
             ClearLocalUserDataManager(
-                tasksRepository = get(),
-                routineRepository = get(),
+                tasksDao = get(),
+                routinesDao = get(),
+                syncDao = get(),
+                cursorStore = get(),
                 alarmGateway = get(),
                 notificationGateway = get(),
                 scheduleRecordDataSource = get(),
@@ -77,12 +100,20 @@ object AppModule {
         factory { WelcomeViewModel(authRepository = get()) }
 
         single<TasksRepository> {
-            TasksRepositoryImpl(get())
+            TasksRepositoryImpl(
+                appDatabase = appDatabase,
+                tasksDao = get(),
+                syncDao = get(),
+                syncTrigger = get(),
+            )
         }
 
         single<RoutineRepository> {
             RoutineRepositoryImpl(
-                dao = get(),
+                appDatabase = appDatabase,
+                routinesDao = get(),
+                syncDao = get(),
+                syncTrigger = get(),
             )
         }
 
@@ -98,7 +129,8 @@ object AppModule {
         }
 
         factory {
-            HomeViewModel(authRepository = get())
+            val logoutUseCase: LogoutUseCase = get()
+            HomeViewModel(logoutUseCase = { logoutUseCase() })
         }
 
         factory {
