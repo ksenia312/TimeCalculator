@@ -1,7 +1,5 @@
 package com.example.morningcalculator.features.landing.ui.card
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -13,9 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,7 +21,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,25 +42,6 @@ fun LandingCard(
 ) {
     val viewItem = routineState.cardViewItem
     var expanded by rememberSaveable(routineState.routineId) { mutableStateOf(false) }
-
-    val tasks = routineState.taskViewItems
-    val currentIndex = routineState.currentTaskIndex
-
-    // Completed tasks, in chronological order (oldest first) so they sit above the current one.
-    val completedTasks = if (viewItem.isOngoing && currentIndex != null) {
-        tasks.take(currentIndex)
-    } else {
-        emptyList()
-    }
-    // For an ongoing routine the "preview" starts at the current task, otherwise from the top.
-    val upcomingTasks = if (viewItem.isOngoing && currentIndex != null) {
-        tasks.drop(currentIndex)
-    } else {
-        tasks
-    }
-    val previewTasks = upcomingTasks.take(2)   // current + next (or first two)
-    val futureTasks = upcomingTasks.drop(2)    // revealed on expand
-    val hasHiddenTasks = completedTasks.isNotEmpty() || futureTasks.isNotEmpty()
 
     Column(
         modifier = modifier
@@ -105,12 +80,12 @@ fun LandingCard(
         LandingCardBody(
             isRoutineOngoing = viewItem.isOngoing,
             isRoutineCompleted = viewItem.isCompleted,
-            expanded = expanded && hasHiddenTasks,
-            hasHiddenTasks = hasHiddenTasks,
+            expanded = expanded && routineState.hasHiddenTasks,
+            hasHiddenTasks = routineState.hasHiddenTasks,
             onToggle = { expanded = !expanded },
-            completedTasks = completedTasks,
-            previewTasks = previewTasks,
-            futureTasks = futureTasks,
+            completedTasks = routineState.completedTasks,
+            previewTasks = routineState.previewTasks,
+            futureTasks = routineState.futureTasks,
         )
     }
 }
@@ -196,11 +171,6 @@ private fun ExpandToggle(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
-        animationSpec = tween(EXPAND_ANIMATION_MS),
-        label = "chevronRotation",
-    )
     val contentColor = MaterialTheme.colorScheme.surface
 
     TextButton(
@@ -214,13 +184,6 @@ private fun ExpandToggle(
             ),
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
             color = contentColor,
-        )
-        Spacer(Modifier.width(4.dp))
-        Icon(
-            imageVector = Icons.Filled.KeyboardArrowDown,
-            contentDescription = null,
-            tint = contentColor,
-            modifier = Modifier.rotate(rotation),
         )
     }
 }

@@ -5,6 +5,8 @@ import com.example.morningcalculator.shared.viewitem.RoutineCardViewItem
 data class LandingRoutineState(
     val routineId: String,
     val cardViewItem: RoutineCardViewItem,
-    val taskViewItems: List<LandingCardTaskViewItem>,
-    val currentTaskIndex: Int?,
+    val completedTasks: List<LandingCardTaskViewItem>,
+    val previewTasks: List<LandingCardTaskViewItem>,
+    val futureTasks: List<LandingCardTaskViewItem>,
+    val hasHiddenTasks: Boolean,
 )

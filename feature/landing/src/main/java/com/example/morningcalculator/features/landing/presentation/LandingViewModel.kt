@@ -60,19 +60,61 @@ class LandingViewModel(
                         isOngoing -> schedule.taskIndexAt(now)
                         else -> 0
                     }
+                    val taskViewItems = schedule.tasks.map { task ->
+                        createLandingCardTaskViewItem(task = task, now = now)
+                    }
+                    val validCurrentIndex = currentIndex?.takeIf { it in taskViewItems.indices }
+                    val taskDistribution = distributeTasks(
+                        taskViewItems = taskViewItems,
+                        isRoutineOngoing = isOngoing,
+                        currentTaskIndex = validCurrentIndex,
+                    )
                     LandingRoutineState(
                         routineId = item.routine.id,
                         cardViewItem = item.cardViewItem,
-                        taskViewItems = schedule.tasks.map { task ->
-                            createLandingCardTaskViewItem(task = task, now = now)
-                        },
-                        currentTaskIndex = currentIndex?.takeIf { it in schedule.tasks.indices },
+                        completedTasks = taskDistribution.completedTasks,
+                        previewTasks = taskDistribution.previewTasks,
+                        futureTasks = taskDistribution.futureTasks,
+                        hasHiddenTasks = taskDistribution.hasHiddenTasks,
                     )
                 }
                 _viewState.value = LandingState.Success(routineStates = routineStates)
             }
         }
     }
+}
+
+private data class LandingTaskDistribution(
+    val completedTasks: List<LandingCardTaskViewItem>,
+    val previewTasks: List<LandingCardTaskViewItem>,
+    val futureTasks: List<LandingCardTaskViewItem>,
+    val hasHiddenTasks: Boolean,
+)
+
+private fun distributeTasks(
+    taskViewItems: List<LandingCardTaskViewItem>,
+    isRoutineOngoing: Boolean,
+    currentTaskIndex: Int?,
+): LandingTaskDistribution {
+    val completedTasks = if (isRoutineOngoing && currentTaskIndex != null) {
+        taskViewItems.take(currentTaskIndex)
+    } else {
+        emptyList()
+    }
+    val upcomingTasks = if (isRoutineOngoing && currentTaskIndex != null) {
+        taskViewItems.drop(currentTaskIndex)
+    } else {
+        taskViewItems
+    }
+    val previewTasks = upcomingTasks.take(2)
+    val futureTasks = upcomingTasks.drop(2)
+
+    return LandingTaskDistribution(
+        completedTasks = completedTasks,
+        previewTasks = previewTasks,
+        futureTasks = futureTasks,
+        hasHiddenTasks = completedTasks.isNotEmpty() || futureTasks.isNotEmpty(),
+    )
 }
 
 sealed interface LandingState {

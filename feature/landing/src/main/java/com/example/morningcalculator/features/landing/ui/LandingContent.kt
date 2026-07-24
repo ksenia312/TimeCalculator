@@ -128,8 +128,10 @@ fun LandingContentPreview() {
                             title = routine.title,
                             willStartIn = kotlin.time.Duration.ZERO,
                         ),
-                        taskViewItems = emptyList(),
-                        currentTaskIndex = null,
+                        completedTasks = emptyList(),
+                        previewTasks = emptyList(),
+                        futureTasks = emptyList(),
+                        hasHiddenTasks = false,
                     )
                 }
             )
