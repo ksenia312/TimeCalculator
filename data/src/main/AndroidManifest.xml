@@ -3,11 +3,11 @@
 
     <application>
         <receiver
-            android:name="com.example.morningcalculator.data.schedule.receiver.RoutineAlarmReceiver"
+            android:name="com.xenikii.timecalculator.data.schedule.receiver.RoutineAlarmReceiver"
             android:exported="false" />
 
         <receiver
-            android:name="com.example.morningcalculator.data.schedule.receiver.BootReceiver"
+            android:name="com.xenikii.timecalculator.data.schedule.receiver.BootReceiver"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>

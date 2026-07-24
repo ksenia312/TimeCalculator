@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.morningcalculator.feature.landing"
+    namespace = "com.xenikii.timecalculator.feature.landing"
     compileSdk = 36
 
     defaultConfig {

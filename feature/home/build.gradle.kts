@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.morningcalculator.feature.home"
+    namespace = "com.xenikii.timecalculator.feature.home"
     compileSdk = 36
 
     defaultConfig {

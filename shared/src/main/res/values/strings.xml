@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MorningCalculator</string>
+    <string name="app_name">Time Calculator</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
@@ -114,7 +114,7 @@
     <string name="routine_not_found">Routine not found</string>
     <string name="modified_at">Modified at</string>
     <string name="app_bar_preview_title">app bar</string>
-    <string name="sample_morning_routine">Morning Routine</string>
+    <string name="sample_time_routine">Time Routine</string>
 
 
     <string name="relative_day_today">Today</string>

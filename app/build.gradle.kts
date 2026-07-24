@@ -13,11 +13,11 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.morningcalculator.apphost"
+    namespace = "com.xenikii.timecalculator.apphost"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.morningcalculator"
+        applicationId = "com.xenikii.timecalculator"
         minSdk = 30
         targetSdk = 36
         versionCode = 15
@@ -91,7 +91,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

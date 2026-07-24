@@ -1,0 +1,40 @@
+package com.xenikii.timecalculator.shared.theme
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
+import com.xenikii.timecalculator.shared.theme.custom.CustomColorScheme
+
+@Composable
+fun TimeCalculatorTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = when {
+        else -> LightColorScheme
+    }
+
+    val appColorScheme = when {
+        else -> LightAppColorScheme
+    }
+
+    CompositionLocalProvider(
+        LocalCustomColorScheme provides appColorScheme, LocalIsDarkTheme provides darkTheme
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content,
+        )
+    }
+
+}
+
+val LocalCustomColorScheme = staticCompositionLocalOf<CustomColorScheme> {
+    error("No CustomColorScheme provided. Did you forget add it?")
+}
+
+val LocalIsDarkTheme = compositionLocalOf { false }

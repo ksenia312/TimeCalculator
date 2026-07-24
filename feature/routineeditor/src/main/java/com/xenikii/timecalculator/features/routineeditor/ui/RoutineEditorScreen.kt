@@ -1,0 +1,247 @@
+package com.xenikii.timecalculator.features.routineeditor.ui
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
+import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRoutineViewModel
+import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewModel
+import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewState
+import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineAnchorSelector
+import com.xenikii.timecalculator.shared.components.AppTextField
+import com.xenikii.timecalculator.shared.components.DatePickerField
+import com.xenikii.timecalculator.shared.components.SmallIconButton
+import com.xenikii.timecalculator.shared.components.TimePickerField
+import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
+import com.xenikii.timecalculator.shared.navigator.AppRoute
+import com.xenikii.timecalculator.shared.navigator.LocalNavigator
+import kotlinx.datetime.LocalTime
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+@Composable
+fun CreateRoutineScreen(
+    viewModel: CreateRoutineViewModel = koinViewModel(),
+) {
+    val navigator = LocalNavigator.current
+    val form by viewModel.viewState.collectAsStateWithLifecycle()
+    RoutineEditorScreen(
+        screenTitle = stringResource(R.string.routine_dialog_add_title),
+        viewState = form,
+        onStateChange = viewModel::onStateChange,
+        onConfirm = {
+            viewModel.saveRoutine()
+            navigator.navigateBack()
+        },
+        onDismiss = navigator::navigateBack,
+    )
+}
+
+@Composable
+fun EditRoutineScreen(
+    routineId: String,
+    viewModel: EditRoutineViewModel = koinViewModel(
+        parameters = { parametersOf(routineId) }
+    ),
+) {
+    val navigator = LocalNavigator.current
+    val state by viewModel.viewState.collectAsStateWithLifecycle()
+    when (val viewState = state) {
+        EditRoutineViewState.Loading -> CircularProgressIndicator()
+        EditRoutineViewState.Error -> {
+            EditorScreenScaffold(
+                screenTitle = stringResource(R.string.routine_dialog_edit_title),
+                onDismiss = navigator::navigateBack,
+            ) { padding ->
+                Text(
+                    text = stringResource(R.string.top_bar_error),
+                    modifier = Modifier
+                        .padding(padding)
+                        .padding(16.dp),
+                )
+            }
+        }
+
+        is EditRoutineViewState.Success -> {
+            RoutineEditorScreen(
+                screenTitle = stringResource(R.string.routine_dialog_edit_title),
+                viewState = viewState.form,
+                onStateChange = viewModel::onStateChange,
+                onConfirm = {
+                    viewModel.saveRoutine()
+                    navigator.navigateBack()
+                },
+                onDismiss = navigator::navigateBack,
+                onDelete = {
+                    viewModel.deleteRoutine()
+                    navigator.navigateTo(AppRoute.Home)
+                },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RoutineEditorScreen(
+    screenTitle: String,
+    viewState: RoutineEditorFormState,
+    onStateChange: (RoutineEditorFormState) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    onDelete: (() -> Unit)? = null,
+) {
+    val resolvedTitle = viewState.title
+    val resolvedAnchor = viewState.anchor
+    val resolvedDate = viewState.date
+    val resolvedTime = viewState.time
+    var showDeleteConfirmation by rememberSaveable { mutableStateOf(false) }
+
+    val options = listOf(
+        RoutineScheduleAnchor.START to stringResource(R.string.routine_anchor_start_at),
+        RoutineScheduleAnchor.END to stringResource(R.string.routine_anchor_end_at)
+    )
+
+    EditorScreenScaffold(
+        screenTitle = screenTitle,
+        onDismiss = onDismiss,
+        headerActions = {
+            if (onDelete != null && viewState.routineId != null) {
+                SmallIconButton(onClick = { showDeleteConfirmation = true }) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteOutline,
+                        contentDescription = stringResource(R.string.content_desc_delete),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                AppTextField(
+                    value = resolvedTitle,
+                    autofocus = resolvedTitle.isEmpty(),
+                    onValueChange = {
+                        onStateChange(
+                            viewState.copy(title = it)
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.label_name)) }
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                RoutineAnchorSelector(
+                    options = options,
+                    anchor = resolvedAnchor,
+                    onChanged = {
+                        onStateChange(
+                            viewState.copy(anchor = it)
+                        )
+                    }
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                DatePickerField(
+                    label = stringResource(R.string.label_date),
+                    initialDate = resolvedDate,
+                    onDateChange = {
+                        onStateChange(
+                            viewState.copy(date = it)
+                        )
+                    }
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                TimePickerField(
+                    label = if (resolvedAnchor == RoutineScheduleAnchor.START) {
+                        stringResource(R.string.routine_start_time)
+                    } else {
+                        stringResource(R.string.routine_end_time)
+                    },
+                    initialTime = resolvedTime,
+                    onTimeChange = { picked ->
+                        val nextTime = LocalTime(picked.hour, picked.minute, 0, 0)
+                        onStateChange(
+                            viewState.copy(time = nextTime)
+                        )
+                    }
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                ElevatedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = resolvedTitle.isNotBlank(),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    onClick = {
+                        onConfirm()
+                    }
+                ) { Text(stringResource(R.string.action_ok)) }
+            }
+        }
+    )
+
+    if (showDeleteConfirmation && onDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text(stringResource(R.string.routine_delete_dialog_title)) },
+            text = { Text(stringResource(R.string.routine_delete_dialog_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirmation = false
+                        onDelete()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+}
