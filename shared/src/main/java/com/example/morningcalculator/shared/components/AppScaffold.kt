@@ -3,6 +3,7 @@ package com.example.morningcalculator.shared.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,7 +28,7 @@ fun AppScaffold(
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.imePadding(),
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,

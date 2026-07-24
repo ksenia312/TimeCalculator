@@ -79,6 +79,6 @@ fun TasksListView(
                 },
             )
         }
-        item { Spacer(Modifier.height(100.dp)) }
+        item { Spacer(Modifier.height(200.dp)) }
     }
 }
