@@ -67,7 +67,7 @@ fun LandingCard(
                     maxLines = 3,
                     color = MaterialTheme.colorScheme.surface,
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(4.dp))
                 RoutineCardStatusRow(
                     isOngoing = viewItem.isOngoing,
                     isCompleted = viewItem.isCompleted,
