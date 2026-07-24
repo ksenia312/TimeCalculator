@@ -72,6 +72,8 @@
     <string name="landing_empty_title">No routines yet</string>
     <string name="landing_empty_subtitle">Create your first routine to start planning your day.</string>
     <string name="landing_empty_action">Create first routine</string>
+    <string name="landing_show_all_tasks">Show all tasks</string>
+    <string name="landing_hide_all_tasks">Hide tasks</string>
     <string name="routines_empty_title">No routines yet</string>
     <string name="routines_empty_subtitle">Create your first routine and keep your day structured.</string>
     <string name="routines_empty_action">Create routine</string>

@@ -53,23 +53,20 @@ class LandingViewModel(
                 )
                 val routineStates = sorted.take(3).map { item ->
                     val schedule = item.schedule
-                    val taskCount = item.routine.data.size
+                    val taskCount = schedule.tasks.size
                     val isOngoing = item.cardViewItem.isOngoing
                     val currentIndex = when {
                         taskCount == 0 -> null
                         isOngoing -> schedule.taskIndexAt(now)
                         else -> 0
                     }
-                    val nextIndex = when {
-                        taskCount == 0 -> null
-                        isOngoing -> currentIndex?.plus(1)
-                        else -> 1
-                    }?.takeIf { it in 0 until taskCount }
                     LandingRoutineState(
                         routineId = item.routine.id,
                         cardViewItem = item.cardViewItem,
-                        currentTaskViewItem = currentIndex?.let { schedule.tasks.getOrNull(it)?.let { task -> createLandingCardTaskViewItem(task, now) } },
-                        nextTaskViewItem = nextIndex?.let { schedule.tasks.getOrNull(it)?.let { task -> createLandingCardTaskViewItem(task, now) } },
+                        taskViewItems = schedule.tasks.map { task ->
+                            createLandingCardTaskViewItem(task = task, now = now)
+                        },
+                        currentTaskIndex = currentIndex?.takeIf { it in schedule.tasks.indices },
                     )
                 }
                 _viewState.value = LandingState.Success(routineStates = routineStates)

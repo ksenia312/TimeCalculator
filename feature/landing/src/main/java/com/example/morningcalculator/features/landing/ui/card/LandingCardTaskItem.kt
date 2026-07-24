@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -39,13 +40,13 @@ fun LandingCardTaskItem(
     end: Instant,
     progress: Float,
     isOngoing: Boolean,
-    isFirst: Boolean,
+    isCompleted: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val header = stringResource(headerRes, remaining.stringValue(context))
 
-    val cardBg = if (isOngoing && isFirst) {
+    val cardBg = if (isOngoing) {
         MaterialTheme.colorScheme.surface.copy(alpha = 0.16f)
     } else {
         Color.Transparent
@@ -57,45 +58,47 @@ fun LandingCardTaskItem(
 
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(cardBg)
             .border(
-                2.dp, cardBorderColor, RoundedCornerShape(20.dp)
+                2.dp, cardBorderColor, RoundedCornerShape(16.dp)
             )
-            .padding(14.dp)
+            .padding(10.dp)
+            .alpha(if (isCompleted) 0.5f else 1f)
     ) {
         Text(
-            text = header, style = MaterialTheme.typography.labelLarge, color = subTextColor
+            text = header, style = MaterialTheme.typography.labelSmall,
+            color = subTextColor
         )
-        Spacer(Modifier.height(4.dp))
         Text(
-            text = title, style = MaterialTheme.typography.titleLarge.copy(
+            text = title, style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ), color = textColor
         )
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(8.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = start.stringTime(),
-                style = MaterialTheme.typography.bodyMedium.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
                 color = subTextColor
             )
             Text(
                 text = end.stringTime(),
-                style = MaterialTheme.typography.bodyMedium.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
                 color = subTextColor
             )
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
 
         val animatedProgress by animateFloatAsState(
             targetValue = progress.coerceIn(0f, 1f),
@@ -109,8 +112,11 @@ fun LandingCardTaskItem(
             trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.20f),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(6.dp)
+                .padding(horizontal = 2.dp)
+                .height(3.dp)
                 .clip(RoundedCornerShape(50))
         )
+
+        Spacer(Modifier.height(6.dp))
     }
 }

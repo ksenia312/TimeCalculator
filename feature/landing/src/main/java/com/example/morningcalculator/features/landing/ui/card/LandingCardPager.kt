@@ -2,10 +2,8 @@ package com.example.morningcalculator.features.landing.ui.card
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -22,30 +20,32 @@ fun LandingCardPager(
     onNavigate: (routineId: String) -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { routineStates.size })
+    val showDots = routineStates.size > 1
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 16.dp),
             pageSpacing = 10.dp,
+            verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(1f),
         ) { page ->
             LandingCard(
-                routineState = routineStates[page], onNavigate = onNavigate, modifier = Modifier.fillMaxSize()
+                routineState = routineStates[page],
+                onNavigate = onNavigate,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
-
-        Spacer(Modifier.height(12.dp))
-
-        LandingCardPagerDots(
-            count = routineStates.size,
-            activeIndex = pagerState.currentPage,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 8.dp)
-        )
+        if (showDots) {
+            LandingCardPagerDots(
+                count = routineStates.size,
+                activeIndex = pagerState.currentPage,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 12.dp),
+            )
+        }
     }
 }
-
