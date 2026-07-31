@@ -98,7 +98,11 @@ fun AppNavigator(
             }
         }
 
-        Box(Modifier.fillMaxSize()) {
+        if (mainState.authViewState == AuthViewState.Initializing) {
+            Box(Modifier.fillMaxSize()) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        } else {
             SharedTransitionLayout {
                 CompositionLocalProvider(LocalSharedTransitionScope provides this) {
                     NavDisplay(
@@ -167,12 +171,6 @@ fun AppNavigator(
                             }
                         }
                     )
-                }
-            }
-
-            if (mainState.authViewState == AuthViewState.Initializing) {
-                Box(Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
             }
         }
