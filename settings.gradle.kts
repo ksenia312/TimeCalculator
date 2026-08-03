@@ -24,7 +24,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MorningCalculator"
+rootProject.name = "TimeCalculator"
 include(":app")
 include(":domain")
 include(":data")

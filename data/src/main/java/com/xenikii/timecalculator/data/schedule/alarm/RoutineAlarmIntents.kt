@@ -12,7 +12,7 @@ const val EXTRA_ROUTINE_ID = "extra_routine_id"
 internal const val EXTRA_ALARM_KIND = "extra_alarm_kind"
 internal const val EXTRA_BOUNDARY_INDEX = "extra_boundary_index"
 internal const val EXTRA_TRIGGER_AT_MILLIS = "extra_trigger_at_millis"
-private const val ROUTINE_SCHEME = "morningcalculator"
+private const val ROUTINE_SCHEME = "timecalculator"
 
 fun stableAlarmRequestCode(
     routineId: String,
