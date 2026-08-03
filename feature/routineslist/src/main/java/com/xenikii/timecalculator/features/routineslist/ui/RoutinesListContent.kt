@@ -1,12 +1,8 @@
 package com.xenikii.timecalculator.features.routineslist.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -17,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.routineslist.presentation.RoutinesListState
-import com.xenikii.timecalculator.features.routineslist.ui.components.RoutineListItem
+import com.xenikii.timecalculator.features.routineslist.ui.components.RoutinesLazyList
 import com.xenikii.timecalculator.shared.components.HomeEmptyState
 import com.xenikii.timecalculator.shared.extensions.bottomIndent
 import com.xenikii.timecalculator.shared.preview.PreviewAll
@@ -28,6 +24,9 @@ import com.xenikii.timecalculator.shared.preview.PreviewTheme
 @Composable
 fun RoutinesListContent(
     viewState: RoutinesListState,
+    selectedIds: Set<String>,
+    onLongPress: (String) -> Unit,
+    onToggleSelect: (String) -> Unit,
     onCreateRoutineClick: () -> Unit = {},
 ) {
     Box(
@@ -56,25 +55,16 @@ fun RoutinesListContent(
                             .padding(horizontal = 24.dp)
                     )
                 } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    ) {
-                        item { Spacer(Modifier.height(16.dp)) }
-                        items.forEach { routineItem ->
-                            item(key = routineItem.routine.id) {
-                                RoutineListItem(
-                                    item = routineItem,
-                                )
-                            }
-                        }
-                        item { Box(Modifier.bottomIndent()) }
-                    }
+                    RoutinesLazyList(
+                        items = items,
+                        selectedIds = selectedIds,
+                        onLongPress = onLongPress,
+                        onToggleSelect = onToggleSelect,
+                    )
                 }
             }
 
             is RoutinesListState.Error -> {
-                val viewState = viewState
                 Text(
                     text = viewState.error,
                     modifier = Modifier
@@ -118,6 +108,9 @@ fun RoutineListContentPreview() {
                 },
                 sort = RoutinesListState.Sort.DEFAULT
             ),
+            selectedIds = emptySet(),
+            onLongPress = {},
+            onToggleSelect = {},
             onCreateRoutineClick = {},
         )
     }

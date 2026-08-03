@@ -57,6 +57,10 @@
     <string name="routine_dialog_edit_title">Edit routine</string>
     <string name="routine_delete_dialog_title">Delete routine?</string>
     <string name="routine_delete_dialog_message">This action cannot be undone.</string>
+    <string name="routines_delete_single_title">Delete \"%1$s\"?</string>
+    <string name="routines_delete_multiple_title">Delete %1$d routines?</string>
+    <string name="routines_delete_single_message">This action cannot be undone.</string>
+    <string name="routines_delete_multiple_message">%1$s\n\nThis action cannot be undone.</string>
     <string name="routine_start_time">Start time</string>
     <string name="routine_end_time">End time</string>
     <string name="routine_status_running">Running</string>

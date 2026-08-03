@@ -8,12 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +34,7 @@ import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
 import com.xenikii.timecalculator.shared.features.SaveTaskButton
 import com.xenikii.timecalculator.shared.features.TaskNameField
 import com.xenikii.timecalculator.shared.features.selectedIndexAfterRemove
+import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
 import com.xenikii.timecalculator.shared.navigator.EditTaskArguments
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -197,46 +196,24 @@ fun EditTaskScreen(
             }
 
             if (showDeleteConfirmation) {
-                AlertDialog(
-                    onDismissRequest = { showDeleteConfirmation = false },
-                    title = {
-                        Text(
-                            stringResource(
-                                if (hasRoutine) R.string.task_unlink_dialog_title
-                                else R.string.task_delete_dialog_title
-                            )
-                        )
+                DeleteConfirmationDialog(
+                    title = stringResource(
+                        if (hasRoutine) R.string.task_unlink_dialog_title
+                        else R.string.task_delete_dialog_title
+                    ),
+                    message = stringResource(
+                        if (hasRoutine) R.string.task_unlink_dialog_message
+                        else R.string.task_delete_dialog_message
+                    ),
+                    confirmText = stringResource(
+                        if (hasRoutine) R.string.action_remove
+                        else R.string.action_delete
+                    ),
+                    onConfirm = {
+                        viewModel.delete()
+                        navigator.navigateBack()
                     },
-                    text = {
-                        Text(
-                            stringResource(
-                                if (hasRoutine) R.string.task_unlink_dialog_message
-                                else R.string.task_delete_dialog_message
-                            )
-                        )
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                showDeleteConfirmation = false
-                                viewModel.delete()
-                                navigator.navigateBack()
-                            }
-                        ) {
-                            Text(
-                                text = stringResource(
-                                    if (hasRoutine) R.string.action_remove
-                                    else R.string.action_delete
-                                ),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDeleteConfirmation = false }) {
-                            Text(stringResource(R.string.action_cancel))
-                        }
-                    }
+                    onDismiss = { showDeleteConfirmation = false },
                 )
             }
         }

@@ -13,9 +13,13 @@ fun RoutinesListScreen(
     routinesViewModel: RoutinesListViewModel = koinViewModel()
 ) {
     val viewState = routinesViewModel.viewState.collectAsStateWithLifecycle()
+    val selectedIds = routinesViewModel.selectedIds.collectAsStateWithLifecycle()
 
     RoutinesListContent(
         viewState = viewState.value,
+        selectedIds = selectedIds.value,
+        onLongPress = routinesViewModel::toggleSelection,
+        onToggleSelect = routinesViewModel::toggleSelection,
         onCreateRoutineClick = onCreateRoutineClick,
     )
 }

@@ -11,6 +11,7 @@ import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 import com.xenikii.timecalculator.shared.viewitem.toViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
@@ -22,8 +23,30 @@ class RoutinesListViewModel(
     private val _viewState = MutableStateFlow<RoutinesListState>(RoutinesListState.Loading)
     val viewState: StateFlow<RoutinesListState> = _viewState
 
+    private val _selectedIds = MutableStateFlow<Set<String>>(emptySet())
+    val selectedIds: StateFlow<Set<String>> = _selectedIds
+
     init {
         loadRoutines()
+    }
+
+    fun toggleSelection(id: String) {
+        _selectedIds.update { current ->
+            if (id in current) current - id else current + id
+        }
+    }
+
+    fun clearSelection() {
+        _selectedIds.value = emptySet()
+    }
+
+    fun deleteSelected() {
+        viewModelScope.launch {
+            _selectedIds.value.forEach { id ->
+                routineRepository.deleteRoutine(id)
+            }
+            _selectedIds.value = emptySet()
+        }
     }
 
     private fun loadRoutines() {

@@ -1,17 +1,22 @@
 package com.xenikii.timecalculator.features.routineslist.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EditCalendar
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,28 +31,33 @@ import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.features.routineslist.presentation.RoutineListItemState
+import com.xenikii.timecalculator.shared.extensions.stringDateTime
 import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
-import com.xenikii.timecalculator.shared.extensions.stringDateTime
 import kotlin.time.Instant
 
 @Composable
 fun RoutineListItem(
     item: RoutineListItemState,
+    isSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
+    onLongPress: () -> Unit = {},
+    onToggleSelect: () -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
-    val onNavigate: () -> Unit = {
-        navigator.navigateTo(
-            AppRoute.Routine(routineId = item.routine.id),
-        )
-    }
 
     RoutineListItem(
         item = item,
-        onNavigate = onNavigate,
+        isSelectionMode = isSelectionMode,
+        isSelected = isSelected,
+        onLongPress = onLongPress,
+        onToggleSelect = onToggleSelect,
+        onNavigate = {
+            navigator.navigateTo(AppRoute.Routine(routineId = item.routine.id))
+        },
         onEditClick = {
             navigator.navigateTo(
                 AppRoute.EditRoutine(
@@ -59,9 +69,14 @@ fun RoutineListItem(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun RoutineListItem(
     item: RoutineListItemState,
+    isSelectionMode: Boolean,
+    isSelected: Boolean,
+    onLongPress: () -> Unit,
+    onToggleSelect: () -> Unit,
     onNavigate: () -> Unit,
     onEditClick: () -> Unit,
 ) {
@@ -72,11 +87,13 @@ private fun RoutineListItem(
 
     val (statusPrefix, statusText) = when {
         isCompleted -> stringResource(R.string.routines_list_status_completed_on) to
-            item.cardViewItem.endInstant.stringDateTime(context = context)
+                item.cardViewItem.endInstant.stringDateTime(context = context)
+
         isOngoing -> stringResource(R.string.routines_list_status_running_ends_on) to
-            item.cardViewItem.endInstant.stringDateTime(context = context)
+                item.cardViewItem.endInstant.stringDateTime(context = context)
+
         else -> stringResource(R.string.routines_list_status_planned_for) to
-            item.cardViewItem.startInstant.stringDateTime(context = context)
+                item.cardViewItem.startInstant.stringDateTime(context = context)
     }
 
     val color = when {
@@ -87,15 +104,42 @@ private fun RoutineListItem(
 
     ListItem(
         modifier = Modifier
+            .heightIn(min = 72.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable(onClick = onNavigate),
+            .background(
+                if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                else MaterialTheme.colorScheme.surface
+            )
+            .combinedClickable(
+                onClick = {
+                    if (isSelectionMode) onToggleSelect() else onNavigate()
+                },
+                onLongClick = {
+                    if (!isSelectionMode) onLongPress() else onToggleSelect()
+                },
+            ),
+        colors = ListItemDefaults.colors(
+            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+        ),
         leadingContent = {
             Box(
-                Modifier
-                    .size(14.dp)
-                    .background(color, shape = CircleShape)
-            )
+                Modifier.size(24.dp),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                if (isSelectionMode) {
+                    Icon(
+                        imageVector = if (isSelected) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
+                        contentDescription = null,
+                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    Box(
+                        Modifier
+                            .size(14.dp)
+                            .background(color, shape = CircleShape)
+                    )
+                }
+            }
         },
         headlineContent = {
             Column {
@@ -119,13 +163,15 @@ private fun RoutineListItem(
             }
         },
         trailingContent = {
-            IconButton(
-                onClick = onEditClick,
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.EditCalendar,
-                    contentDescription = null,
-                )
+            if (!isSelectionMode) {
+                IconButton(
+                    onClick = onEditClick,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.EditCalendar,
+                        contentDescription = null,
+                    )
+                }
             }
         },
     )
@@ -167,6 +213,10 @@ fun RoutineListItemPreview() {
         )
         RoutineListItem(
             item = item,
+            isSelectionMode = false,
+            isSelected = false,
+            onLongPress = {},
+            onToggleSelect = {},
             onNavigate = {},
             onEditClick = {}
         )

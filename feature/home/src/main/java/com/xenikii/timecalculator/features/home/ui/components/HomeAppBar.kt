@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -15,7 +16,10 @@ import com.xenikii.timecalculator.shared.preview.PreviewTheme
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun HomeAppBar(selectedTab: HomeTab) {
+fun HomeAppBar(
+    selectedTab: HomeTab,
+    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {},
+) {
     TopAppBar(
         modifier = Modifier.shadow(6.dp),
         title = {
@@ -29,6 +33,7 @@ fun HomeAppBar(selectedTab: HomeTab) {
                 style = MaterialTheme.typography.titleLarge,
             )
         },
+        actions = actions,
     )
 }
 
