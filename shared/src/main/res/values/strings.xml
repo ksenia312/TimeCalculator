@@ -101,6 +101,10 @@
     <string name="task_duration_left">%1$s left</string>
     <string name="task_delete_dialog_title">Delete task?</string>
     <string name="task_delete_dialog_message">This action cannot be undone.</string>
+    <string name="tasks_delete_single_title">Delete \"%1$s\"?</string>
+    <string name="tasks_delete_multiple_title">Delete %1$d tasks?</string>
+    <string name="tasks_delete_single_message">This action cannot be undone.</string>
+    <string name="tasks_delete_multiple_message">%1$s\n\nThis action cannot be undone.</string>
     <string name="task_unlink_dialog_title">Remove from routine?</string>
     <string name="task_unlink_dialog_message">The task will be removed from this routine.</string>
     <string name="task_duplicate_durations_error">Durations must be unique.</string>

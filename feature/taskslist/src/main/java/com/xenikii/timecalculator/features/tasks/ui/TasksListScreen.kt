@@ -17,9 +17,13 @@ fun TasksListScreen(
 ) {
     val navigator = LocalNavigator.current
     val viewState = viewModel.viewState.collectAsStateWithLifecycle()
+    val selectedIds = viewModel.selectedIds.collectAsStateWithLifecycle()
 
     TasksListContent(
         viewState = viewState.value,
+        selectedIds = selectedIds.value,
+        onLongPress = viewModel::toggleSelection,
+        onToggleSelect = viewModel::toggleSelection,
         onEditTask = { task ->
             navigator.navigateTo(
                 AppRoute.EditTask(
