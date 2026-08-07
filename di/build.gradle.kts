@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.xenikii.timecalculator.di"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 30
