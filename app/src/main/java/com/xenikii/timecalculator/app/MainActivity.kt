@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation3.runtime.NavKey
 import com.xenikii.timecalculator.shared.extensions.toAppRoute
 import com.xenikii.timecalculator.shared.navigator.AppNavigator
@@ -22,6 +23,7 @@ import com.xenikii.timecalculator.shared.theme.TimeCalculatorTheme
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 

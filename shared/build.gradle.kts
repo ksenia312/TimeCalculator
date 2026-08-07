@@ -45,5 +45,6 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     api(libs.kotlinx.datetime)
     implementation(libs.haze)
+    implementation(libs.androidx.core.splashscreen)
     testImplementation(libs.junit)
 }
