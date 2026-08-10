@@ -52,6 +52,8 @@ class RoutineRepositoryImpl(
             color = request.color,
             scheduledAtMillis = scheduledAt.toEpochMilliseconds(),
             scheduledAtAnchor = request.scheduledAtAnchor.name,
+            recurrenceUnit = request.recurrence.unit.name,
+            recurrenceInterval = request.recurrence.interval.coerceAtLeast(1),
             modifiedAt = System.currentTimeMillis()
         )
 
@@ -70,6 +72,8 @@ class RoutineRepositoryImpl(
             color = normalized.color,
             scheduledAtMillis = normalized.scheduledAt.toEpochMilliseconds(),
             scheduledAtAnchor = normalized.scheduledAtAnchor.name,
+            recurrenceUnit = normalized.recurrence.unit.name,
+            recurrenceInterval = normalized.recurrence.interval.coerceAtLeast(1),
             modifiedAt = System.currentTimeMillis()
         )
 

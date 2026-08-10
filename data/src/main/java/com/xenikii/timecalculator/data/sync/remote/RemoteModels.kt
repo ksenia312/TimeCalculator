@@ -27,6 +27,8 @@ data class RemoteRoutine(
     val color: String,
     @SerialName("scheduled_at_millis") val scheduledAtMillis: Long,
     @SerialName("scheduled_at_anchor") val scheduledAtAnchor: String,
+    @SerialName("recurrence_unit") val recurrenceUnit: String = "NONE",
+    @SerialName("recurrence_interval") val recurrenceInterval: Int = 1,
     val items: List<RemoteRoutineItem> = emptyList(),
     @SerialName("modified_at") val modifiedAt: Long,
     val deleted: Boolean = false,

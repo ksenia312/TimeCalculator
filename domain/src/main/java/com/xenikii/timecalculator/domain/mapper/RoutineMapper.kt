@@ -8,6 +8,7 @@ fun Routine.copyWithRequest(request: RoutineRequest): Routine {
         title = request.title,
         scheduledAt = request.scheduledAt,
         scheduledAtAnchor = request.scheduledAtAnchor,
+        recurrence = request.recurrence,
         color = request.color
     )
 }

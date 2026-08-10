@@ -218,7 +218,7 @@ interface SyncDao {
         RoutineItemEntity::class,
         PendingDeletionEntity::class,
     ],
-    version = 2
+    version = 3
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

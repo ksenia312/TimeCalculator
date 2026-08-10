@@ -16,6 +16,7 @@ import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.TasksRepository
 import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.MIGRATION_1_2
+import com.xenikii.timecalculator.data.db.MIGRATION_2_3
 import com.xenikii.timecalculator.data.repository.RoutineRepositoryImpl
 import com.xenikii.timecalculator.data.repository.TasksRepositoryImpl
 import com.xenikii.timecalculator.data.schedule.alarm.AlarmManagerRoutineAlarmGateway
@@ -54,7 +55,7 @@ object AppModule {
             context = context,
             klass = AppDatabase::class.java,
             name = "morning-db"
-        ).addMigrations(MIGRATION_1_2).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
 
         single { appDatabase.tasksDao() }
         single { appDatabase.routinesDao() }

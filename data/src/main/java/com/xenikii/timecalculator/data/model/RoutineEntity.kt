@@ -11,6 +11,8 @@ data class RoutineEntity(
     val color: String,
     val scheduledAtMillis: Long,
     val scheduledAtAnchor: String,
+    val recurrenceUnit: String = "NONE",
+    val recurrenceInterval: Int = 1,
     val modifiedAt: Long,
     val pendingSync: Boolean = true,
 )

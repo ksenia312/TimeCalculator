@@ -1,11 +1,16 @@
 package com.xenikii.timecalculator.features.routineeditor.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -15,6 +20,7 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,15 +28,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewState
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineAnchorSelector
+import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineRecurrenceUnitSelector
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.DatePickerField
 import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
@@ -117,6 +127,8 @@ private fun RoutineEditorScreen(
 ) {
     val resolvedTitle = viewState.title
     val resolvedAnchor = viewState.anchor
+    val resolvedRecurrenceUnit = viewState.recurrenceUnit
+    val resolvedRecurrenceInterval = viewState.recurrenceInterval
     val resolvedDate = viewState.date
     val resolvedTime = viewState.time
     var showDeleteConfirmation by rememberSaveable { mutableStateOf(false) }
@@ -125,6 +137,13 @@ private fun RoutineEditorScreen(
         RoutineScheduleAnchor.START to stringResource(R.string.routine_anchor_start_at),
         RoutineScheduleAnchor.END to stringResource(R.string.routine_anchor_end_at)
     )
+    val recurrenceUnitOptions = listOf(
+        RoutineRecurrenceUnit.DAY to stringResource(R.string.routine_recurrence_unit_day),
+        RoutineRecurrenceUnit.WEEK to stringResource(R.string.routine_recurrence_unit_week),
+        RoutineRecurrenceUnit.MONTH to stringResource(R.string.routine_recurrence_unit_month),
+        RoutineRecurrenceUnit.YEAR to stringResource(R.string.routine_recurrence_unit_year),
+    )
+    val repeatsEnabled = resolvedRecurrenceUnit != RoutineRecurrenceUnit.NONE
 
     EditorScreenScaffold(
         screenTitle = screenTitle,
@@ -174,18 +193,6 @@ private fun RoutineEditorScreen(
 
                 Spacer(Modifier.height(12.dp))
 
-                DatePickerField(
-                    label = stringResource(R.string.label_date),
-                    initialDate = resolvedDate,
-                    onDateChange = {
-                        onStateChange(
-                            viewState.copy(date = it)
-                        )
-                    }
-                )
-
-                Spacer(Modifier.height(12.dp))
-
                 TimePickerField(
                     label = if (resolvedAnchor == RoutineScheduleAnchor.START) {
                         stringResource(R.string.routine_start_time)
@@ -200,6 +207,98 @@ private fun RoutineEditorScreen(
                         )
                     }
                 )
+
+                Spacer(Modifier.height(12.dp))
+
+                val onCheckerChange: (Boolean) -> Unit = { enabled ->
+                    onStateChange(
+                        viewState.copy(
+                            recurrenceUnit = if (enabled) {
+                                if (resolvedRecurrenceUnit == RoutineRecurrenceUnit.NONE) {
+                                    RoutineRecurrenceUnit.DAY
+                                } else {
+                                    resolvedRecurrenceUnit
+                                }
+                            } else {
+                                RoutineRecurrenceUnit.NONE
+                            },
+                        )
+                    )
+                }
+
+                DatePickerField(
+                    label = if (repeatsEnabled) {
+                        stringResource(R.string.label_repeat_start_date)
+                    } else {
+                        stringResource(R.string.label_date)
+                    },
+                    initialDate = resolvedDate,
+                    onDateChange = {
+                        onStateChange(
+                            viewState.copy(date = it)
+                        )
+                    }
+                )
+                Spacer(Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.extraLarge)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.extraLarge
+                        )
+                        .clickable {
+                            onCheckerChange(!repeatsEnabled)
+                        }
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.routine_repeat_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Switch(
+                        checked = repeatsEnabled,
+                        onCheckedChange = { enabled ->
+                            onCheckerChange(enabled)
+                        },
+                    )
+                }
+
+                if (repeatsEnabled) {
+                    Spacer(Modifier.height(12.dp))
+
+                    AppTextField(
+                        value = resolvedRecurrenceInterval.toString(),
+                        onValueChange = { value ->
+                            val parsed = value.toIntOrNull()?.coerceAtLeast(1)
+                            onStateChange(
+                                viewState.copy(
+                                    recurrenceInterval = parsed ?: 1,
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        label = { Text(stringResource(R.string.routine_repeat_every_label)) },
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    RoutineRecurrenceUnitSelector(
+                        options = recurrenceUnitOptions,
+                        unit = resolvedRecurrenceUnit,
+                        onChanged = {
+                            onStateChange(
+                                viewState.copy(recurrenceUnit = it)
+                            )
+                        },
+                    )
+                }
 
                 Spacer(Modifier.height(12.dp))
 

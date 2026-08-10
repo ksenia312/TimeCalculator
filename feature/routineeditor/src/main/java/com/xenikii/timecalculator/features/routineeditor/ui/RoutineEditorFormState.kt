@@ -1,6 +1,8 @@
 package com.xenikii.timecalculator.features.routineeditor.ui
 
 import com.xenikii.timecalculator.domain.model.Routine
+import com.xenikii.timecalculator.domain.model.RoutineRecurrence
+import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.shared.extensions.withZeroSeconds
 import kotlinx.datetime.LocalTime
@@ -14,6 +16,8 @@ data class RoutineEditorFormState(
     val routineId: String? = null,
     val title: String = "",
     val anchor: RoutineScheduleAnchor = RoutineScheduleAnchor.END,
+    val recurrenceUnit: RoutineRecurrenceUnit = RoutineRecurrenceUnit.NONE,
+    val recurrenceInterval: Int = 1,
     val date: LocalDate = LocalDate.now(ZoneId.systemDefault()).plusDays(1),
     val time: LocalTime = LocalTime(7, 0),
 )
@@ -29,6 +33,8 @@ fun Routine.toRoutineEditorFormState(zoneId: ZoneId = ZoneId.systemDefault()): R
         routineId = id,
         title = title,
         anchor = scheduledAtAnchor,
+        recurrenceUnit = recurrence.unit,
+        recurrenceInterval = recurrence.interval,
         date = initialDateTime.toLocalDate(),
         time = LocalTime(initialDateTime.hour, initialDateTime.minute, 0, 0),
     )
@@ -55,4 +61,8 @@ fun Routine.applyRoutineEditorFormState(
     title = routineEditorFormState.title,
     scheduledAt = routineEditorFormState.toScheduledAtInstant(zoneId),
     scheduledAtAnchor = routineEditorFormState.anchor,
+    recurrence = RoutineRecurrence(
+        interval = routineEditorFormState.recurrenceInterval.coerceAtLeast(1),
+        unit = routineEditorFormState.recurrenceUnit,
+    ),
 )

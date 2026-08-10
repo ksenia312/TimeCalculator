@@ -40,6 +40,8 @@ fun RoutinePopulated.toRemote(): RemoteRoutine =
         color = routine.color,
         scheduledAtMillis = routine.scheduledAtMillis,
         scheduledAtAnchor = routine.scheduledAtAnchor,
+        recurrenceUnit = routine.recurrenceUnit,
+        recurrenceInterval = routine.recurrenceInterval,
         items = items.sortedBy { it.item.orderIndex }.map { item ->
             RemoteRoutineItem(
                 id = item.item.id,
@@ -59,6 +61,8 @@ fun RemoteRoutine.toEntities(): Pair<RoutineEntity, List<RoutineItemEntity>> =
         color = color,
         scheduledAtMillis = scheduledAtMillis,
         scheduledAtAnchor = scheduledAtAnchor,
+        recurrenceUnit = recurrenceUnit,
+        recurrenceInterval = recurrenceInterval.coerceAtLeast(1),
         modifiedAt = modifiedAt,
         pendingSync = false,
     ) to items.map { item ->
@@ -88,6 +92,8 @@ fun tombstoneRoutine(id: String, modifiedAt: Long): RemoteRoutine =
         color = "",
         scheduledAtMillis = 0L,
         scheduledAtAnchor = "START",
+        recurrenceUnit = "NONE",
+        recurrenceInterval = 1,
         items = emptyList(),
         modifiedAt = modifiedAt,
         deleted = true,

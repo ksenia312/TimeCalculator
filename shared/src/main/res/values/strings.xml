@@ -39,6 +39,8 @@
     <string name="label_anchor">Anchor</string>
     <string name="label_when_to_leave">When to leave?</string>
     <string name="label_duration_number">Duration №%1$d</string>
+    <string name="label_repeat_start_date">From date</string>
+    <string name="label_repeat_end_date">To date</string>
 
     <string name="home_tab_home">Home</string>
     <string name="home_tab_routines">Routines</string>
@@ -52,8 +54,8 @@
     <string name="fab_manage_tasks">Link existing tasks</string>
     <string name="fab_add_item">Add Item</string>
 
-    <string name="routine_anchor_start_at">Start at</string>
-    <string name="routine_anchor_end_at">End at</string>
+    <string name="routine_anchor_start_at">Time start at</string>
+    <string name="routine_anchor_end_at">Time end at</string>
     <string name="routine_dialog_add_title">Add new routine</string>
     <string name="routine_dialog_edit_title">Edit routine</string>
     <string name="routine_delete_dialog_title">Delete routine?</string>
@@ -64,6 +66,13 @@
     <string name="routines_delete_multiple_message">%1$s\n\nThis action cannot be undone.</string>
     <string name="routine_start_time">Start time</string>
     <string name="routine_end_time">End time</string>
+    <string name="routine_repeat_label">Repeat</string>
+    <string name="routine_repeat_every_label">Every</string>
+    <string name="routine_repeat_unit_label">Repeat unit</string>
+    <string name="routine_recurrence_unit_day">Day</string>
+    <string name="routine_recurrence_unit_week">Week</string>
+    <string name="routine_recurrence_unit_month">Month</string>
+    <string name="routine_recurrence_unit_year">Year</string>
     <string name="routine_status_running">Running</string>
     <string name="routine_status_completed">Completed</string>
     <string name="routine_status_planned">Planned</string>

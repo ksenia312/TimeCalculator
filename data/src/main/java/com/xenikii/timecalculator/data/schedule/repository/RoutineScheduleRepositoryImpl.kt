@@ -3,6 +3,7 @@ package com.xenikii.timecalculator.data.schedule.repository
 import com.xenikii.timecalculator.data.schedule.computation.calculateSchedule
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineAlarmKind
+import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
@@ -26,7 +27,7 @@ class RoutineScheduleRepositoryImpl(
         routine: Routine,
         now: Instant,
     ): RoutineSchedule {
-        return calculateSchedule(routine)
+        return calculateSchedule(routine, now)
     }
 
     override suspend fun reconcile(
@@ -45,43 +46,7 @@ class RoutineScheduleRepositoryImpl(
             }
 
             routines.forEach { routine ->
-                val schedule = computeSchedule(routine, now)
-                val record = scheduleRecordDataSource.getRecord(routine.id)
-                if (!forceReschedule && record?.signature == schedule.signature) {
-                    return@forEach
-                }
-
-                if (record != null) {
-                    alarmGateway.cancelRoutine(routine.id, record.taskCount)
-                } else {
-                    alarmGateway.cancelRoutine(routine.id, schedule.tasks.size)
-                }
-
-                when (schedule.phaseAt(now)) {
-                    RoutineSchedulePhase.FUTURE -> {
-                        alarmGateway.schedule(schedule)
-                        notificationGateway.cancelProgress(routine.id)
-                    }
-
-                    RoutineSchedulePhase.ACTIVE -> {
-                        alarmGateway.schedule(schedule)
-                        notificationGateway.postProgress(routine, schedule, now)
-                    }
-
-                    RoutineSchedulePhase.FINISHED -> {
-                        notificationGateway.cancelRoutineNotifications(routine.id)
-                        scheduleRecordDataSource.removeRecord(routine.id)
-                        return@forEach
-                    }
-                }
-
-                scheduleRecordDataSource.putRecord(
-                    routine.id,
-                    ScheduleRecord(
-                        signature = schedule.signature,
-                        taskCount = schedule.tasks.size,
-                    ),
-                )
+                rescheduleRoutine(routine = routine, now = now, forceReschedule = forceReschedule)
             }
         }
     }
@@ -93,28 +58,87 @@ class RoutineScheduleRepositoryImpl(
         triggerAtMillis: Long,
         now: Instant,
     ) {
-        val schedule = computeSchedule(routine, now)
-        val expectedTrigger = when (kind) {
-            RoutineAlarmKind.START -> schedule.effectiveStart.toEpochMilliseconds()
-            RoutineAlarmKind.TASK -> schedule.tasks.getOrNull(boundaryIndex)?.start?.toEpochMilliseconds()
-            RoutineAlarmKind.END -> schedule.end.toEpochMilliseconds()
-        } ?: return
-
-        if (triggerAtMillis >= 0 && triggerAtMillis != expectedTrigger) return
-
-        when (kind) {
-            RoutineAlarmKind.START -> {
-                notificationGateway.postProgress(routine, schedule, now)
+        mutex.withLock {
+            val schedule = if (
+                kind == RoutineAlarmKind.END &&
+                routine.recurrence.unit != RoutineRecurrenceUnit.NONE
+            ) {
+                val referenceMillis = if (triggerAtMillis >= 0L) {
+                    triggerAtMillis - 1L
+                } else {
+                    now.toEpochMilliseconds() - 1L
+                }
+                computeSchedule(routine, Instant.fromEpochMilliseconds(referenceMillis))
+            } else {
+                computeSchedule(routine, now)
             }
+            val expectedTrigger = when (kind) {
+                RoutineAlarmKind.START -> schedule.effectiveStart.toEpochMilliseconds()
+                RoutineAlarmKind.TASK -> schedule.tasks.getOrNull(boundaryIndex)?.start?.toEpochMilliseconds()
+                RoutineAlarmKind.END -> schedule.end.toEpochMilliseconds()
+            } ?: return
 
-            RoutineAlarmKind.TASK -> {
-                notificationGateway.postProgress(routine, schedule, now)
-            }
+            if (triggerAtMillis >= 0 && triggerAtMillis != expectedTrigger) return
 
-            RoutineAlarmKind.END -> {
-                notificationGateway.cancelProgress(routine.id)
-                scheduleRecordDataSource.removeRecord(routine.id)
+            when (kind) {
+                RoutineAlarmKind.START -> {
+                    notificationGateway.postProgress(routine, schedule, now)
+                }
+
+                RoutineAlarmKind.TASK -> {
+                    notificationGateway.postProgress(routine, schedule, now)
+                }
+
+                RoutineAlarmKind.END -> {
+                    notificationGateway.cancelProgress(routine.id)
+                    scheduleRecordDataSource.removeRecord(routine.id)
+                    if (routine.recurrence.unit != RoutineRecurrenceUnit.NONE) {
+                        rescheduleRoutine(routine = routine, now = now, forceReschedule = true)
+                    }
+                }
             }
         }
+    }
+
+    private fun rescheduleRoutine(
+        routine: Routine,
+        now: Instant,
+        forceReschedule: Boolean,
+    ) {
+        val schedule = computeSchedule(routine, now)
+        val record = scheduleRecordDataSource.getRecord(routine.id)
+        if (!forceReschedule && record?.signature == schedule.signature) return
+
+        if (record != null) {
+            alarmGateway.cancelRoutine(routine.id, record.taskCount)
+        } else {
+            alarmGateway.cancelRoutine(routine.id, schedule.tasks.size)
+        }
+
+        when (schedule.phaseAt(now)) {
+            RoutineSchedulePhase.FUTURE -> {
+                alarmGateway.schedule(schedule)
+                notificationGateway.cancelProgress(routine.id)
+            }
+
+            RoutineSchedulePhase.ACTIVE -> {
+                alarmGateway.schedule(schedule)
+                notificationGateway.postProgress(routine, schedule, now)
+            }
+
+            RoutineSchedulePhase.FINISHED -> {
+                notificationGateway.cancelRoutineNotifications(routine.id)
+                scheduleRecordDataSource.removeRecord(routine.id)
+                return
+            }
+        }
+
+        scheduleRecordDataSource.putRecord(
+            routine.id,
+            ScheduleRecord(
+                signature = schedule.signature,
+                taskCount = schedule.tasks.size,
+            ),
+        )
     }
 }

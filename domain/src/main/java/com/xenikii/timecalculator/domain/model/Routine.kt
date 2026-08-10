@@ -16,12 +16,28 @@ enum class RoutineScheduleAnchor {
 }
 
 @Serializable
+enum class RoutineRecurrenceUnit {
+    NONE,
+    DAY,
+    WEEK,
+    MONTH,
+    YEAR,
+}
+
+@Serializable
+data class RoutineRecurrence(
+    val interval: Int = 1,
+    val unit: RoutineRecurrenceUnit = RoutineRecurrenceUnit.NONE,
+)
+
+@Serializable
 data class Routine(
     val id: String,
     val title: String,
     @Serializable(with = InstantIsoSerializer::class)
     val scheduledAt: Instant,
     val scheduledAtAnchor: RoutineScheduleAnchor = RoutineScheduleAnchor.END,
+    val recurrence: RoutineRecurrence = RoutineRecurrence(),
     val modifiedAt: Long,
     val color: String,
     val data: List<RoutineLink>,
@@ -33,6 +49,7 @@ data class RoutineRequest(
     @Serializable(with = InstantIsoSerializer::class)
     val scheduledAt: Instant,
     val scheduledAtAnchor: RoutineScheduleAnchor = RoutineScheduleAnchor.END,
+    val recurrence: RoutineRecurrence = RoutineRecurrence(),
     val color: String,
 )
 
