@@ -59,6 +59,8 @@ fun FabMenu(
         containerColor = itemContainerColor, contentColor = itemContentColor
     )
     val largeContainerSize = ToggleFloatingActionButtonDefaults.containerSizeLarge()(0f)
+    val largeCornerRadius = ToggleFloatingActionButtonDefaults.containerCornerRadiusLarge()(0f)
+    val expandedCornerRadius = largeContainerSize / 2
 
     BackHandler(isExpanded) { onChangeExpanded(false) }
     FloatingActionButtonMenu(
@@ -74,7 +76,10 @@ fun FabMenu(
                     initialSize = largeContainerSize,
                     finalSize = largeContainerSize
                 ),
-                containerCornerRadius = ToggleFloatingActionButtonDefaults.containerCornerRadiusLarge(),
+                containerCornerRadius = ToggleFloatingActionButtonDefaults.containerCornerRadius(
+                    largeCornerRadius,
+                    expandedCornerRadius
+                ),
             ) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.Close else mainImageVector,

@@ -2,8 +2,6 @@ package com.xenikii.timecalculator.shared.navigator
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
@@ -23,9 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -133,10 +131,7 @@ fun AppNavigator(
                                 }
 
                                 is AppRoute.Routine -> {
-                                    NavEntry(
-                                        key = key,
-                                        metadata = noTransitionMetadata()
-                                    ) {
+                                    NavEntry(key = key) {
                                         SharedElementEntry { RoutineScreen(id = key.routineId) }
                                     }
                                 }
@@ -227,8 +222,3 @@ private fun predictivePopTransitionSpec(): AnimatedContentTransitionScope<Scene<
             targetOffsetX = { it },
         ) + fadeOut()
     }
-
-private fun noTransitionMetadata() =
-    NavDisplay.transitionSpec { EnterTransition.None togetherWith ExitTransition.None } +
-            NavDisplay.popTransitionSpec { EnterTransition.None togetherWith ExitTransition.None } +
-            NavDisplay.predictivePopTransitionSpec { EnterTransition.None togetherWith ExitTransition.None }
