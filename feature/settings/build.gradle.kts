@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.xenikii.timecalculator.feature.home"
+    namespace = "com.xenikii.timecalculator.feature.settings"
     compileSdk = 37
 
     defaultConfig {
@@ -29,20 +29,13 @@ kotlin {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":shared"))
-    implementation(project(":feature:landing"))
-    implementation(project(":feature:routineslist"))
-    implementation(project(":feature:taskslist"))
-    implementation(project(":feature:settings"))
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.constraintlayout.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
 }

@@ -33,6 +33,7 @@ import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewModel
 import com.xenikii.timecalculator.features.routineslist.presentation.RoutinesListViewModel
+import com.xenikii.timecalculator.features.settings.presentation.SettingsViewModel
 import com.xenikii.timecalculator.features.taskeditor.presentation.CreateTaskViewModel
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.xenikii.timecalculator.features.tasks.presentation.TasksListViewModel
@@ -128,9 +129,14 @@ object AppModule {
             )
         }
 
+        factory { HomeViewModel() }
+
         factory {
             val logoutUseCase: LogoutUseCase = get()
-            HomeViewModel(logoutUseCase = { logoutUseCase() })
+            SettingsViewModel(
+                logoutUseCase = { logoutUseCase() },
+                authRepository = get(),
+            )
         }
 
         factory {

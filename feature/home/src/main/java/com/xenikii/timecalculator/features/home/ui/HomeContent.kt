@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.features.home.ui.components.HomeTab
 import com.xenikii.timecalculator.features.landing.ui.LandingScreen
 import com.xenikii.timecalculator.features.routineslist.ui.RoutinesListScreen
+import com.xenikii.timecalculator.features.settings.ui.SettingsScreen
 import com.xenikii.timecalculator.features.tasks.ui.TasksListScreen
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
@@ -21,10 +22,8 @@ fun HomeContent(
     current: HomeTab,
     onCreateRoutineClick: () -> Unit,
     onCreateTaskClick: () -> Unit,
-    onLogoutClick: () -> Unit,
-    isLoggingOut: Boolean,
     paddingValues: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier
@@ -35,10 +34,7 @@ fun HomeContent(
             HomeTab.LANDING -> LandingScreen(onCreateRoutineClick = onCreateRoutineClick)
             HomeTab.ROUTINES -> RoutinesListScreen(onCreateRoutineClick = onCreateRoutineClick)
             HomeTab.TASKS -> TasksListScreen(onCreateTaskClick = onCreateTaskClick)
-            HomeTab.SETTINGS -> SettingsContent(
-                onLogoutClick = onLogoutClick,
-                isLoggingOut = isLoggingOut,
-            )
+            HomeTab.SETTINGS -> SettingsScreen()
         }
     }
 }
@@ -51,9 +47,7 @@ fun HomeContentPreview() {
             current = HomeTab.ROUTINES,
             onCreateRoutineClick = {},
             onCreateTaskClick = {},
-            onLogoutClick = {},
-            isLoggingOut = false,
-            paddingValues = PaddingValues(0.dp)
+            paddingValues = PaddingValues(0.dp),
         )
     }
 }

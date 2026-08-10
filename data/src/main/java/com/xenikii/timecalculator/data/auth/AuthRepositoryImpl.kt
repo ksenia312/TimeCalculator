@@ -1,8 +1,10 @@
 package com.xenikii.timecalculator.data.auth
 
+import com.xenikii.timecalculator.data.mapper.mapToUser
 import com.xenikii.timecalculator.domain.model.AuthError
 import com.xenikii.timecalculator.domain.model.AuthException
 import com.xenikii.timecalculator.domain.model.AuthSessionState
+import com.xenikii.timecalculator.domain.model.User
 import com.xenikii.timecalculator.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
@@ -15,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -59,7 +62,10 @@ class AuthRepositoryImpl(
     override suspend fun hasActiveSession(): Boolean =
         client.auth.currentSessionOrNull() != null
 
-    override fun currentUserId(): String? = client.auth.currentUserOrNull()?.id
+    override fun currentUser(): User? = client.auth.currentUserOrNull()?.mapToUser()
+    override fun observeCurrentUser(): Flow<User?> {
+        return client.auth.sessionStatus.map { it.mapToUser() }
+    }
 
     override suspend fun signIn(email: String, password: String): Result<Unit> =
         runAuth {
@@ -90,7 +96,7 @@ class AuthRepositoryImpl(
      * one previously seen on this device, then remember the current user.
      */
     private suspend fun reconcileUser() {
-        val current = currentUserId() ?: return
+        val current = currentUser()?.id ?: return
         val last = userPreferences.getLastUserId()
         if (last != null && last != current) {
             clearLocalUserDataManager()

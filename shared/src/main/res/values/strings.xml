@@ -44,6 +44,7 @@
     <string name="home_tab_routines">Routines</string>
     <string name="home_tab_tasks">Tasks</string>
     <string name="home_tab_settings">Settings</string>
+    <string name="home_tab_landing">Landing</string>
 
     <string name="fab_task">Task</string>
     <string name="fab_routine">Routine</string>
@@ -115,7 +116,11 @@
     <string name="tasks_empty_title">No tasks yet</string>
     <string name="tasks_empty_subtitle">Create your first task to build routines faster.</string>
     <string name="tasks_empty_action">Create task</string>
+    <string name="settings_profile_title">Profile</string>
+    <string name="settings_email_label">Email</string>
+    <string name="settings_email_placeholder">Email not available</string>
     <string name="settings_action_logout">Log out</string>
+    <string name="settings_action_logging_out">Logging out...</string>
 
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>

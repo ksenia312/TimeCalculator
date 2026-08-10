@@ -121,8 +121,6 @@ fun HomeScreen(
             current = selectedTab,
             onCreateRoutineClick = { navigator.navigateTo(AppRoute.CreateRoutine) },
             onCreateTaskClick = { navigator.navigateTo(AppRoute.CreateTask()) },
-            onLogoutClick = homeViewModel::logout,
-            isLoggingOut = viewState.value.isLoggingOut,
         )
     }
 

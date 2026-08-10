@@ -5,23 +5,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -36,6 +31,7 @@ import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
+import com.xenikii.timecalculator.shared.components.AppListItem
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 import kotlin.time.Instant
 
@@ -102,25 +98,16 @@ private fun RoutineListItem(
         else -> LocalCustomColorScheme.current.label
     }
 
-    ListItem(
-        modifier = Modifier
-            .heightIn(min = 72.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                else MaterialTheme.colorScheme.surface
-            )
-            .combinedClickable(
-                onClick = {
-                    if (isSelectionMode) onToggleSelect() else onNavigate()
-                },
-                onLongClick = {
-                    if (!isSelectionMode) onLongPress() else onToggleSelect()
-                },
-            ),
-        colors = ListItemDefaults.colors(
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+    AppListItem(
+        modifier = Modifier.combinedClickable(
+            onClick = {
+                if (isSelectionMode) onToggleSelect() else onNavigate()
+            },
+            onLongClick = {
+                if (!isSelectionMode) onLongPress() else onToggleSelect()
+            },
         ),
+        isSelected = isSelected,
         leadingContent = {
             Box(
                 Modifier.size(24.dp),

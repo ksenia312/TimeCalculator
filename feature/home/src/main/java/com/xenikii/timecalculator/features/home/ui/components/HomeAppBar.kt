@@ -28,7 +28,7 @@ fun HomeAppBar(
                     HomeTab.ROUTINES -> stringResource(R.string.home_tab_routines)
                     HomeTab.TASKS -> stringResource(R.string.home_tab_tasks)
                     HomeTab.SETTINGS -> stringResource(R.string.home_tab_settings)
-                    HomeTab.LANDING -> ""
+                    HomeTab.LANDING -> stringResource(R.string.home_tab_landing)
                 },
                 style = MaterialTheme.typography.titleLarge,
             )
