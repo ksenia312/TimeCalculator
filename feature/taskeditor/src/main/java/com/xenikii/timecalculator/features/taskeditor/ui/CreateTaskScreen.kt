@@ -20,6 +20,7 @@ import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.TaskRequest
 import com.xenikii.timecalculator.features.taskeditor.presentation.CreateTaskViewModel
 import com.xenikii.timecalculator.shared.features.AddDurationButton
+import com.xenikii.timecalculator.shared.features.DurationInput
 import com.xenikii.timecalculator.shared.features.DurationRow
 import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
 import com.xenikii.timecalculator.shared.features.SaveTaskButton
@@ -40,7 +41,7 @@ fun CreateTaskScreen(
     val navigator = LocalNavigator.current
     val hasRoutine = viewModel.hasRoutine
     var title by remember { mutableStateOf("") }
-    val durations = remember { mutableStateListOf("") }
+    val durations = remember { mutableStateListOf(DurationInput()) }
     val showDuplicateError by viewModel.showDuplicateError.collectAsStateWithLifecycle()
 
     var selectedIndex by remember(hasRoutine) {
@@ -76,11 +77,7 @@ fun CreateTaskScreen(
                             selectedIndex = index
                         }
                     },
-                    onValueChange = { new ->
-                        if (new.all { it.isDigit() }) {
-                            durations[index] = new
-                        }
-                    },
+                    onValueChange = { new -> durations[index] = new },
                     onRemove = {
                         durations.removeAt(index)
                         if (hasRoutine) {
@@ -98,7 +95,7 @@ fun CreateTaskScreen(
                 AddDurationButton(
                     text = stringResource(R.string.task_add_more_durations),
                     onClick = {
-                        durations.add("")
+                        durations.add(DurationInput())
                         if (hasRoutine) {
                             selectedIndex = durations.lastIndex
                         }
@@ -108,15 +105,15 @@ fun CreateTaskScreen(
 
             item {
                 SaveTaskButton(
-                    enabled = durations.isNotEmpty() && durations.all { it.isNotBlank() },
+                    enabled = durations.isNotEmpty() && durations.all(DurationInput::hasAnyValue),
                     onConfirm = {
-                        val durationsRes = runCatching { durations.map { it.toInt().minutes } }.getOrNull()
-                        if (durationsRes != null) {
+                        val durationsRes = durations.mapNotNull { it.totalMinutesOrNull()?.minutes }
+                        if (durationsRes.size == durations.size) {
                             val saved = viewModel.createTask(
                                 TaskRequest(
                                     title = title,
                                     description = "",
-                                    durations = durationsRes
+                                    durations = durationsRes.filterNotNull()
                                 ),
                                 selectedDurationIndex = selectedIndex,
                             )

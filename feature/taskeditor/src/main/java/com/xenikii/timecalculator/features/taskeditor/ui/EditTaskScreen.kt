@@ -29,6 +29,7 @@ import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewState
 import com.xenikii.timecalculator.shared.features.AddDurationButton
+import com.xenikii.timecalculator.shared.features.DurationInput
 import com.xenikii.timecalculator.shared.features.DurationRow
 import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
 import com.xenikii.timecalculator.shared.features.SaveTaskButton
@@ -79,7 +80,9 @@ fun EditTaskScreen(
                 mutableStateOf(if (hasRoutine) state.initialSelectedIndex else null)
             }
             val durations = remember(task.id) {
-                task.data.map { it.duration.inWholeMinutes.toString() }.toMutableStateList()
+                task.data
+                    .map { DurationInput.fromTotalMinutes(it.duration.inWholeMinutes) }
+                    .toMutableStateList()
             }
             var showDeleteConfirmation by remember(task.id) { mutableStateOf(false) }
 
@@ -133,11 +136,7 @@ fun EditTaskScreen(
                                     selectedIndex = index
                                 }
                             },
-                            onValueChange = { new ->
-                                if (new.all { it.isDigit() }) {
-                                    durations[index] = new
-                                }
-                            },
+                            onValueChange = { new -> durations[index] = new },
                             onRemove = {
                                 durations.removeAt(index)
                                 if (hasRoutine) {
@@ -155,7 +154,7 @@ fun EditTaskScreen(
                         AddDurationButton(
                             text = stringResource(R.string.task_add_more_durations),
                             onClick = {
-                                durations.add("")
+                                durations.add(DurationInput())
                                 if (hasRoutine) {
                                     selectedIndex = durations.lastIndex
                                 }
@@ -165,12 +164,10 @@ fun EditTaskScreen(
 
                     item {
                         SaveTaskButton(
-                            enabled = durations.isNotEmpty() && durations.all { it.isNotBlank() },
+                            enabled = durations.isNotEmpty() && durations.all(DurationInput::hasAnyValue),
                             onConfirm = {
-                                val durationsRes = runCatching {
-                                    durations.map { it.toInt().minutes }
-                                }.getOrNull()
-                                if (durationsRes != null) {
+                                val durationsRes = durations.mapNotNull { it.totalMinutesOrNull()?.minutes }
+                                if (durationsRes.size == durations.size) {
                                     val saved = viewModel.saveTask(
                                         title = title,
                                         durations = durationsRes,

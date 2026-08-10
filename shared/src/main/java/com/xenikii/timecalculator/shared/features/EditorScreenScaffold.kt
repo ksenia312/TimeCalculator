@@ -86,11 +86,11 @@ fun TaskNameField(
 @Composable
 fun DurationRow(
     index: Int,
-    value: String,
+    value: DurationInput,
     selectable: Boolean,
     selected: Boolean,
     onSelect: () -> Unit,
-    onValueChange: (String) -> Unit,
+    onValueChange: (DurationInput) -> Unit,
     onRemove: () -> Unit,
 ) {
     Row(
@@ -98,7 +98,7 @@ fun DurationRow(
         modifier = Modifier
             .fillMaxWidth()
             .graphicsLayer { clip = false },
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         if (selectable) {
             RadioButton(
@@ -108,9 +108,9 @@ fun DurationRow(
             )
         }
 
-        DurationField(
-            value = value,
+        DurationFields(
             label = stringResource(R.string.label_duration_number, index + 1),
+            value = value,
             onValueChange = onValueChange,
         )
 
@@ -119,23 +119,45 @@ fun DurationRow(
 }
 
 @Composable
-fun RowScope.DurationField(
-    value: String,
+fun RowScope.DurationFields(
     label: String,
-    onValueChange: (String) -> Unit,
+    value: DurationInput,
+    onValueChange: (DurationInput) -> Unit,
 ) {
-    AppTextField(
-        value = value,
-        onValueChange = onValueChange,
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .weight(1f)
             .offset(y = (-4).dp),
-        label = { Text(label) },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next,
-        ),
-    )
+    ) {
+        AppTextField(
+            value = value.hours,
+            onValueChange = { newValue ->
+                onValueChange(value.copy(hours = newValue.filter(Char::isDigit)))
+            },
+            modifier = Modifier.weight(1f),
+            label = { Text(stringResource(R.string.label_hours)) },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+            ),
+            singleLine = true,
+        )
+
+        AppTextField(
+            value = value.minutes,
+            onValueChange = { newValue ->
+                onValueChange(value.copy(minutes = newValue.filter(Char::isDigit)))
+            },
+            modifier = Modifier.weight(1f),
+            label = { Text(stringResource(R.string.label_minutes)) },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+            ),
+            singleLine = true,
+        )
+    }
 }
 
 @Composable

@@ -20,6 +20,7 @@
             <option value="$PROJECT_DIR$/feature/routineeditor" />
             <option value="$PROJECT_DIR$/feature/routinescreen" />
             <option value="$PROJECT_DIR$/feature/routineslist" />
+            <option value="$PROJECT_DIR$/feature/settings" />
             <option value="$PROJECT_DIR$/feature/taskeditor" />
             <option value="$PROJECT_DIR$/feature/taskslist" />
             <option value="$PROJECT_DIR$/shared" />

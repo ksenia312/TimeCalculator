@@ -39,6 +39,8 @@
     <string name="label_anchor">Anchor</string>
     <string name="label_when_to_leave">When to leave?</string>
     <string name="label_duration_number">Duration №%1$d</string>
+    <string name="label_hours">Hours</string>
+    <string name="label_minutes">Minutes</string>
     <string name="label_repeat_start_date">From date</string>
     <string name="label_repeat_end_date">To date</string>
 
