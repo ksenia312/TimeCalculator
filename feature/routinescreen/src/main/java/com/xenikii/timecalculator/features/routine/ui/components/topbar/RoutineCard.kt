@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
+import com.xenikii.timecalculator.shared.features.RoutineRecurrenceBadge
 import com.xenikii.timecalculator.shared.features.RoutineCardStatusRow
 import com.xenikii.timecalculator.shared.features.RoutineCardTimeInfo
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
@@ -42,6 +44,16 @@ fun RoutineCard(
             )
 
             Spacer(Modifier.height(8.dp))
+
+            if (viewItem.recurrence.unit != RoutineRecurrenceUnit.NONE) {
+                RoutineRecurrenceBadge(
+                    recurrence = viewItem.recurrence,
+                    contentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                )
+
+                Spacer(Modifier.height(8.dp))
+            }
 
             RoutineCardStatusRow(
                 isOngoing = viewItem.isOngoing,

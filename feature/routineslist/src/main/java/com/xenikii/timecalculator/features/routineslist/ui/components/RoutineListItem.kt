@@ -32,6 +32,7 @@ import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.components.AppListItem
+import com.xenikii.timecalculator.shared.features.RoutineRecurrenceBadge
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 import kotlin.time.Instant
 
@@ -134,6 +135,9 @@ private fun RoutineListItem(
                     text = routine.title,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 3
+                )
+                RoutineRecurrenceBadge(
+                    recurrence = item.cardViewItem.recurrence,
                 )
                 Text(
                     text = buildAnnotatedString {

@@ -29,5 +29,6 @@ fun Routine.toViewItem(
         endInstant = schedule.end,
         title = this.title,
         willStartIn = schedule.effectiveStart - now,
+        recurrence = recurrence,
     )
 }

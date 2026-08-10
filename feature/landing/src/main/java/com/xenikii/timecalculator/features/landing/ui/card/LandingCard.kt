@@ -29,9 +29,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.features.landing.presentation.LandingCardTaskViewItem
 import com.xenikii.timecalculator.features.landing.presentation.LandingRoutineState
 import com.xenikii.timecalculator.shared.animation.routineCardSharedKey
+import com.xenikii.timecalculator.shared.features.RoutineRecurrenceBadge
 import com.xenikii.timecalculator.shared.features.RoutineCardStatusRow
 import com.xenikii.timecalculator.shared.features.RoutineCardTimeInfo
 import com.xenikii.timecalculator.shared.features.routineCard
@@ -67,6 +69,14 @@ fun LandingCard(
                     maxLines = 3,
                     color = MaterialTheme.colorScheme.surface,
                 )
+                if (viewItem.recurrence.unit != RoutineRecurrenceUnit.NONE) {
+                    Spacer(Modifier.height(4.dp))
+                    RoutineRecurrenceBadge(
+                        recurrence = viewItem.recurrence,
+                        contentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                    )
+                }
                 Spacer(Modifier.height(4.dp))
                 RoutineCardStatusRow(
                     isOngoing = viewItem.isOngoing,
