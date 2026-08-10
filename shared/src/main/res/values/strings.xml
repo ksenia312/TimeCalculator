@@ -9,6 +9,12 @@
     <string name="auth_welcome_subtitle">Plan your day and manage your time effectively with our app</string>
     <string name="auth_welcome_login">Log in</string>
     <string name="auth_welcome_register">Sign up</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_notifications_title">Stay on track with notifications</string>
+    <string name="onboarding_notifications_subtitle">Allow notifications to get routine reminders and task updates right on time.</string>
+    <string name="onboarding_notifications_allow">Allow</string>
+    <string name="onboarding_notifications_skip">Not now</string>
     <string name="auth_login_title">Welcome back</string>
     <string name="auth_register_title">Create account</string>
     <string name="auth_field_email">Email</string>

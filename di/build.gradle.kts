@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":feature:home"))
     implementation(project(":feature:landing"))
+    implementation(project(":feature:onboarding"))
     implementation(project(":feature:routinescreen"))
     implementation(project(":feature:routineeditor"))
     implementation(project(":feature:routineslist"))

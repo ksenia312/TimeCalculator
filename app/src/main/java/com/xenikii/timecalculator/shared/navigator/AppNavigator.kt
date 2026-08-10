@@ -35,6 +35,7 @@ import com.xenikii.timecalculator.features.auth.ui.RegisterScreen
 import com.xenikii.timecalculator.features.auth.ui.WelcomeScreen
 import com.xenikii.timecalculator.features.home.ui.HomeScreen
 import com.xenikii.timecalculator.features.routine.ui.RoutineScreen
+import com.xenikii.timecalculator.features.onboarding.ui.OnboardingScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.CreateRoutineScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.EditRoutineScreen
 import com.xenikii.timecalculator.features.taskeditor.ui.CreateTaskScreen
@@ -114,6 +115,14 @@ fun AppNavigator(
                         predictivePopTransitionSpec = predictivePopTransitionSpec(),
                         entryProvider = { key ->
                             when (key) {
+                                AppRoute.Onboarding -> {
+                                    NavEntry(key = key) {
+                                        OnboardingScreen(
+                                            onFinished = { backStack.resetTo(AppRoute.Welcome) },
+                                        )
+                                    }
+                                }
+
                                 AppRoute.Welcome -> {
                                     NavEntry(key = key) { WelcomeScreen() }
                                 }

@@ -87,6 +87,7 @@ dependencies {
     implementation(project(":feature:routineeditor"))
     implementation(project(":feature:taskeditor"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:onboarding"))
     implementation(project(":feature:settings"))
 
     testImplementation(libs.junit)

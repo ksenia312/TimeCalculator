@@ -19,6 +19,9 @@ sealed interface AppRoute : NavKey {
     data object Welcome : AppRoute
 
     @Serializable
+    data object Onboarding : AppRoute
+
+    @Serializable
     data object Login : AppRoute
 
     @Serializable
@@ -48,6 +51,6 @@ sealed interface AppRoute : NavKey {
 
 /** Destinations that must not be shown without an active session. */
 fun AppRoute.requiresAuthentication(): Boolean = when (this) {
-    AppRoute.Welcome, AppRoute.Login, AppRoute.Register -> false
+    AppRoute.Welcome, AppRoute.Onboarding, AppRoute.Login, AppRoute.Register -> false
     else -> true
 }

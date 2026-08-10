@@ -6,12 +6,16 @@ import com.xenikii.timecalculator.data.auth.AuthRepositoryImpl
 import com.xenikii.timecalculator.data.auth.AuthSessionStateMemoryDataSource
 import com.xenikii.timecalculator.data.auth.AuthUserPreferences
 import com.xenikii.timecalculator.data.auth.ClearLocalUserDataManager
+import com.xenikii.timecalculator.data.onboarding.OnboardingRepositoryImpl
+import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboardingLocalDataSource
 import com.xenikii.timecalculator.data.auth.SupabaseClientProvider
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
 import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
 import com.xenikii.timecalculator.domain.repository.AuthRepository
+import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
+import com.xenikii.timecalculator.domain.repository.OnboardingRepository
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.TasksRepository
 import com.xenikii.timecalculator.data.db.AppDatabase
@@ -30,6 +34,7 @@ import com.xenikii.timecalculator.data.sync.SyncTrigger
 import com.xenikii.timecalculator.data.sync.remote.SupabaseRemoteDataSource
 import com.xenikii.timecalculator.features.home.presentation.HomeViewModel
 import com.xenikii.timecalculator.features.landing.presentation.LandingViewModel
+import com.xenikii.timecalculator.features.onboarding.presentation.OnboardingViewModel
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewModel
@@ -64,6 +69,8 @@ object AppModule {
         single { SupabaseClientProvider.create(supabaseUrl, supabaseKey) }
         single { AuthSessionStateMemoryDataSource() }
         single { AuthUserPreferences(context) }
+        single<OnboardingLocalDataSource> { PreferencesOnboardingLocalDataSource(context) }
+        single<OnboardingRepository> { OnboardingRepositoryImpl(localDataSource = get()) }
         single { SyncCursorStore(context) }
         single { SyncTrigger() }
         single { SupabaseRemoteDataSource(get()) }
@@ -100,6 +107,7 @@ object AppModule {
         factory { LoginViewModel(authRepository = get()) }
         factory { RegisterViewModel(authRepository = get()) }
         factory { WelcomeViewModel(authRepository = get()) }
+        factory { OnboardingViewModel(onboardingRepository = get()) }
 
         single<TasksRepository> {
             TasksRepositoryImpl(
