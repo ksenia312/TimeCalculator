@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
@@ -83,15 +82,13 @@ fun LoginContent(
                 ),
             )
             Spacer(Modifier.height(AuthSpacing.FieldSpacing))
-            AppTextField(
+            AuthPasswordTextField(
                 value = state.password,
                 onValueChange = onPasswordChange,
+                labelResId = R.string.auth_field_password,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
                 enabled = !state.isLoading,
                 isError = state.error != null,
-                label = { Text(stringResource(R.string.auth_field_password)) },
-                visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
