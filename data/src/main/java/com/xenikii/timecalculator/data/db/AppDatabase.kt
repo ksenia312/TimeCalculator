@@ -127,15 +127,44 @@ interface TasksDao {
 @Dao
 interface RoutinesDao {
     @Transaction
-    @Query("SELECT * FROM routines")
+    @Query(
+        """
+        SELECT r.*
+        FROM routines r
+        LEFT JOIN routine_items ri ON ri.routineId = r.id
+        LEFT JOIN tasks t ON t.id = ri.taskId
+        LEFT JOIN sub_data sd ON sd.id = ri.subDataId
+        GROUP BY r.id
+        """
+    )
     fun getRoutinesPopulated(): Flow<List<RoutinePopulated>>
 
     @Transaction
-    @Query("SELECT * FROM routines WHERE pendingSync = 1")
+    @Query(
+        """
+        SELECT r.*
+        FROM routines r
+        LEFT JOIN routine_items ri ON ri.routineId = r.id
+        LEFT JOIN tasks t ON t.id = ri.taskId
+        LEFT JOIN sub_data sd ON sd.id = ri.subDataId
+        WHERE r.pendingSync = 1
+        GROUP BY r.id
+        """
+    )
     suspend fun getPendingRoutines(): List<RoutinePopulated>
 
     @Transaction
-    @Query("SELECT * FROM routines WHERE id = :id")
+    @Query(
+        """
+        SELECT r.*
+        FROM routines r
+        LEFT JOIN routine_items ri ON ri.routineId = r.id
+        LEFT JOIN tasks t ON t.id = ri.taskId
+        LEFT JOIN sub_data sd ON sd.id = ri.subDataId
+        WHERE r.id = :id
+        GROUP BY r.id
+        """
+    )
     suspend fun getRoutinePopulated(id: String): RoutinePopulated?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

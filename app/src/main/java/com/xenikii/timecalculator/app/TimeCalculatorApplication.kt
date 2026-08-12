@@ -28,6 +28,7 @@ class TimeCalculatorApplication : Application() {
         }
         koinApplication.koin.get<SyncManager>().start()
         RoutineScheduleInitializer(
+            context = applicationContext,
             routineRepository = koinApplication.koin.get<RoutineRepository>(),
             scheduleRepository = koinApplication.koin.get<RoutineScheduleRepository>(),
             alarmGateway = koinApplication.koin.get<RoutineAlarmGateway>(),
