@@ -7,13 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation3.runtime.NavKey
-import com.xenikii.timecalculator.domain.repository.OnboardingRepository
 import com.xenikii.timecalculator.shared.extensions.toAppRoute
 import com.xenikii.timecalculator.shared.navigator.AppNavigator
 import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.PendingDeepLink
 import com.xenikii.timecalculator.shared.theme.TimeCalculatorTheme
-import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
 
@@ -25,9 +23,8 @@ class MainActivity : ComponentActivity() {
         intent.toAppRoute()?.let { PendingDeepLink.route.value = it }
 
         setContent {
-            val onboardingRepository = koinInject<OnboardingRepository>()
             val initialBackStack: List<NavKey> = listOf(
-                if (onboardingRepository.isCompleted()) AppRoute.Welcome else AppRoute.Onboarding,
+                AppRoute.Welcome,
             )
 
             TimeCalculatorTheme {

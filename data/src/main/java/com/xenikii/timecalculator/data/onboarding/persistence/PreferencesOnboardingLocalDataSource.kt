@@ -1,6 +1,7 @@
 package com.xenikii.timecalculator.data.onboarding.persistence
 
 import android.content.Context
+import androidx.core.content.edit
 import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
 
 class PreferencesOnboardingLocalDataSource(
@@ -12,7 +13,7 @@ class PreferencesOnboardingLocalDataSource(
     override fun isCompleted(): Boolean = prefs.getBoolean(KEY_COMPLETED, false)
 
     override fun setCompleted(completed: Boolean) {
-        prefs.edit().putBoolean(KEY_COMPLETED, completed).apply()
+        prefs.edit { putBoolean(KEY_COMPLETED, completed) }
     }
 
     private companion object {

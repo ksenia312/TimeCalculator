@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -40,6 +40,7 @@ import com.xenikii.timecalculator.domain.model.RoutineLink
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
 import com.xenikii.timecalculator.shared.components.AppCircleIndicator
+import com.xenikii.timecalculator.shared.components.AppElevatedButton
 import com.xenikii.timecalculator.shared.extensions.draggableItem
 import com.xenikii.timecalculator.shared.extensions.stringTime
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
@@ -129,8 +130,9 @@ fun RoutineTaskItem(
                 expanded = menuExpanded,
                 onExpandedChange = { menuExpanded = !menuExpanded },
             ) {
-                ElevatedButton(
+                AppElevatedButton(
                     onClick = { },
+                    contentPadding = ButtonDefaults.ContentPadding,
                     modifier = Modifier.menuAnchor(
                         type = ExposedDropdownMenuAnchorType.PrimaryEditable,
                         enabled = true,

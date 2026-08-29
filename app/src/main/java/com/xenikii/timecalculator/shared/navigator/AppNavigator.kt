@@ -34,8 +34,8 @@ import com.xenikii.timecalculator.features.auth.ui.LoginScreen
 import com.xenikii.timecalculator.features.auth.ui.RegisterScreen
 import com.xenikii.timecalculator.features.auth.ui.WelcomeScreen
 import com.xenikii.timecalculator.features.home.ui.HomeScreen
-import com.xenikii.timecalculator.features.routine.ui.RoutineScreen
 import com.xenikii.timecalculator.features.onboarding.ui.OnboardingScreen
+import com.xenikii.timecalculator.features.routine.ui.RoutineScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.CreateRoutineScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.EditRoutineScreen
 import com.xenikii.timecalculator.features.taskeditor.ui.CreateTaskScreen
@@ -68,9 +68,14 @@ fun AppNavigator(
             when (mainState.authViewState) {
                 AuthViewState.Initializing -> Unit
 
-                AuthViewState.LoggedOut -> {
-                    if (current == null || current.requiresAuthentication()) {
-                        backStack.resetTo(AppRoute.Welcome)
+                is AuthViewState.LoggedOut -> {
+                    if (current == null || current.requiresAuthentication() || current is AppRoute.Welcome) {
+                        val targetRoute = if (mainViewModel.isOnboardingCompleted()) {
+                            AppRoute.Welcome
+                        } else {
+                            AppRoute.Onboarding
+                        }
+                        backStack.resetTo(targetRoute)
                     }
                 }
 
@@ -85,6 +90,7 @@ fun AppNavigator(
                 }
             }
         }
+
 
         LaunchedEffect(mainState.authViewState, pendingDeepLink) {
             if (mainState.authViewState == AuthViewState.LoggedIn) {

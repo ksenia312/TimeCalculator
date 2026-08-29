@@ -12,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.auth.presentation.AuthFormState
+import com.xenikii.timecalculator.shared.components.AppButton
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.BackButton
@@ -106,7 +106,7 @@ fun LoginContent(
                 )
             }
             Spacer(Modifier.height(AuthSpacing.ActionSpacing))
-            Button(
+            AppButton(
                 onClick = onSubmit,
                 enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth(),

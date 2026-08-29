@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.components.AddNewButton
+import com.xenikii.timecalculator.shared.components.AppElevatedButton
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.BackButton
@@ -189,10 +189,8 @@ fun SaveTaskButton(
     enabled: Boolean,
     onConfirm: () -> Unit,
 ) {
-    ElevatedButton(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp),
+    AppElevatedButton(
+        modifier = Modifier.fillMaxWidth(),
         enabled = enabled,
         onClick = onConfirm,
         colors = ButtonDefaults.elevatedButtonColors(

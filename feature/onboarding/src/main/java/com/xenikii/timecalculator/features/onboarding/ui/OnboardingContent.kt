@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,15 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.features.onboarding.presentation.OnboardingViewState
+import com.xenikii.timecalculator.features.onboarding.presentation.onboardingImages
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingImagePage
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingNotificationPage
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingPagerDots
-import com.xenikii.timecalculator.features.onboarding.presentation.OnboardingViewState
-import com.xenikii.timecalculator.features.onboarding.presentation.onboardingImages
+import com.xenikii.timecalculator.shared.components.AppButton
+import com.xenikii.timecalculator.shared.components.AppOutlinedButton
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlin.math.abs
 
 @Composable
 fun OnboardingContent(
@@ -46,17 +49,21 @@ fun OnboardingContent(
         initialPage = state.currentPage,
         pageCount = { pageCount },
     )
-    val isNotificationPage = state.currentPage == lastPageIndex
+    val isNotificationPage = pagerState.currentPage == lastPageIndex
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }
+        snapshotFlow { pagerState.settledPage }
             .distinctUntilChanged()
             .collect(onPageChange)
     }
 
     LaunchedEffect(state.currentPage) {
         if (pagerState.currentPage != state.currentPage) {
-            pagerState.animateScrollToPage(state.currentPage)
+            if (abs(pagerState.currentPage - state.currentPage) > 1) {
+                pagerState.scrollToPage(state.currentPage)
+            } else {
+                pagerState.animateScrollToPage(state.currentPage)
+            }
         }
     }
 
@@ -89,7 +96,7 @@ fun OnboardingContent(
 
             OnboardingPagerDots(
                 count = pageCount,
-                activeIndex = state.currentPage,
+                activeIndex = pagerState.currentPage,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
 
@@ -100,13 +107,13 @@ fun OnboardingContent(
                         .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    OutlinedButton(
+                    AppOutlinedButton(
                         onClick = onSkipNotificationsClick,
                         modifier = Modifier.weight(1f),
                     ) {
                         Text(stringResource(R.string.onboarding_notifications_skip))
                     }
-                    Button(
+                    AppButton(
                         onClick = onAllowNotificationsClick,
                         modifier = Modifier.weight(1f),
                     ) {
@@ -120,13 +127,13 @@ fun OnboardingContent(
                         .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    OutlinedButton(
+                    AppOutlinedButton(
                         onClick = onSkipClick,
                         modifier = Modifier.weight(1f),
                     ) {
                         Text(stringResource(R.string.onboarding_skip))
                     }
-                    Button(
+                    AppButton(
                         onClick = onNextClick,
                         modifier = Modifier.weight(1f),
                     ) {
@@ -134,6 +141,7 @@ fun OnboardingContent(
                     }
                 }
             }
+            Spacer(Modifier.height(24.dp))
         }
     }
 }

@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +40,7 @@ import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutin
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewState
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineAnchorSelector
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineRecurrenceUnitSelector
+import com.xenikii.timecalculator.shared.components.AppElevatedButton
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.DatePickerField
 import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
@@ -302,7 +302,7 @@ private fun RoutineEditorScreen(
 
                 Spacer(Modifier.height(12.dp))
 
-                ElevatedButton(
+                AppElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = resolvedTitle.isNotBlank(),
                     colors = ButtonDefaults.elevatedButtonColors(

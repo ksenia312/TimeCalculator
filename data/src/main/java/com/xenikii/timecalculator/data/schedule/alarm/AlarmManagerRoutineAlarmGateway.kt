@@ -79,10 +79,11 @@ class AlarmManagerRoutineAlarmGateway(
                 operation,
             )
         } else {
-            AlarmManagerCompat.setAndAllowWhileIdle(
+            val showIntent = buildRoutineDetailPendingIntent(context, routineId)
+            AlarmManagerCompat.setAlarmClock(
                 alarmManager,
-                AlarmManager.RTC_WAKEUP,
                 triggerAtMillis,
+                showIntent,
                 operation,
             )
         }

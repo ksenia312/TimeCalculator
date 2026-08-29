@@ -10,9 +10,8 @@ data class MainViewState(
 sealed interface AuthViewState {
     data object Initializing : AuthViewState
     data object LoggedIn : AuthViewState
-    data object LoggedOut : AuthViewState
-}
-
-sealed interface MainEvent {
-    data object SessionExpired : MainEvent
+    sealed interface LoggedOut : AuthViewState {
+        data object UserInitiated : LoggedOut
+        data object SessionExpired : LoggedOut
+    }
 }

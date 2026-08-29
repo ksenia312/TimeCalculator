@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.auth.presentation.WelcomeState
+import com.xenikii.timecalculator.shared.components.AppButton
+import com.xenikii.timecalculator.shared.components.AppOutlinedButton
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
@@ -69,14 +69,14 @@ fun WelcomeContent(
                         textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(AuthSpacing.ContentSpacing))
-                    Button(
+                    AppButton(
                         onClick = onNavigateToLogin,
                         modifier = Modifier.fillMaxWidth(0.5f),
                     ) {
                         Text(stringResource(R.string.auth_welcome_login))
                     }
                     Spacer(Modifier.height(AuthSpacing.LinkSpacing))
-                    OutlinedButton(
+                    AppOutlinedButton(
                         onClick = onNavigateToRegister,
                         modifier = Modifier.fillMaxWidth(0.5f),
                     ) {

@@ -2,6 +2,7 @@ package com.xenikii.timecalculator.data.sync.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.EncodeDefault
 
 @Serializable
 data class RemoteTask(
@@ -27,7 +28,9 @@ data class RemoteRoutine(
     val color: String,
     @SerialName("scheduled_at_millis") val scheduledAtMillis: Long,
     @SerialName("scheduled_at_anchor") val scheduledAtAnchor: String,
+    @EncodeDefault
     @SerialName("recurrence_unit") val recurrenceUnit: String = "NONE",
+    @EncodeDefault
     @SerialName("recurrence_interval") val recurrenceInterval: Int = 1,
     val items: List<RemoteRoutineItem> = emptyList(),
     @SerialName("modified_at") val modifiedAt: Long,

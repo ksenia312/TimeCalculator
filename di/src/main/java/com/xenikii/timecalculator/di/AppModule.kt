@@ -6,21 +6,12 @@ import com.xenikii.timecalculator.data.auth.AuthRepositoryImpl
 import com.xenikii.timecalculator.data.auth.AuthSessionStateMemoryDataSource
 import com.xenikii.timecalculator.data.auth.AuthUserPreferences
 import com.xenikii.timecalculator.data.auth.ClearLocalUserDataManager
-import com.xenikii.timecalculator.data.onboarding.OnboardingRepositoryImpl
-import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboardingLocalDataSource
 import com.xenikii.timecalculator.data.auth.SupabaseClientProvider
-import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
-import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
-import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
-import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
-import com.xenikii.timecalculator.domain.repository.AuthRepository
-import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
-import com.xenikii.timecalculator.domain.repository.OnboardingRepository
-import com.xenikii.timecalculator.domain.repository.RoutineRepository
-import com.xenikii.timecalculator.domain.repository.TasksRepository
 import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.MIGRATION_1_2
 import com.xenikii.timecalculator.data.db.MIGRATION_2_3
+import com.xenikii.timecalculator.data.onboarding.OnboardingRepositoryImpl
+import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboardingLocalDataSource
 import com.xenikii.timecalculator.data.repository.RoutineRepositoryImpl
 import com.xenikii.timecalculator.data.repository.TasksRepositoryImpl
 import com.xenikii.timecalculator.data.schedule.alarm.AlarmManagerRoutineAlarmGateway
@@ -32,6 +23,18 @@ import com.xenikii.timecalculator.data.sync.SyncCursorStore
 import com.xenikii.timecalculator.data.sync.SyncEngine
 import com.xenikii.timecalculator.data.sync.SyncTrigger
 import com.xenikii.timecalculator.data.sync.remote.SupabaseRemoteDataSource
+import com.xenikii.timecalculator.domain.repository.AuthRepository
+import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
+import com.xenikii.timecalculator.domain.repository.OnboardingRepository
+import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
+import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
+import com.xenikii.timecalculator.domain.repository.RoutineRepository
+import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
+import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
+import com.xenikii.timecalculator.domain.repository.TasksRepository
+import com.xenikii.timecalculator.features.auth.presentation.LoginViewModel
+import com.xenikii.timecalculator.features.auth.presentation.RegisterViewModel
+import com.xenikii.timecalculator.features.auth.presentation.WelcomeViewModel
 import com.xenikii.timecalculator.features.home.presentation.HomeViewModel
 import com.xenikii.timecalculator.features.landing.presentation.LandingViewModel
 import com.xenikii.timecalculator.features.onboarding.presentation.OnboardingViewModel
@@ -43,9 +46,6 @@ import com.xenikii.timecalculator.features.settings.presentation.SettingsViewMod
 import com.xenikii.timecalculator.features.taskeditor.presentation.CreateTaskViewModel
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.xenikii.timecalculator.features.tasks.presentation.TasksListViewModel
-import com.xenikii.timecalculator.features.auth.presentation.LoginViewModel
-import com.xenikii.timecalculator.features.auth.presentation.RegisterViewModel
-import com.xenikii.timecalculator.features.auth.presentation.WelcomeViewModel
 import com.xenikii.timecalculator.shared.navigator.EditTaskArguments
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -106,7 +106,7 @@ object AppModule {
         }
         factory { LoginViewModel(authRepository = get()) }
         factory { RegisterViewModel(authRepository = get()) }
-        factory { WelcomeViewModel(authRepository = get()) }
+        factory { WelcomeViewModel(authRepository = get(), onboardingRepository = get()) }
         factory { OnboardingViewModel(onboardingRepository = get()) }
 
         single<TasksRepository> {
