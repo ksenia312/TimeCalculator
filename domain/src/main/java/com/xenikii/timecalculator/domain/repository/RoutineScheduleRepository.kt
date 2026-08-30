@@ -45,7 +45,3 @@ interface ScheduleRecordDataSource {
     fun removeRecord(routineId: String)
     fun trackedRoutineIds(): Set<String>
 }
-
-interface RoutineScheduleInitializer {
-    fun start()
-}

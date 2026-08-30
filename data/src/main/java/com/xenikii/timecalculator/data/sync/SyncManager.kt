@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class SyncManager(
     private val syncEngine: SyncEngine,
@@ -36,7 +37,7 @@ class SyncManager(
             .launchIn(synchronizationScope)
 
         syncTrigger.observe()
-            .debounce(3_000)
+            .debounce(3_000.milliseconds)
             .onEach { syncEngine.sync() }
             .launchIn(synchronizationScope)
 

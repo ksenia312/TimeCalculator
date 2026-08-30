@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 class LandingViewModel(
@@ -31,7 +32,7 @@ class LandingViewModel(
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                delay(1000)
+                delay(1000.milliseconds)
                 _now.value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
             }
         }
