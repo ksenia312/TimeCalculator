@@ -5,7 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.xenikii.timecalculator.data.R
+import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.data.schedule.alarm.buildRoutineDetailPendingIntent
 import com.xenikii.timecalculator.data.schedule.alarm.stableNotificationId
 import com.xenikii.timecalculator.domain.model.Routine

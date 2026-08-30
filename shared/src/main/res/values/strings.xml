@@ -118,11 +118,6 @@
     <string name="routine_card_completed_at">Completed at</string>
     <string name="routine_card_will_end">Will end</string>
 
-    <string name="notification_channel_routine_progress">Routine progress</string>
-    <string name="notification_channel_routine_progress_description">Shows the active routine and current task countdown</string>
-    <string name="notification_channel_task_alerts">Task alerts</string>
-    <string name="notification_channel_task_alerts_description">Alerts when a routine starts or a task changes</string>
-
     <string name="task_create_title">Create task</string>
     <string name="task_update_title">Update task</string>
     <string name="task_add_more_durations">Add more durations</string>
@@ -210,4 +205,10 @@
         <item quantity="one">%d year</item>
         <item quantity="other">%d years</item>
     </plurals>
+
+    <string name="notification_routine_title">Routine in progress</string>
+    <string name="notification_channel_routine_progress">Routine progress</string>
+    <string name="notification_channel_routine_progress_description">Shows the active routine and current task countdown</string>
+    <string name="notification_channel_task_alerts">Task alerts</string>
+    <string name="notification_channel_task_alerts_description">Notifies when a routine or task starts</string>
 </resources>
