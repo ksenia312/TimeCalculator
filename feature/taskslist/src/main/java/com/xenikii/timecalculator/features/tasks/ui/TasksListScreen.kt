@@ -21,8 +21,11 @@ fun TasksListScreen(
     val viewState = viewModel.viewState.collectAsStateWithLifecycle()
     val selectedIds = viewModel.selectedIds.collectAsStateWithLifecycle()
 
+    val state = viewState.value
+    val hasData = state is TasksListViewState.Success && state.tasks.isNotEmpty()
+
     TasksListContent(
-        viewState = if (isSyncing) TasksListViewState.Loading else viewState.value,
+        viewState = if (isSyncing && !hasData) TasksListViewState.Loading else state,
         selectedIds = selectedIds.value,
         onLongPress = viewModel::toggleSelection,
         onToggleSelect = viewModel::toggleSelection,

@@ -33,15 +33,6 @@ class SyncEngine(
         }
     }
 
-    suspend fun pushLocalChanges(): Result<Unit> = mutex.withLock {
-        if (!authRepository.hasActiveSession()) return@withLock Result.success(Unit)
-        runCatching {
-            pullInto()
-            pushDeletions()
-            pushUpserts()
-        }
-    }
-
     private suspend fun pushDeletions() {
         val deletions = syncDao.getPendingDeletions()
         if (deletions.isEmpty()) return
@@ -195,7 +186,7 @@ class SyncEngine(
         if (cursor == null) return true
         val timestamp = updatedAt ?: return false
         return timestamp > cursor.updatedAt ||
-            (timestamp == cursor.updatedAt && (cursor.lastEntityId == null || id > cursor.lastEntityId))
+                (timestamp == cursor.updatedAt && (cursor.lastEntityId == null || id > cursor.lastEntityId))
     }
 
     private companion object {

@@ -16,8 +16,11 @@ fun LandingScreen(
 ) {
     val viewState = landingViewModel.viewState.collectAsStateWithLifecycle()
 
+    val state = viewState.value
+    val hasData = state is LandingState.Success && state.routineStates.isNotEmpty()
+
     LandingContent(
-        viewState = if (isSyncing) LandingState.Loading else viewState.value,
+        viewState = if (isSyncing && !hasData) LandingState.Loading else state,
         onCreateRoutineClick = onCreateRoutineClick,
     )
 }

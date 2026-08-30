@@ -17,8 +17,11 @@ fun RoutinesListScreen(
     val viewState = routinesViewModel.viewState.collectAsStateWithLifecycle()
     val selectedIds = routinesViewModel.selectedIds.collectAsStateWithLifecycle()
 
+    val state = viewState.value
+    val hasData = state is RoutinesListState.Success && state.items.isNotEmpty()
+
     RoutinesListContent(
-        viewState = if (isSyncing) RoutinesListState.Loading else viewState.value,
+        viewState = if (isSyncing && !hasData) RoutinesListState.Loading else state,
         selectedIds = selectedIds.value,
         onLongPress = routinesViewModel::toggleSelection,
         onToggleSelect = routinesViewModel::toggleSelection,
