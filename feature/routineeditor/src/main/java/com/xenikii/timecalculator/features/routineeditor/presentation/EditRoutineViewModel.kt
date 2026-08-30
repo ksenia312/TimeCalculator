@@ -25,10 +25,13 @@ class EditRoutineViewModel(
         viewModelScope.launch {
             routineRepository.getRoutineFlow(routineId).collect { routine ->
                 currentRoutine = routine
-                _viewState.value = if (routine == null) {
-                    EditRoutineViewState.Error
-                } else {
-                    EditRoutineViewState.Success(routine.toRoutineEditorFormState())
+                _viewState.value = when {
+                    routine == null -> EditRoutineViewState.Error
+                    // Seed the editable form only on the first load. Later emissions keep the
+                    // in-progress edits (e.g. selected days) instead of resetting them.
+                    _viewState.value !is EditRoutineViewState.Success ->
+                        EditRoutineViewState.Success(routine.toRoutineEditorFormState())
+                    else -> _viewState.value
                 }
             }
         }

@@ -46,7 +46,7 @@
 
     <string name="label_name">Название</string>
     <string name="label_date">Дата</string>
-    <string name="label_anchor">Базировать на</string>
+    <string name="label_anchor">Точка отсчёта</string>
     <string name="label_when_to_leave">Когда уходить?</string>
     <string name="label_duration_number">Продолжительность №%1$d</string>
     <string name="label_hours">Часы</string>
@@ -81,28 +81,28 @@
     <string name="routine_repeat_label">Повторять</string>
     <string name="routine_repeat_every_label">Каждые</string>
     <string name="routine_repeat_unit_label">Единица повтора</string>
-    <string name="routine_repeat_on_days_label">Повторять в</string>
+    <string name="routine_repeat_on_days_label">Повторять по дням недели</string>
     <string name="routine_recurrence_unit_day">День</string>
     <string name="routine_recurrence_unit_week">Неделя</string>
     <string name="routine_recurrence_unit_month">Месяц</string>
     <string name="routine_recurrence_unit_year">Год</string>
-    <string name="routine_recurrence_summary_daily">Повторяется ежедневно</string>
-    <string name="routine_recurrence_summary_weekly">Повторяется еженедельно</string>
-    <string name="routine_recurrence_summary_monthly">Повторяется ежемесячно</string>
-    <string name="routine_recurrence_summary_yearly">Повторяется ежегодно</string>
-    <string name="routine_recurrence_summary_every">Повторяется каждые %1$s</string>
+    <string name="routine_recurrence_summary_daily">Ежедневно</string>
+    <string name="routine_recurrence_summary_weekly">Еженедельно</string>
+    <string name="routine_recurrence_summary_monthly">Ежемесячно</string>
+    <string name="routine_recurrence_summary_yearly">Ежегодно</string>
+    <string name="routine_recurrence_summary_every">Каждые %1$s</string>
     <string name="routine_recurrence_summary_on_days">%1$s:\n%2$s</string>
     <string name="routine_recurrence_weekdays">Рабочие дни</string>
     <string name="routine_recurrence_weekends">Выходные</string>
     <string name="routine_status_running">В процессе</string>
-    <string name="routine_status_completed">Завершено</string>
-    <string name="routine_status_planned">Запланировано</string>
+    <string name="routine_status_completed">Рутина завершена</string>
+    <string name="routine_status_planned">Рутина запланирована</string>
     <string name="routine_time_will_start_in">Начнётся через</string>
     <string name="routine_time_ends_in">Заканчивается через</string>
 
-    <string name="routines_list_status_completed_on">завершено</string>
+    <string name="routines_list_status_completed_on">рутина завершена</string>
     <string name="routines_list_status_running_ends_on">выполняется, заканчивается</string>
-    <string name="routines_list_status_planned_for">запланировано на</string>
+    <string name="routines_list_status_planned_for">рутина запланирована на</string>
     <string name="routines_list_no_routines_scheduled">Нет запланированных рутин</string>
     <string name="landing_empty_title">Ещё нет рутин</string>
     <string name="landing_empty_subtitle">Создайте вашу первую рутину, чтобы начать планировать день.</string>
@@ -116,7 +116,7 @@
     <string name="routine_card_started_at">Начало</string>
     <string name="routine_card_will_start">Начнётся</string>
     <string name="routine_card_ends_at">Окончание</string>
-    <string name="routine_card_completed_at">Завершено</string>
+    <string name="routine_card_completed_at">Рутина завершена</string>
     <string name="routine_card_will_end">Закончится</string>
 
     <string name="task_create_title">Создать задачу</string>
