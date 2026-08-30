@@ -15,6 +15,13 @@ android {
     namespace = "com.xenikii.timecalculator.apphost"
     compileSdk = 37
 
+    val secrets = Properties()
+    val secretsFile = project.rootProject.file("secrets.properties")
+
+    if (secretsFile.exists()) {
+        secretsFile.inputStream().use { secrets.load(it) }
+    }
+
     defaultConfig {
         applicationId = "com.xenikii.timecalculator"
         minSdk = 30
@@ -36,6 +43,30 @@ android {
         )
     }
 
+    signingConfigs {
+        create("upload") {
+            val retrievedStorePassword = secrets.getProperty("STORE_PASSWORD")
+                ?: System.getenv("STORE_PASSWORD")
+            val retrievedKeyAlias = secrets.getProperty("KEY_ALIAS")
+                ?: System.getenv("KEY_ALIAS")
+            val retrievedKeyPassword = secrets.getProperty("KEY_PASSWORD")
+                ?: System.getenv("KEY_PASSWORD")
+
+            if (retrievedStorePassword.isNullOrBlank() || retrievedKeyAlias.isNullOrBlank() || retrievedKeyPassword.isNullOrBlank()) {
+                println(
+                    "WARNING: Missing signing configuration for 'upload' signing config. " +
+                        "Provide STORE_PASSWORD, KEY_ALIAS and KEY_PASSWORD " +
+                        "via secrets.properties or environment variables."
+                )
+            }
+
+            storeFile = file("../release-keystore.jks")
+            storePassword = retrievedStorePassword
+            keyAlias = retrievedKeyAlias
+            keyPassword = retrievedKeyPassword
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -43,7 +74,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("upload")
         }
     }
     compileOptions {
