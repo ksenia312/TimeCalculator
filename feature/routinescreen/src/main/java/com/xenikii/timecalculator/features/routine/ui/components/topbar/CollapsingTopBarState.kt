@@ -18,8 +18,9 @@ import androidx.compose.ui.unit.dp
  * Drives a collapsing top bar from the scroll of its content.
  *
  * The [fraction] goes from 0f (fully expanded) to 1f (fully collapsed) as the user scrolls
- * up through [maxOffsetPx] pixels, and expands back when scrolling down. Scroll deltas used
- * for collapsing/expanding are consumed so the bar reacts before the list starts moving.
+ * up through [maxOffsetPx] pixels. Collapsing happens eagerly (before the list moves), while
+ * expanding back only happens once the content has been scrolled all the way to the top and
+ * there is leftover downward scroll, so the expanded bar shows only at the very top.
  */
 @Stable
 class CollapsingTopBarState(private val maxOffsetPx: Float) {
@@ -29,12 +30,29 @@ class CollapsingTopBarState(private val maxOffsetPx: Float) {
     val fraction: Float
         get() = if (maxOffsetPx == 0f) 0f else offsetPx / maxOffsetPx
 
+    private fun consume(deltaY: Float): Float {
+        val previous = offsetPx
+        val newValue = (previous - deltaY).coerceIn(0f, maxOffsetPx)
+        offsetPx = newValue
+        return previous - newValue
+    }
+
     val nestedScrollConnection: NestedScrollConnection = object : NestedScrollConnection {
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-            val previous = offsetPx
-            val newValue = (previous - available.y).coerceIn(0f, maxOffsetPx)
-            offsetPx = newValue
-            return Offset(0f, previous - newValue)
+            // Only collapse while scrolling up (content moving up). Expanding is deferred to
+            // onPostScroll so the list reaches the top before the bar starts expanding.
+            if (available.y >= 0f) return Offset.Zero
+            return Offset(0f, consume(available.y))
+        }
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource,
+        ): Offset {
+            // Expand only with the downward scroll left over after the list reached its top.
+            if (available.y <= 0f) return Offset.Zero
+            return Offset(0f, consume(available.y))
         }
     }
 
