@@ -2,11 +2,14 @@ package com.xenikii.timecalculator.features.home.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.features.home.ui.components.HomeTab
 import com.xenikii.timecalculator.features.landing.ui.LandingScreen
@@ -26,10 +29,15 @@ fun HomeContent(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
     Box(
         modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(
+                top = paddingValues.calculateTopPadding(),
+                start = paddingValues.calculateStartPadding(layoutDirection = layoutDirection) + 12.dp,
+                end = paddingValues.calculateEndPadding(layoutDirection = layoutDirection) + 12.dp,
+            )
     ) {
         when (current) {
             HomeTab.LANDING -> LandingScreen(

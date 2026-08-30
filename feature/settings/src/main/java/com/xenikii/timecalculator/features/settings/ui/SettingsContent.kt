@@ -38,6 +38,7 @@ import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewState
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppListItem
+import com.xenikii.timecalculator.shared.extensions.bottomIndent
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
@@ -57,10 +58,11 @@ fun SettingsContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 24.dp)
+            .padding(horizontal = 12.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
     ) {
+        Spacer(modifier = Modifier.height(24.dp))
         AppListItem(
             headlineContent = {
                 Text(
@@ -147,6 +149,9 @@ fun SettingsContent(
                 )
             }
         }
+        Spacer(
+            modifier = Modifier.bottomIndent()
+        )
     }
 }
 

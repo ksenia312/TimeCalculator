@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
-fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 12.dp)
+fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 120.dp)
 
 /**
  * Makes an item in a reorderable list draggable via long-press.

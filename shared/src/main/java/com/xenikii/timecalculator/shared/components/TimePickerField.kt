@@ -2,10 +2,12 @@ package com.xenikii.timecalculator.shared.components
 
 import android.view.MotionEvent
 import androidx.compose.foundation.layout.fillMaxWidth
+import android.content.res.Configuration
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import com.xenikii.timecalculator.R
 import kotlinx.datetime.LocalTime
@@ -81,6 +84,8 @@ private fun TimePickerDialogCompose(
         initialMinute = initial.minute,
         is24Hour = true
     )
+    val isLandscape = LocalConfiguration.current.orientation ==
+        Configuration.ORIENTATION_LANDSCAPE
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -95,7 +100,11 @@ private fun TimePickerDialogCompose(
             }
         },
         text = {
-            TimePicker(state = state)
+            if (isLandscape) {
+                TimeInput(state = state)
+            } else {
+                TimePicker(state = state)
+            }
         }
     )
 }

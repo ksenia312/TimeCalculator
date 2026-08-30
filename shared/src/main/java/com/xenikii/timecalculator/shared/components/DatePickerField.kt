@@ -1,9 +1,11 @@
 package com.xenikii.timecalculator.shared.components
 
+import android.content.res.Configuration
 import android.view.MotionEvent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -13,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import com.xenikii.timecalculator.R
 import java.time.LocalDate
@@ -38,12 +41,15 @@ fun DatePickerField(
 
 
     if (showDialog.value) {
+        val isLandscape = LocalConfiguration.current.orientation ==
+            Configuration.ORIENTATION_LANDSCAPE
         val datePickerState = rememberDatePickerState(
             initialSelectedDateMillis = date
                 .value
                 .atStartOfDay(ZoneOffset.UTC)
                 .toInstant()
-                .toEpochMilli()
+                .toEpochMilli(),
+            initialDisplayMode = if (isLandscape) DisplayMode.Input else DisplayMode.Picker
         )
 
         DatePickerDialog(
