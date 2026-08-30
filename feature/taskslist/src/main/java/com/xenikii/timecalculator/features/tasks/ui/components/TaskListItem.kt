@@ -21,6 +21,7 @@ import com.xenikii.timecalculator.shared.components.AppListItem
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewConstants
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
+import com.xenikii.timecalculator.shared.extensions.shortStringValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -63,7 +64,7 @@ fun TaskListItem(
                 Text(
                     text = stringResource(
                         R.string.task_durations,
-                        task.data.joinToString { it.duration.toString() }
+                        task.data.joinToString { it.duration.shortStringValue() }
                     ),
                     style = MaterialTheme.typography.bodySmall
                 )

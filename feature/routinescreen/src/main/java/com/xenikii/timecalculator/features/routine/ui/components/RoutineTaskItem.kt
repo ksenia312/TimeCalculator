@@ -43,6 +43,7 @@ import com.xenikii.timecalculator.shared.components.AppCircleIndicator
 import com.xenikii.timecalculator.shared.components.AppElevatedButtonMedium
 import com.xenikii.timecalculator.shared.extensions.draggableItem
 import com.xenikii.timecalculator.shared.extensions.stringTime
+import com.xenikii.timecalculator.shared.extensions.shortStringValue
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,7 +141,7 @@ fun RoutineTaskItem(
                 ) {
                     Box {
                         Text(
-                            selectedDuration.takeIf { it > kotlin.time.Duration.ZERO }?.toString()
+                            selectedDuration.takeIf { it > kotlin.time.Duration.ZERO }?.shortStringValue()
                                 ?: stringResource(R.string.task_set_duration),
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (selectedDuration > kotlin.time.Duration.ZERO) {
@@ -165,7 +166,7 @@ fun RoutineTaskItem(
                     link.task.dataSortedByDuration.forEach { sub ->
                         DropdownMenuItem(
                             text = {
-                                Text("${sub.duration}")
+                                Text(sub.duration.shortStringValue())
                             },
                             onClick = {
                                 menuExpanded = false

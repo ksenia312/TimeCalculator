@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Time Calculator</string>
+    <string name="action_ok">ОК</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_delete">Удалить</string>
+
+    <string name="auth_welcome_title">Time Calculator</string>
+    <string name="auth_welcome_subtitle">Планируйте свой день и управляйте временем эффективно</string>
+    <string name="auth_welcome_login">Вход</string>
+    <string name="auth_welcome_register">Регистрация</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_notifications_title">Оставайтесь в курсе с уведомлениями</string>
+    <string name="onboarding_notifications_subtitle">Разрешите уведомления, чтобы получать напоминания о задачах</string>
+    <string name="onboarding_notifications_allow">Разрешить</string>
+    <string name="onboarding_notifications_skip">Позже</string>
+    <string name="auth_login_title">С возвращением!</string>
+    <string name="auth_register_title">Создать аккаунт</string>
+    <string name="auth_field_email">Электронная почта</string>
+    <string name="auth_field_password">Пароль</string>
+    <string name="auth_field_confirm_password">Подтвердите пароль</string>
+    <string name="auth_action_login">Вход</string>
+    <string name="auth_action_register">Регистрация</string>
+    <string name="auth_link_to_register">Нет аккаунта? Зарегистрируйтесь</string>
+    <string name="auth_link_to_login">Уже есть аккаунт? Войдите</string>
+    <string name="auth_error_invalid_credentials">Неверная электронная почта или пароль.</string>
+    <string name="auth_error_user_exists">Аккаунт с этой почтой уже существует.</string>
+    <string name="auth_error_weak_password">Пароль слишком слабый.</string>
+    <string name="auth_error_network">Нет подключения. Попробуйте ещё раз.</string>
+    <string name="auth_error_rate_limited">Слишком много попыток. Попробуйте позже.</string>
+    <string name="auth_error_unknown">Что-то пошло не так. Попробуйте ещё раз.</string>
+    <string name="auth_error_passwords_mismatch">Пароли не совпадают.</string>
+    <string name="auth_error_empty_fields">Пожалуйста, заполните все поля.</string>
+    <string name="auth_session_expired">Сеанс истёк. Пожалуйста, войдите снова.</string>
+
+    <string name="content_desc_delete">Удалить</string>
+    <string name="content_desc_routine_settings">Параметры рутины</string>
+    <string name="content_desc_back">Назад</string>
+    <string name="content_desc_close">Закрыть</string>
+    <string name="content_desc_open_menu">Открыть меню</string>
+    <string name="content_desc_close_menu">Закрыть меню</string>
+    <string name="content_desc_show_password">Показать пароль</string>
+    <string name="content_desc_hide_password">Скрыть пароль</string>
+
+    <string name="label_name">Название</string>
+    <string name="label_date">Дата</string>
+    <string name="label_anchor">Базировать на</string>
+    <string name="label_when_to_leave">Когда уходить?</string>
+    <string name="label_duration_number">Продолжительность №%1$d</string>
+    <string name="label_hours">Часы</string>
+    <string name="label_minutes">Минуты</string>
+    <string name="label_repeat_start_date">С даты</string>
+    <string name="label_repeat_end_date">До даты</string>
+
+    <string name="home_tab_home">Главная</string>
+    <string name="home_tab_routines">Рутины</string>
+    <string name="home_tab_tasks">Задачи</string>
+    <string name="home_tab_settings">Параметры</string>
+    <string name="home_tab_landing">Главная</string>
+
+    <string name="fab_task">Задача</string>
+    <string name="fab_routine">Рутина</string>
+    <string name="fab_add_task">Создать задачу</string>
+    <string name="fab_manage_tasks">Связать существующие задачи</string>
+    <string name="fab_add_item">Добавить элемент</string>
+
+    <string name="routine_anchor_start_at">Время начала</string>
+    <string name="routine_anchor_end_at">Время окончания</string>
+    <string name="routine_dialog_add_title">Добавить новую рутину</string>
+    <string name="routine_dialog_edit_title">Редактировать рутину</string>
+    <string name="routine_delete_dialog_title">Удалить рутину?</string>
+    <string name="routine_delete_dialog_message">Это действие нельзя отменить.</string>
+    <string name="routines_delete_single_title">Удалить \"%1$s\"?</string>
+    <string name="routines_delete_multiple_title">Удалить %1$d рутин?</string>
+    <string name="routines_delete_single_message">Это действие нельзя отменить.</string>
+    <string name="routines_delete_multiple_message">%1$s\n\nЭто действие нельзя отменить.</string>
+    <string name="routine_start_time">Время начала</string>
+    <string name="routine_end_time">Время окончания</string>
+    <string name="routine_repeat_label">Повторять</string>
+    <string name="routine_repeat_every_label">Каждые</string>
+    <string name="routine_repeat_unit_label">Единица повтора</string>
+    <string name="routine_repeat_on_days_label">Повторять в</string>
+    <string name="routine_recurrence_unit_day">День</string>
+    <string name="routine_recurrence_unit_week">Неделя</string>
+    <string name="routine_recurrence_unit_month">Месяц</string>
+    <string name="routine_recurrence_unit_year">Год</string>
+    <string name="routine_recurrence_summary_daily">Повторяется ежедневно</string>
+    <string name="routine_recurrence_summary_weekly">Повторяется еженедельно</string>
+    <string name="routine_recurrence_summary_monthly">Повторяется ежемесячно</string>
+    <string name="routine_recurrence_summary_yearly">Повторяется ежегодно</string>
+    <string name="routine_recurrence_summary_every">Повторяется каждые %1$s</string>
+    <string name="routine_recurrence_summary_on_days">%1$s:\n%2$s</string>
+    <string name="routine_recurrence_weekdays">Рабочие дни</string>
+    <string name="routine_recurrence_weekends">Выходные</string>
+    <string name="routine_status_running">В процессе</string>
+    <string name="routine_status_completed">Завершено</string>
+    <string name="routine_status_planned">Запланировано</string>
+    <string name="routine_time_will_start_in">Начнётся через</string>
+    <string name="routine_time_ends_in">Заканчивается через</string>
+
+    <string name="routines_list_status_completed_on">завершено</string>
+    <string name="routines_list_status_running_ends_on">выполняется, заканчивается</string>
+    <string name="routines_list_status_planned_for">запланировано на</string>
+    <string name="routines_list_no_routines_scheduled">Нет запланированных рутин</string>
+    <string name="landing_empty_title">Ещё нет рутин</string>
+    <string name="landing_empty_subtitle">Создайте вашу первую рутину, чтобы начать планировать день.</string>
+    <string name="landing_empty_action">Создать первую рутину</string>
+    <string name="landing_show_all_tasks">Показать все задачи</string>
+    <string name="landing_hide_all_tasks">Скрыть задачи</string>
+    <string name="routines_empty_title">Ещё нет рутин</string>
+    <string name="routines_empty_subtitle">Создайте вашу первую рутину и держите день в порядке.</string>
+    <string name="routines_empty_action">Создать рутину</string>
+
+    <string name="routine_card_started_at">Начало</string>
+    <string name="routine_card_will_start">Начнётся</string>
+    <string name="routine_card_ends_at">Окончание</string>
+    <string name="routine_card_completed_at">Завершено</string>
+    <string name="routine_card_will_end">Закончится</string>
+
+    <string name="task_create_title">Создать задачу</string>
+    <string name="task_update_title">Обновить задачу</string>
+    <string name="task_add_more_durations">Добавить ещё продолжительность</string>
+    <string name="task_durations">Продолжительности: %1$s</string>
+    <string name="task_set_duration">Установить продолжительность</string>
+    <string name="task_duration_left">%1$s осталось</string>
+    <string name="task_delete_dialog_title">Удалить задачу?</string>
+    <string name="task_delete_dialog_message">Это действие нельзя отменить.</string>
+    <string name="tasks_delete_single_title">Удалить \"%1$s\"?</string>
+    <string name="tasks_delete_multiple_title">Удалить %1$d задач?</string>
+    <string name="tasks_delete_single_message">Это действие нельзя отменить.</string>
+    <string name="tasks_delete_multiple_message">%1$s\n\nЭто действие нельзя отменить.</string>
+    <string name="task_unlink_dialog_title">Удалить из рутины?</string>
+    <string name="task_unlink_dialog_message">Задача будет удалена из этой рутины.</string>
+    <string name="task_duplicate_durations_error">Продолжительности должны быть уникальными.</string>
+    <string name="action_remove">Удалить</string>
+
+    <string name="tasks_manage_title">Управление задачами</string>
+    <string name="tasks_create_new">Создать новую задачу</string>
+    <string name="tasks_empty_title">Ещё нет задач</string>
+    <string name="tasks_empty_subtitle">Создайте вашу первую задачу, чтобы быстрее создавать рутины.</string>
+    <string name="tasks_empty_action">Создать задачу</string>
+    <string name="settings_profile_title">Профиль</string>
+    <string name="settings_email_label">Электронная почта</string>
+    <string name="settings_email_placeholder">Электронная почта недоступна</string>
+    <string name="settings_action_logout">Выход</string>
+    <string name="settings_action_logging_out">Выход...</string>
+    <string name="settings_logout_dialog_title">Выйти?</string>
+    <string name="settings_logout_dialog_message">Вы уверены, что хотите выйти из своего аккаунта?</string>
+    <string name="settings_logout_dialog_confirm">Выход</string>
+    <string name="settings_notifications_label">Уведомления</string>
+    <string name="settings_notifications_supporting">Live уведомления о прогрессе рутин и задач</string>
+    <string name="settings_notifications_blocked">Уведомления отключены в системных параметрах</string>
+    <string name="settings_notifications_open_system_settings">Открыть системные параметры</string>
+    <string name="settings_privacy_policy_label">Политика приватности</string>
+    <string name="settings_privacy_policy_supporting">Узнайте, как мы собираем и используем ваши данные</string>
+    <string name="settings_privacy_policy_url">https://ksenia312.github.io/morning-calculator-docs/privacy-policy.html</string>
+    <string name="settings_terms_label">Условия использования</string>
+    <string name="settings_terms_supporting">Прочитайте правила использования приложения</string>
+    <string name="settings_terms_url">https://ksenia312.github.io/morning-calculator-docs/terms-and-conditions.html</string>
+
+    <string name="top_bar_error">Ошибка</string>
+    <string name="top_bar_loading">Загрузка</string>
+    <string name="routine_not_found">Рутина не найдена</string>
+    <string name="modified_at">Изменено</string>
+    <string name="app_bar_preview_title">панель приложения</string>
+    <string name="sample_time_routine">Временная рутина</string>
+
+    <string name="relative_day_today">Сегодня</string>
+    <string name="relative_day_yesterday">Вчера</string>
+    <string name="relative_day_tomorrow">Завтра</string>
+    <string name="datetime_with_comma">%1$s, %2$s</string>
+    <string name="duration_list_separator">,\u0020</string>
+
+    <plurals name="duration_seconds">
+        <item quantity="one">%d сек</item>
+        <item quantity="few">%d сек</item>
+        <item quantity="other">%d сек</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="one">%d мин</item>
+        <item quantity="few">%d мин</item>
+        <item quantity="other">%d мин</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d ч</item>
+        <item quantity="few">%d ч</item>
+        <item quantity="other">%d ч</item>
+    </plurals>
+    <plurals name="duration_days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="other">%d дней</item>
+    </plurals>
+    <plurals name="routine_recurrence_days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="other">%d дней</item>
+    </plurals>
+    <plurals name="routine_recurrence_weeks">
+        <item quantity="one">%d неделя</item>
+        <item quantity="few">%d недели</item>
+        <item quantity="other">%d недель</item>
+    </plurals>
+    <plurals name="routine_recurrence_months">
+        <item quantity="one">%d месяц</item>
+        <item quantity="few">%d месяца</item>
+        <item quantity="other">%d месяцев</item>
+    </plurals>
+    <plurals name="routine_recurrence_years">
+        <item quantity="one">%d год</item>
+        <item quantity="few">%d года</item>
+        <item quantity="other">%d лет</item>
+    </plurals>
+
+    <string name="notification_routine_title">Рутина в процессе</string>
+    <string name="notification_channel_routine_progress">Прогресс рутины</string>
+    <string name="notification_channel_routine_progress_description">Показывает активную рутину и обратный отсчёт текущей задачи</string>
+    <string name="notification_channel_task_alerts">Оповещения о задачах</string>
+    <string name="notification_channel_task_alerts_description">Уведомляет при начале рутины или задачи</string>
+</resources>
