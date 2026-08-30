@@ -7,6 +7,7 @@ import com.xenikii.timecalculator.domain.model.RoutineRecurrence
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
+import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
@@ -73,6 +74,38 @@ class RoutineScheduleRepositoryImplTest {
 
         assertEquals(instant(day = 7, hour = 9), schedule.effectiveStart)
         assertEquals(instant(day = 7, hour = 9, minute = 5), schedule.end)
+    }
+
+    @Test
+    fun `daily recurrence starting in the future does not start early`() {
+        val repository = createRepository()
+        val now = instant(day = 1, hour = 9)
+        val routine = routine(
+            scheduledAt = instant(day = 3, hour = 9),
+            anchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(interval = 1, unit = RoutineRecurrenceUnit.DAY),
+        )
+
+        val schedule = repository.computeSchedule(routine, now)
+
+        assertEquals(instant(day = 3, hour = 9), schedule.effectiveStart)
+        assertEquals(RoutineSchedulePhase.FUTURE, schedule.phaseAt(now))
+    }
+
+    @Test
+    fun `monthly recurrence starting in the future does not start early`() {
+        val repository = createRepository()
+        val now = zonedInstant(2026, 1, 15, 10, 0)
+        val routine = routine(
+            scheduledAt = zonedInstant(2026, 2, 1, 9, 0),
+            anchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(interval = 1, unit = RoutineRecurrenceUnit.MONTH),
+        )
+
+        val schedule = repository.computeSchedule(routine, now)
+
+        assertEquals(zonedInstant(2026, 2, 1, 9, 0), schedule.effectiveStart)
+        assertEquals(RoutineSchedulePhase.FUTURE, schedule.phaseAt(now))
     }
 
     @Test

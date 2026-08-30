@@ -106,7 +106,8 @@ private fun anchorRange(
         }
         val step = unitMillis * interval
         val delta = now.toEpochMilliseconds() - base.toEpochMilliseconds()
-        val cycles = Math.floorDiv(delta, step)
+        // When now is before the repeat start date, the first occurrence is base itself.
+        val cycles = Math.floorDiv(delta, step).coerceAtLeast(0)
         val prev = Instant.fromEpochMilliseconds(base.toEpochMilliseconds() + cycles * step)
         val next = Instant.fromEpochMilliseconds(prev.toEpochMilliseconds() + step)
         return prev to next
@@ -142,6 +143,8 @@ private fun previousByCalendar(
     interval: Int,
     chronoUnit: ChronoUnit,
 ): ZonedDateTime {
+    // When now is before the repeat start date, the first occurrence is base itself.
+    if (nowZdt < baseZdt) return baseZdt
     val between = chronoUnit.between(baseZdt, nowZdt)
     var steps = Math.floorDiv(between, interval.toLong())
     var candidate = baseZdt.plus(steps * interval.toLong(), chronoUnit)
