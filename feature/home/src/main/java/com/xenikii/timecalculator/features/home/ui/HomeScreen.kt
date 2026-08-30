@@ -41,6 +41,7 @@ fun HomeScreen(
 ) {
     val navigator = LocalNavigator.current
     val viewState = homeViewModel.uiState.collectAsStateWithLifecycle()
+    val isSyncing by homeViewModel.isSyncing.collectAsStateWithLifecycle()
     val selectedTab = viewState.value.selectedTab
     val showFab = selectedTab != HomeTab.SETTINGS
 
@@ -119,6 +120,7 @@ fun HomeScreen(
             modifier = Modifier,
             paddingValues = it,
             current = selectedTab,
+            isSyncing = isSyncing,
             onCreateRoutineClick = { navigator.navigateTo(AppRoute.CreateRoutine) },
             onCreateTaskClick = { navigator.navigateTo(AppRoute.CreateTask()) },
         )

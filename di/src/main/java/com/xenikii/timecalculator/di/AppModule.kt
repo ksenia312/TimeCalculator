@@ -138,7 +138,7 @@ object AppModule {
             )
         }
 
-        factory { HomeViewModel() }
+        factory { HomeViewModel(syncStateProvider = get()) }
 
         factory {
             val logoutUseCase: LogoutUseCase = get()

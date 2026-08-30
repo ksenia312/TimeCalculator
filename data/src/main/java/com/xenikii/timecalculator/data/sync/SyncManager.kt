@@ -5,10 +5,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.xenikii.timecalculator.domain.model.AuthSessionState
 import com.xenikii.timecalculator.domain.repository.AuthRepository
+import com.xenikii.timecalculator.domain.repository.SyncStateProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -19,9 +22,11 @@ class SyncManager(
     private val syncEngine: SyncEngine,
     private val syncTrigger: SyncTrigger,
     private val authRepository: AuthRepository,
-) {
+) : SyncStateProvider {
     private val synchronizationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var hasStarted = false
+    private val _isSyncing = MutableStateFlow(false)
+    override val isSyncing: StateFlow<Boolean> = _isSyncing
 
     @OptIn(FlowPreview::class)
     fun start() {
@@ -31,20 +36,29 @@ class SyncManager(
         authRepository.observeAuthSessionState()
             .onEach { state ->
                 if (state == AuthSessionState.LoggedIn) {
-                    synchronizationScope.launch { syncEngine.sync() }
+                    synchronizationScope.launch { runSync() }
                 }
             }
             .launchIn(synchronizationScope)
 
         syncTrigger.observe()
             .debounce(3_000.milliseconds)
-            .onEach { syncEngine.sync() }
+            .onEach { runSync() }
             .launchIn(synchronizationScope)
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
-                synchronizationScope.launch { syncEngine.sync() }
+                synchronizationScope.launch { runSync() }
             }
         })
+    }
+
+    private suspend fun runSync() {
+        _isSyncing.value = true
+        try {
+            syncEngine.sync()
+        } finally {
+            _isSyncing.value = false
+        }
     }
 }

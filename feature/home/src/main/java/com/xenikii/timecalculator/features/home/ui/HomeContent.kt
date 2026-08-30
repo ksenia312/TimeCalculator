@@ -20,6 +20,7 @@ import com.xenikii.timecalculator.shared.preview.PreviewTheme
 @Composable
 fun HomeContent(
     current: HomeTab,
+    isSyncing: Boolean,
     onCreateRoutineClick: () -> Unit,
     onCreateTaskClick: () -> Unit,
     paddingValues: PaddingValues,
@@ -31,9 +32,18 @@ fun HomeContent(
             .padding(paddingValues)
     ) {
         when (current) {
-            HomeTab.LANDING -> LandingScreen(onCreateRoutineClick = onCreateRoutineClick)
-            HomeTab.ROUTINES -> RoutinesListScreen(onCreateRoutineClick = onCreateRoutineClick)
-            HomeTab.TASKS -> TasksListScreen(onCreateTaskClick = onCreateTaskClick)
+            HomeTab.LANDING -> LandingScreen(
+                onCreateRoutineClick = onCreateRoutineClick,
+                isSyncing = isSyncing,
+            )
+            HomeTab.ROUTINES -> RoutinesListScreen(
+                onCreateRoutineClick = onCreateRoutineClick,
+                isSyncing = isSyncing,
+            )
+            HomeTab.TASKS -> TasksListScreen(
+                onCreateTaskClick = onCreateTaskClick,
+                isSyncing = isSyncing,
+            )
             HomeTab.SETTINGS -> SettingsScreen()
         }
     }
@@ -45,6 +55,7 @@ fun HomeContentPreview() {
     PreviewTheme {
         HomeContent(
             current = HomeTab.ROUTINES,
+            isSyncing = false,
             onCreateRoutineClick = {},
             onCreateTaskClick = {},
             paddingValues = PaddingValues(0.dp),

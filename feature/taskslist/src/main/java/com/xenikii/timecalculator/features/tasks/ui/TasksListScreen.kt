@@ -3,6 +3,7 @@ package com.xenikii.timecalculator.features.tasks.ui
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.xenikii.timecalculator.features.tasks.presentation.TasksListViewState
 import com.xenikii.timecalculator.features.tasks.presentation.TasksListViewModel
 import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.EditTaskArguments
@@ -13,6 +14,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TasksListScreen(
     onCreateTaskClick: () -> Unit = {},
+    isSyncing: Boolean = false,
     viewModel: TasksListViewModel = koinViewModel()
 ) {
     val navigator = LocalNavigator.current
@@ -20,7 +22,7 @@ fun TasksListScreen(
     val selectedIds = viewModel.selectedIds.collectAsStateWithLifecycle()
 
     TasksListContent(
-        viewState = viewState.value,
+        viewState = if (isSyncing) TasksListViewState.Loading else viewState.value,
         selectedIds = selectedIds.value,
         onLongPress = viewModel::toggleSelection,
         onToggleSelect = viewModel::toggleSelection,
