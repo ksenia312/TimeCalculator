@@ -26,8 +26,8 @@ import com.xenikii.timecalculator.features.onboarding.presentation.onboardingIma
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingImagePage
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingNotificationPage
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingPagerDots
-import com.xenikii.timecalculator.shared.components.AppButton
-import com.xenikii.timecalculator.shared.components.AppOutlinedButton
+import com.xenikii.timecalculator.shared.components.AppButtonMedium
+import com.xenikii.timecalculator.shared.components.AppOutlinedButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
@@ -107,13 +107,13 @@ fun OnboardingContent(
                         .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    AppOutlinedButton(
+                    AppOutlinedButtonMedium(
                         onClick = onSkipNotificationsClick,
                         modifier = Modifier.weight(1f),
                     ) {
                         Text(stringResource(R.string.onboarding_notifications_skip))
                     }
-                    AppButton(
+                    AppButtonMedium(
                         onClick = onAllowNotificationsClick,
                         modifier = Modifier.weight(1f),
                     ) {
@@ -127,13 +127,13 @@ fun OnboardingContent(
                         .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    AppOutlinedButton(
+                    AppOutlinedButtonMedium(
                         onClick = onSkipClick,
                         modifier = Modifier.weight(1f),
                     ) {
                         Text(stringResource(R.string.onboarding_skip))
                     }
-                    AppButton(
+                    AppButtonMedium(
                         onClick = onNextClick,
                         modifier = Modifier.weight(1f),
                     ) {

@@ -20,8 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.auth.presentation.WelcomeState
-import com.xenikii.timecalculator.shared.components.AppButton
-import com.xenikii.timecalculator.shared.components.AppOutlinedButton
+import com.xenikii.timecalculator.shared.components.AppButtonExpressive
+import com.xenikii.timecalculator.shared.components.AppOutlinedButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
@@ -69,18 +69,21 @@ fun WelcomeContent(
                         textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(AuthSpacing.ContentSpacing))
-                    AppButton(
-                        onClick = onNavigateToLogin,
-                        modifier = Modifier.fillMaxWidth(0.5f),
-                    ) {
-                        Text(stringResource(R.string.auth_welcome_login))
-                    }
-                    Spacer(Modifier.height(AuthSpacing.LinkSpacing))
-                    AppOutlinedButton(
+                    AppButtonExpressive(
                         onClick = onNavigateToRegister,
-                        modifier = Modifier.fillMaxWidth(0.5f),
+                        modifier = Modifier.fillMaxWidth(0.7f),
                     ) {
                         Text(stringResource(R.string.auth_welcome_register))
+                    }
+                    Spacer(Modifier.height(AuthSpacing.LinkSpacing))
+                    AppOutlinedButtonMedium(
+                        onClick = onNavigateToLogin,
+                        modifier = Modifier.fillMaxWidth(0.7f),
+                    ) {
+                        Text(
+                            stringResource(R.string.auth_welcome_login),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

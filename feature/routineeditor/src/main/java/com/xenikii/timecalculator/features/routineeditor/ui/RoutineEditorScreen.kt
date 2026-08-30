@@ -40,7 +40,7 @@ import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutin
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewState
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineAnchorSelector
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineRecurrenceUnitSelector
-import com.xenikii.timecalculator.shared.components.AppElevatedButton
+import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.DatePickerField
 import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
@@ -163,10 +163,11 @@ private fun RoutineEditorScreen(
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
+                Spacer(Modifier.height(16.dp))
                 AppTextField(
                     value = resolvedTitle,
                     autofocus = resolvedTitle.isEmpty(),
@@ -302,7 +303,7 @@ private fun RoutineEditorScreen(
 
                 Spacer(Modifier.height(12.dp))
 
-                AppElevatedButton(
+                AppButtonMedium(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = resolvedTitle.isNotBlank(),
                     colors = ButtonDefaults.elevatedButtonColors(
@@ -313,6 +314,8 @@ private fun RoutineEditorScreen(
                         onConfirm()
                     }
                 ) { Text(stringResource(R.string.action_ok)) }
+
+                Spacer(Modifier.height(16.dp))
             }
         }
     )

@@ -34,10 +34,7 @@ import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.theme.TimeCalculatorTheme
 
 data class FabItem(
-    val iconRes: Int,
-    val title: String,
-    val contentDescription: String,
-    val onClick: () -> Unit
+    val iconRes: Int, val title: String, val contentDescription: String, val onClick: () -> Unit
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -64,21 +61,16 @@ fun FabMenu(
 
     BackHandler(isExpanded) { onChangeExpanded(false) }
     FloatingActionButtonMenu(
-        modifier = modifier,
-        expanded = isExpanded,
-        horizontalAlignment = horizontalAlignment,
-        button = {
+        modifier = modifier, expanded = isExpanded, horizontalAlignment = horizontalAlignment, button = {
             ToggleFloatingActionButton(
                 checked = isExpanded,
                 onCheckedChange = onChangeExpanded,
                 containerColor = { mainContainerColor },
                 containerSize = ToggleFloatingActionButtonDefaults.containerSize(
-                    initialSize = largeContainerSize,
-                    finalSize = largeContainerSize
+                    initialSize = largeContainerSize, finalSize = largeContainerSize
                 ),
                 containerCornerRadius = ToggleFloatingActionButtonDefaults.containerCornerRadius(
-                    largeCornerRadius,
-                    expandedCornerRadius
+                    largeCornerRadius, expandedCornerRadius
                 ),
             ) {
                 Icon(
@@ -94,9 +86,8 @@ fun FabMenu(
                         .rotate(rotation)
                 )
             }
-        }
-    ) {
-        fabItems.forEachIndexed { index, item ->
+        }) {
+        fabItems.forEach { item ->
             ElevatedButtonWithIconM3(
                 iconRes = item.iconRes,
                 colors = colors,
@@ -127,14 +118,12 @@ fun FloatingActionButtonMenuScope.ElevatedButtonWithIconM3(
         contentColor = colors.contentColor,
         icon = {
             Icon(
-                painter = painterResource(iconRes),
-                contentDescription = contentDescription
+                painter = painterResource(iconRes), contentDescription = contentDescription
             )
         },
         text = {
             Text(text)
-        }
-    )
+        })
 }
 
 @Preview
@@ -150,14 +139,12 @@ fun FabMenuPreview() {
                         iconRes = R.drawable.home,
                         title = stringResource(R.string.fab_add_item),
                         contentDescription = stringResource(R.string.fab_add_item),
-                        onClick = {}
-                    ),
+                        onClick = {}),
                     FabItem(
                         iconRes = R.drawable.home,
                         title = stringResource(R.string.fab_add_item),
                         contentDescription = stringResource(R.string.fab_add_item),
-                        onClick = {}
-                    ),
+                        onClick = {}),
                 )
             )
         }
@@ -168,7 +155,7 @@ fun FabMenuPreview() {
 @Preview
 @Composable
 fun FabMenuPreviewExpanded() {
-    com.xenikii.timecalculator.shared.theme.TimeCalculatorTheme {
+    TimeCalculatorTheme {
         Surface {
             FabMenu(
                 isExpanded = true,
@@ -179,14 +166,12 @@ fun FabMenuPreviewExpanded() {
                         iconRes = R.drawable.home,
                         title = stringResource(R.string.fab_add_item),
                         contentDescription = stringResource(R.string.fab_add_item),
-                        onClick = {}
-                    ),
+                        onClick = {}),
                     FabItem(
                         iconRes = R.drawable.home,
                         title = stringResource(R.string.fab_add_item),
                         contentDescription = stringResource(R.string.fab_add_item),
-                        onClick = {}
-                    ),
+                        onClick = {}),
                 )
             )
         }

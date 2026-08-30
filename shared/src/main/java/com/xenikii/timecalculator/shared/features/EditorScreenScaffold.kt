@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -29,7 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.components.AddNewButton
-import com.xenikii.timecalculator.shared.components.AppElevatedButton
+import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.BackButton
@@ -189,7 +188,7 @@ fun SaveTaskButton(
     enabled: Boolean,
     onConfirm: () -> Unit,
 ) {
-    AppElevatedButton(
+    AppButtonMedium(
         modifier = Modifier.fillMaxWidth(),
         enabled = enabled,
         onClick = onConfirm,

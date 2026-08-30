@@ -40,7 +40,7 @@ import com.xenikii.timecalculator.domain.model.RoutineLink
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
 import com.xenikii.timecalculator.shared.components.AppCircleIndicator
-import com.xenikii.timecalculator.shared.components.AppElevatedButton
+import com.xenikii.timecalculator.shared.components.AppElevatedButtonMedium
 import com.xenikii.timecalculator.shared.extensions.draggableItem
 import com.xenikii.timecalculator.shared.extensions.stringTime
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
@@ -130,7 +130,7 @@ fun RoutineTaskItem(
                 expanded = menuExpanded,
                 onExpandedChange = { menuExpanded = !menuExpanded },
             ) {
-                AppElevatedButton(
+                AppElevatedButtonMedium(
                     onClick = { },
                     contentPadding = ButtonDefaults.ContentPadding,
                     modifier = Modifier.menuAnchor(
@@ -142,6 +142,7 @@ fun RoutineTaskItem(
                         Text(
                             selectedDuration.takeIf { it > kotlin.time.Duration.ZERO }?.toString()
                                 ?: stringResource(R.string.task_set_duration),
+                            style = MaterialTheme.typography.bodyMedium,
                             color = if (selectedDuration > kotlin.time.Duration.ZERO) {
                                 MaterialTheme.colorScheme.onBackground
                             } else {

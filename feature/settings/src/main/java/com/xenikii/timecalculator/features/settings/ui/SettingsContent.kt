@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,13 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewState
-import com.xenikii.timecalculator.shared.components.AppButton
+import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppListItem
 import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
 import com.xenikii.timecalculator.shared.preview.PreviewAll
@@ -87,10 +87,10 @@ fun SettingsContent(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        AppButton(
+        AppButtonMedium(
             onClick = { showLogoutDialog = true },
             enabled = !viewState.isLoggingOut,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.error,
                 contentColor = MaterialTheme.colorScheme.onError,
@@ -101,14 +101,11 @@ fun SettingsContent(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .size(16.dp),
-                    color = MaterialTheme.colorScheme.onError,
+                    color = ButtonDefaults.buttonColors().disabledContentColor,
                     strokeWidth = 2.dp,
                 )
                 Text(
                     text = stringResource(R.string.settings_action_logging_out),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onError
-                    )
                 )
             } else {
                 Icon(
@@ -118,9 +115,6 @@ fun SettingsContent(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.settings_action_logout),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onError
-                    )
                 )
             }
         }
