@@ -28,6 +28,12 @@ enum class RoutineRecurrenceUnit {
 data class RoutineRecurrence(
     val interval: Int = 1,
     val unit: RoutineRecurrenceUnit = RoutineRecurrenceUnit.NONE,
+    /**
+     * ISO day-of-week numbers (1 = Monday .. 7 = Sunday) the routine repeats on.
+     * Only meaningful when [unit] is [RoutineRecurrenceUnit.WEEK]. An empty set means the
+     * routine repeats on the same weekday as its scheduled date.
+     */
+    val daysOfWeek: Set<Int> = emptySet(),
 )
 
 @Serializable

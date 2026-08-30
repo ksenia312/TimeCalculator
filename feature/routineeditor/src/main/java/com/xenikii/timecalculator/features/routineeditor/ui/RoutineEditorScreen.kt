@@ -40,6 +40,7 @@ import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRout
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewState
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineAnchorSelector
+import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineDaysOfWeekSelector
 import com.xenikii.timecalculator.features.routineeditor.ui.components.RoutineRecurrenceUnitSelector
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppTextField
@@ -300,6 +301,29 @@ private fun RoutineEditorScreen(
                             )
                         },
                     )
+
+                    if (resolvedRecurrenceUnit == RoutineRecurrenceUnit.WEEK) {
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            text = stringResource(R.string.routine_repeat_on_days_label),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        RoutineDaysOfWeekSelector(
+                            selectedDays = viewState.effectiveRecurrenceDaysOfWeek(),
+                            onToggle = { day ->
+                                val updated = viewState.effectiveRecurrenceDaysOfWeek()
+                                    .toMutableSet()
+                                    .apply { if (!add(day)) remove(day) }
+                                onStateChange(
+                                    viewState.copy(recurrenceDaysOfWeek = updated)
+                                )
+                            },
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(12.dp))

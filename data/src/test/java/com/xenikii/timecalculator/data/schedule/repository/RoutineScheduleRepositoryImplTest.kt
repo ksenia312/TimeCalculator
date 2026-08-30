@@ -186,6 +186,87 @@ class RoutineScheduleRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `computes weekly on selected days next cycle`() {
+        val repository = createRepository()
+        // 2026-01-05 is a Monday. Repeat on Monday and Wednesday.
+        val now = zonedInstant(2026, 1, 6, 10, 0)
+        val routine = routine(
+            scheduledAt = zonedInstant(2026, 1, 5, 9, 0),
+            anchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(
+                interval = 1,
+                unit = RoutineRecurrenceUnit.WEEK,
+                daysOfWeek = setOf(1, 3),
+            ),
+        )
+
+        val schedule = repository.computeSchedule(routine, now)
+
+        assertEquals(zonedInstant(2026, 1, 7, 9, 0), schedule.effectiveStart)
+    }
+
+    @Test
+    fun `computes weekly on selected days respecting week interval`() {
+        val repository = createRepository()
+        // Every 2 weeks on Monday, starting Monday 2026-01-05. The week of 2026-01-12 is skipped.
+        val now = zonedInstant(2026, 1, 12, 10, 0)
+        val routine = routine(
+            scheduledAt = zonedInstant(2026, 1, 5, 9, 0),
+            anchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(
+                interval = 2,
+                unit = RoutineRecurrenceUnit.WEEK,
+                daysOfWeek = setOf(1),
+            ),
+        )
+
+        val schedule = repository.computeSchedule(routine, now)
+
+        assertEquals(zonedInstant(2026, 1, 19, 9, 0), schedule.effectiveStart)
+    }
+
+    @Test
+    fun `weekly on selected days starting in the future does not start early`() {
+        val repository = createRepository()
+        // Repeat on Wednesday, start date Monday 2026-01-05, now is before the start.
+        val now = zonedInstant(2026, 1, 1, 10, 0)
+        val routine = routine(
+            scheduledAt = zonedInstant(2026, 1, 5, 9, 0),
+            anchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(
+                interval = 1,
+                unit = RoutineRecurrenceUnit.WEEK,
+                daysOfWeek = setOf(3),
+            ),
+        )
+
+        val schedule = repository.computeSchedule(routine, now)
+
+        assertEquals(zonedInstant(2026, 1, 7, 9, 0), schedule.effectiveStart)
+        assertEquals(RoutineSchedulePhase.FUTURE, schedule.phaseAt(now))
+    }
+
+    @Test
+    fun `weekly selected day before start weekday shifts to next week`() {
+        val repository = createRepository()
+        // Start date Wednesday 2026-01-07 but only Monday selected: first occurrence is next Monday.
+        val now = zonedInstant(2026, 1, 7, 8, 0)
+        val routine = routine(
+            scheduledAt = zonedInstant(2026, 1, 7, 9, 0),
+            anchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(
+                interval = 1,
+                unit = RoutineRecurrenceUnit.WEEK,
+                daysOfWeek = setOf(1),
+            ),
+        )
+
+        val schedule = repository.computeSchedule(routine, now)
+
+        assertEquals(zonedInstant(2026, 1, 12, 9, 0), schedule.effectiveStart)
+    }
+
     private fun createRepository(): RoutineScheduleRepositoryImpl =
         RoutineScheduleRepositoryImpl(
             alarmGateway = RecordingAlarmGateway(),

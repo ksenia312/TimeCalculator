@@ -47,6 +47,7 @@ fun RoutinePopulated.toDomain(): Routine {
         recurrence = RoutineRecurrence(
             interval = routine.recurrenceInterval.coerceAtLeast(1),
             unit = recurrenceUnit,
+            daysOfWeek = routine.recurrenceDaysOfWeek.decodeRecurrenceDaysOfWeek(),
         ),
         modifiedAt = routine.modifiedAt,
         data = fullLinks

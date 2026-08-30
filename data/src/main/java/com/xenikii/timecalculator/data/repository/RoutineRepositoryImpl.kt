@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.RoutinesDao
 import com.xenikii.timecalculator.data.db.SyncDao
+import com.xenikii.timecalculator.data.mapper.encodeRecurrenceDaysOfWeek
 import com.xenikii.timecalculator.data.mapper.toDomain
 import com.xenikii.timecalculator.data.model.PendingDeletionEntity
 import com.xenikii.timecalculator.data.model.RoutineEntity
@@ -58,6 +59,7 @@ class RoutineRepositoryImpl(
             scheduledAtAnchor = request.scheduledAtAnchor.name,
             recurrenceUnit = request.recurrence.unit.name,
             recurrenceInterval = request.recurrence.interval.coerceAtLeast(1),
+            recurrenceDaysOfWeek = request.recurrence.daysOfWeek.encodeRecurrenceDaysOfWeek(),
             modifiedAt = System.currentTimeMillis()
         )
 
@@ -78,6 +80,7 @@ class RoutineRepositoryImpl(
             scheduledAtAnchor = normalized.scheduledAtAnchor.name,
             recurrenceUnit = normalized.recurrence.unit.name,
             recurrenceInterval = normalized.recurrence.interval.coerceAtLeast(1),
+            recurrenceDaysOfWeek = normalized.recurrence.daysOfWeek.encodeRecurrenceDaysOfWeek(),
             modifiedAt = System.currentTimeMillis()
         )
 

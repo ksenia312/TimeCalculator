@@ -10,6 +10,7 @@ import com.xenikii.timecalculator.data.auth.SupabaseClientProvider
 import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.MIGRATION_1_2
 import com.xenikii.timecalculator.data.db.MIGRATION_2_3
+import com.xenikii.timecalculator.data.db.MIGRATION_3_4
 import com.xenikii.timecalculator.data.notification.settings.NotificationSettingsRepositoryImpl
 import com.xenikii.timecalculator.data.notification.settings.PreferencesNotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.data.notification.settings.SystemNotificationPermissionChecker
@@ -67,7 +68,7 @@ object AppModule {
             context = context,
             klass = AppDatabase::class.java,
             name = "morning-db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
 
         single { appDatabase.tasksDao() }
         single { appDatabase.routinesDao() }

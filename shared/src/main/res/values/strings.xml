@@ -79,6 +79,7 @@
     <string name="routine_repeat_label">Repeat</string>
     <string name="routine_repeat_every_label">Every</string>
     <string name="routine_repeat_unit_label">Repeat unit</string>
+    <string name="routine_repeat_on_days_label">Repeat on</string>
     <string name="routine_recurrence_unit_day">Day</string>
     <string name="routine_recurrence_unit_week">Week</string>
     <string name="routine_recurrence_unit_month">Month</string>
@@ -88,6 +89,8 @@
     <string name="routine_recurrence_summary_monthly">Repeats monthly</string>
     <string name="routine_recurrence_summary_yearly">Repeats yearly</string>
     <string name="routine_recurrence_summary_every">Repeats every %1$s</string>
+    <string name="routine_recurrence_summary_on_days">%1$s:\n%2$s</string>
+    <string name="routine_recurrence_weekdays">Weekdays</string>
     <string name="routine_status_running">Running</string>
     <string name="routine_status_completed">Completed</string>
     <string name="routine_status_planned">Planned</string>

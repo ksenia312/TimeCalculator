@@ -13,6 +13,7 @@ data class RoutineEntity(
     val scheduledAtAnchor: String,
     val recurrenceUnit: String = "NONE",
     val recurrenceInterval: Int = 1,
+    val recurrenceDaysOfWeek: String = "",
     val modifiedAt: Long,
     val pendingSync: Boolean = true,
 )

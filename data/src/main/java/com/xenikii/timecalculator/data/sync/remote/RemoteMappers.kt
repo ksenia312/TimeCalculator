@@ -2,6 +2,9 @@ package com.xenikii.timecalculator.data.sync.remote
 
 import com.xenikii.timecalculator.data.db.RoutinePopulated
 import com.xenikii.timecalculator.data.db.TaskWithSubData
+import com.xenikii.timecalculator.data.mapper.decodeRecurrenceDaysOfWeek
+import com.xenikii.timecalculator.data.mapper.encodeRecurrenceDaysOfWeek
+import com.xenikii.timecalculator.data.mapper.sanitizeRecurrenceDaysOfWeek
 import com.xenikii.timecalculator.data.model.RoutineEntity
 import com.xenikii.timecalculator.data.model.RoutineItemEntity
 import com.xenikii.timecalculator.data.model.SubDataEntity
@@ -42,6 +45,7 @@ fun RoutinePopulated.toRemote(): RemoteRoutine =
         scheduledAtAnchor = routine.scheduledAtAnchor,
         recurrenceUnit = routine.recurrenceUnit,
         recurrenceInterval = routine.recurrenceInterval,
+        recurrenceDaysOfWeek = routine.recurrenceDaysOfWeek.decodeRecurrenceDaysOfWeek().sorted(),
         items = items.sortedBy { it.item.orderIndex }.map { item ->
             RemoteRoutineItem(
                 id = item.item.id,
@@ -63,6 +67,7 @@ fun RemoteRoutine.toEntities(): Pair<RoutineEntity, List<RoutineItemEntity>> =
         scheduledAtAnchor = scheduledAtAnchor,
         recurrenceUnit = recurrenceUnit,
         recurrenceInterval = recurrenceInterval.coerceAtLeast(1),
+        recurrenceDaysOfWeek = recurrenceDaysOfWeek.sanitizeRecurrenceDaysOfWeek().encodeRecurrenceDaysOfWeek(),
         modifiedAt = modifiedAt,
         pendingSync = false,
     ) to items.map { item ->
@@ -94,6 +99,7 @@ fun tombstoneRoutine(id: String, modifiedAt: Long): RemoteRoutine =
         scheduledAtAnchor = "START",
         recurrenceUnit = "NONE",
         recurrenceInterval = 1,
+        recurrenceDaysOfWeek = emptyList(),
         items = emptyList(),
         modifiedAt = modifiedAt,
         deleted = true,

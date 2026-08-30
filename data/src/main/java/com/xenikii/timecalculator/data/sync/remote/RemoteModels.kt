@@ -32,6 +32,8 @@ data class RemoteRoutine(
     @SerialName("recurrence_unit") val recurrenceUnit: String = "NONE",
     @EncodeDefault
     @SerialName("recurrence_interval") val recurrenceInterval: Int = 1,
+    @EncodeDefault
+    @SerialName("recurrence_days_of_week") val recurrenceDaysOfWeek: List<Int> = emptyList(),
     val items: List<RemoteRoutineItem> = emptyList(),
     @SerialName("modified_at") val modifiedAt: Long,
     val deleted: Boolean = false,
