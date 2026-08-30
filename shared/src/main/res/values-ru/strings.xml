@@ -123,7 +123,7 @@
     <string name="task_update_title">Обновить задачу</string>
     <string name="task_add_more_durations">Добавить ещё продолжительность</string>
     <string name="task_durations">Продолжительности: %1$s</string>
-    <string name="task_set_duration">Установить продолжительность</string>
+    <string name="task_set_duration">Установить</string>
     <string name="task_duration_left">%1$s осталось</string>
     <string name="task_delete_dialog_title">Удалить задачу?</string>
     <string name="task_delete_dialog_message">Это действие нельзя отменить.</string>
