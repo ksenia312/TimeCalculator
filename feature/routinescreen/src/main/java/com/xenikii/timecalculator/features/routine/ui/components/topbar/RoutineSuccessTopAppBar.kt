@@ -1,6 +1,10 @@
 package com.xenikii.timecalculator.features.routine.ui.components.topbar
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,6 +33,7 @@ import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 fun RoutineSuccessTopAppBar(
     viewState: RoutineViewState.Success,
     collapseFraction: Float = 0f,
+    scrollableState: ScrollableState? = null,
     onShowEditDialog: () -> Unit = { },
 ) {
     val fraction = collapseFraction.coerceIn(0f, 1f)
@@ -42,15 +47,24 @@ fun RoutineSuccessTopAppBar(
     Column(
         modifier = Modifier
             .routineCard(
-                verticalPadding = lerp(24.dp, 12.dp, fraction),
-                horizontalPadding = 0.dp,
+                verticalPadding = if (collapsedOwnsTitle) PaddingValues(top = 8.dp, bottom = 12.dp) else PaddingValues(top = 8.dp, bottom = 16.dp),
+                horizontalPadding = PaddingValues(0.dp),
                 viewItem = viewItem,
                 sharedKey = routineCardSharedKey(viewState.routine.id),
                 shape = RoundedCornerShape(
                     bottomEnd = 28.dp,
                     bottomStart = 28.dp
                 ),
-                onClick = onShowEditDialog,
+            )
+            .then(
+                if (scrollableState != null) {
+                    Modifier.scrollable(
+                        state = scrollableState,
+                        orientation = Orientation.Vertical,
+                    )
+                } else {
+                    Modifier
+                }
             )
             .statusBarsPadding()
     ) {
@@ -58,6 +72,7 @@ fun RoutineSuccessTopAppBar(
             title = viewItem.title,
             collapsedTitleAlpha = titleEnter,
             ownsTitleForA11y = collapsedOwnsTitle,
+            onSettingsClick = onShowEditDialog,
         )
 
         Spacer(Modifier.height(lerp(16.dp, 0.dp, fraction)))

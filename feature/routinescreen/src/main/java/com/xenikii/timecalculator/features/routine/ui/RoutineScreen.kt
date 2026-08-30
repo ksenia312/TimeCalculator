@@ -43,6 +43,7 @@ fun RoutineScreen(
                 RoutineTopBar(
                     viewState = viewState,
                     collapseFraction = collapsingTopBar.fraction,
+                    scrollableState = collapsingTopBar.scrollableState,
                     onShowEditDialog = {
                         navigator.navigateTo(
                             AppRoute.EditRoutine(

@@ -3,6 +3,7 @@ package com.xenikii.timecalculator.features.landing.ui.card
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,7 +53,7 @@ fun LandingCard(
             .fillMaxSize()
             .routineCard(
                 viewItem = viewItem,
-                horizontalPadding = 16.dp,
+                horizontalPadding = PaddingValues(horizontal = 16.dp),
                 sharedKey = routineCardSharedKey(routineState.routineId),
             ) {
                 onNavigate(routineState.routineId)

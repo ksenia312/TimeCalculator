@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.features.routine.ui.components.topbar
 
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,17 @@ class CollapsingTopBarState(private val maxOffsetPx: Float) {
             offsetPx = newValue
             return Offset(0f, previous - newValue)
         }
+    }
+
+    /**
+     * Lets the top bar itself be dragged to collapse/expand it, so a swipe that starts directly
+     * on the bar (e.g. on the routine card) scrolls it instead of doing nothing.
+     */
+    val scrollableState: ScrollableState = ScrollableState { delta ->
+        val previous = offsetPx
+        val newValue = (previous - delta).coerceIn(0f, maxOffsetPx)
+        offsetPx = newValue
+        previous - newValue
     }
 }
 

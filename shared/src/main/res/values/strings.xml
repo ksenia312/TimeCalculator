@@ -35,6 +35,7 @@
     <string name="auth_session_expired">Your session expired. Please log in again.</string>
 
     <string name="content_desc_delete">Delete</string>
+    <string name="content_desc_routine_settings">Routine settings</string>
     <string name="content_desc_back">Back</string>
     <string name="content_desc_close">Close</string>
     <string name="content_desc_open_menu">Open menu</string>

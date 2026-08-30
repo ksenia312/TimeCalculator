@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.features.routine.ui.components.topbar
 
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.xenikii.timecalculator.R
@@ -9,6 +10,7 @@ import com.xenikii.timecalculator.features.routine.presentation.RoutineViewState
 fun RoutineTopBar(
     viewState: RoutineViewState,
     collapseFraction: Float = 0f,
+    scrollableState: ScrollableState? = null,
     onShowEditDialog: () -> Unit,
 ) {
     when (viewState) {
@@ -16,6 +18,7 @@ fun RoutineTopBar(
             RoutineSuccessTopAppBar(
                 viewState,
                 collapseFraction = collapseFraction,
+                scrollableState = scrollableState,
                 onShowEditDialog = onShowEditDialog
             )
         }

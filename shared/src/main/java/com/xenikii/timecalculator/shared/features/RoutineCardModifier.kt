@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.shared.animation.LocalCardAnimatedContentScope
 import com.xenikii.timecalculator.shared.animation.LocalSharedTransitionScope
@@ -25,12 +25,12 @@ import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Modifier.routineCard(
-    horizontalPadding: Dp = 24.dp,
-    verticalPadding: Dp = 32.dp,
+    horizontalPadding: PaddingValues = PaddingValues(horizontal = 24.dp),
+    verticalPadding: PaddingValues = PaddingValues(vertical = 32.dp),
     shape: RoundedCornerShape = RoundedCornerShape(28.dp),
     viewItem: RoutineCardViewItem,
     sharedKey: Any? = null,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
 ): Modifier {
     val sharedScope = LocalSharedTransitionScope.current
     val animatedScope = LocalCardAnimatedContentScope.current
@@ -66,10 +66,17 @@ fun Modifier.routineCard(
                 isCompleted = viewItem.isCompleted
             )
         )
-        .clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = onClick,
+        .then(
+            if (onClick != null) {
+                Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                )
+            } else {
+                Modifier
+            }
         )
-        .padding(horizontalPadding, verticalPadding)
+        .padding(horizontalPadding)
+        .padding(verticalPadding)
 }
