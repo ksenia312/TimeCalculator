@@ -63,7 +63,7 @@
     <string name="fab_task">Задача</string>
     <string name="fab_routine">Рутина</string>
     <string name="fab_add_task">Создать задачу</string>
-    <string name="fab_manage_tasks">Связать существующие задачи</string>
+    <string name="fab_manage_tasks">Выбрать из библиотеки задач</string>
     <string name="fab_add_item">Добавить элемент</string>
 
     <string name="routine_anchor_start_at">Время начала</string>
