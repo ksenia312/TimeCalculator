@@ -18,6 +18,11 @@ interface RoutineScheduleRepository {
         forceReschedule: Boolean = false,
     )
 
+    suspend fun refreshNotifications(
+        routines: List<Routine>,
+        now: Instant,
+    )
+
     suspend fun handleAlarm(
         routine: Routine,
         kind: RoutineAlarmKind,

@@ -147,6 +147,19 @@ interface RoutinesDao {
         LEFT JOIN routine_items ri ON ri.routineId = r.id
         LEFT JOIN tasks t ON t.id = ri.taskId
         LEFT JOIN sub_data sd ON sd.id = ri.subDataId
+        GROUP BY r.id
+        """
+    )
+    suspend fun getRoutinesPopulatedOnce(): List<RoutinePopulated>
+
+    @Transaction
+    @Query(
+        """
+        SELECT r.*
+        FROM routines r
+        LEFT JOIN routine_items ri ON ri.routineId = r.id
+        LEFT JOIN tasks t ON t.id = ri.taskId
+        LEFT JOIN sub_data sd ON sd.id = ri.subDataId
         WHERE r.pendingSync = 1
         GROUP BY r.id
         """

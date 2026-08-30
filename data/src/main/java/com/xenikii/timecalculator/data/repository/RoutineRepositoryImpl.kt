@@ -44,6 +44,10 @@ class RoutineRepositoryImpl(
     override fun getRoutineFlow(id: String): Flow<Routine?> =
         routinesFlow.map { routines -> routines.firstOrNull { it.id == id } }
 
+    override suspend fun getRoutines(): List<Routine> = withContext(Dispatchers.IO) {
+        routinesDao.getRoutinesPopulatedOnce().map { it.toDomain() }
+    }
+
     override suspend fun addRoutine(request: RoutineRequest) {
         val scheduledAt = request.scheduledAt.withZeroSeconds()
         val routineEntity = RoutineEntity(

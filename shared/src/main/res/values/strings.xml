@@ -148,6 +148,10 @@
     <string name="settings_logout_dialog_title">Log out?</string>
     <string name="settings_logout_dialog_message">Are you sure you want to log out of your account?</string>
     <string name="settings_logout_dialog_confirm">Log out</string>
+    <string name="settings_notifications_label">Notifications</string>
+    <string name="settings_notifications_supporting">Live progress notifications for routines and tasks</string>
+    <string name="settings_notifications_blocked">Notifications are turned off in system settings</string>
+    <string name="settings_notifications_open_system_settings">Open system settings</string>
 
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>

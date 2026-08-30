@@ -1,7 +1,10 @@
 package com.xenikii.timecalculator.features.settings.ui
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,10 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AlternateEmail
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,6 +47,7 @@ import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 fun SettingsContent(
     viewState: SettingsViewState,
     onLogoutClick: () -> Unit,
+    onNotificationsEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val email = viewState.user?.email ?: stringResource(R.string.settings_email_placeholder)
@@ -86,7 +94,14 @@ fun SettingsContent(
             },
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        NotificationSettingsItem(
+            viewState = viewState,
+            onEnabledChange = onNotificationsEnabledChange,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         AppButtonMedium(
             onClick = { showLogoutDialog = true },
@@ -124,6 +139,74 @@ fun SettingsContent(
     }
 }
 
+@Composable
+private fun ColumnScope.NotificationSettingsItem(
+    viewState: SettingsViewState,
+    onEnabledChange: (Boolean) -> Unit,
+) {
+    val context = LocalContext.current
+    val allowed = viewState.areSystemNotificationsAllowed
+
+
+    AppListItem(
+        headlineContent = {
+            Text(
+                text = stringResource(R.string.settings_notifications_label),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        },
+        supportingContent = {
+            Text(
+                text = if (allowed) {
+                    stringResource(R.string.settings_notifications_supporting)
+                } else {
+                    stringResource(R.string.settings_notifications_blocked)
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = LocalCustomColorScheme.current.label,
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = if (viewState.isNotificationsSwitchOn) {
+                    Icons.Filled.Notifications
+                } else {
+                    Icons.Filled.NotificationsOff
+                },
+                contentDescription = null,
+                Modifier.size(24.dp),
+            )
+        },
+        trailingContent = {
+            Switch(
+                checked = viewState.isNotificationsSwitchOn,
+                onCheckedChange = onEnabledChange,
+                enabled = allowed,
+            )
+        },
+    )
+
+    if (!allowed) {
+        Spacer(modifier = Modifier.height(12.dp))
+        AppButtonMedium(
+            onClick = {
+                context.startActivity(
+                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    },
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.settings_notifications_open_system_settings),
+            )
+        }
+    }
+}
+
 @PreviewAll
 @Composable
 private fun SettingsContentPreview() {
@@ -131,6 +214,19 @@ private fun SettingsContentPreview() {
         SettingsContent(
             viewState = SettingsViewState(),
             onLogoutClick = {},
+            onNotificationsEnabledChange = {},
+        )
+    }
+}
+
+@PreviewAll
+@Composable
+private fun SettingsContentNotificationsBlockedPreview() {
+    PreviewTheme {
+        SettingsContent(
+            viewState = SettingsViewState(areSystemNotificationsAllowed = false),
+            onLogoutClick = {},
+            onNotificationsEnabledChange = {},
         )
     }
 }
@@ -142,6 +238,7 @@ private fun SettingsContentLoggingOutPreview() {
         SettingsContent(
             viewState = SettingsViewState(isLoggingOut = true),
             onLogoutClick = {},
+            onNotificationsEnabledChange = {},
         )
     }
 }

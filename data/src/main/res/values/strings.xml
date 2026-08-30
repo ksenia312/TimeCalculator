@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="notification_routine_title">Routine in progress</string>
     <string name="notification_channel_routine_progress">Routine progress</string>
     <string name="notification_channel_routine_progress_description">Shows the active routine and current task countdown</string>
     <string name="notification_channel_task_alerts">Task alerts</string>

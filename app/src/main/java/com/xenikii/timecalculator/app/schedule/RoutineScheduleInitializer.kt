@@ -1,7 +1,9 @@
 package com.xenikii.timecalculator.app.schedule
 
 import android.content.Context
+import com.xenikii.timecalculator.data.schedule.RefreshRoutineNotificationsUseCase
 import com.xenikii.timecalculator.data.schedule.watchdog.RoutineScheduleWatchdogScheduler
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
@@ -10,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.milliseconds
@@ -21,6 +24,8 @@ class RoutineScheduleInitializer(
     private val scheduleRepository: RoutineScheduleRepository,
     private val alarmGateway: RoutineAlarmGateway,
     private val permissionRequester: RoutineExactAlarmPermissionRequester,
+    private val notificationSettingsRepository: NotificationSettingsRepository,
+    private val refreshRoutineNotifications: RefreshRoutineNotificationsUseCase,
 ) {
     private val started = AtomicBoolean(false)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -40,6 +45,13 @@ class RoutineScheduleInitializer(
                         routines = routines,
                         now = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
                     )
+                }
+        }
+        scope.launch {
+            notificationSettingsRepository.observeEnabled()
+                .drop(1)
+                .collect {
+                    refreshRoutineNotifications()
                 }
         }
     }

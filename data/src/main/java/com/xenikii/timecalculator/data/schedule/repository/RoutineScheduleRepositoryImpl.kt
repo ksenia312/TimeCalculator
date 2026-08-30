@@ -7,6 +7,7 @@ import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
@@ -19,6 +20,7 @@ class RoutineScheduleRepositoryImpl(
     private val alarmGateway: RoutineAlarmGateway,
     private val notificationGateway: RoutineNotificationGateway,
     private val scheduleRecordDataSource: ScheduleRecordDataSource,
+    private val notificationSettings: NotificationSettingsLocalDataSource,
 ) : RoutineScheduleRepository {
 
     private val mutex = Mutex()
@@ -47,6 +49,24 @@ class RoutineScheduleRepositoryImpl(
 
             routines.forEach { routine ->
                 rescheduleRoutine(routine = routine, now = now, forceReschedule = forceReschedule)
+            }
+        }
+    }
+
+    override suspend fun refreshNotifications(
+        routines: List<Routine>,
+        now: Instant,
+    ) {
+        mutex.withLock {
+            val enabled = notificationSettings.isEnabled()
+            routines.forEach { routine ->
+                val schedule = computeSchedule(routine, now)
+                val isActive = schedule.phaseAt(now) == RoutineSchedulePhase.ACTIVE
+                if (enabled && isActive) {
+                    notificationGateway.postProgress(routine, schedule, now)
+                } else {
+                    notificationGateway.cancelProgress(routine.id)
+                }
             }
         }
     }

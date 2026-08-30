@@ -10,9 +10,12 @@ import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -124,6 +127,7 @@ class RoutineScheduleRepositoryImplTest {
             alarmGateway = alarmGateway,
             notificationGateway = notificationGateway,
             scheduleRecordDataSource = records,
+            notificationSettings = FakeNotificationSettingsLocalDataSource(),
         )
         val routine = routine(
             scheduledAt = instant(day = 1, hour = 9),
@@ -154,6 +158,7 @@ class RoutineScheduleRepositoryImplTest {
             alarmGateway = RecordingAlarmGateway(),
             notificationGateway = RecordingNotificationGateway(),
             scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
+            notificationSettings = FakeNotificationSettingsLocalDataSource(),
         )
 
     private fun routine(
@@ -208,6 +213,17 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
     }
 
     override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant) = Unit
+}
+
+private class FakeNotificationSettingsLocalDataSource(
+    enabled: Boolean = true,
+) : NotificationSettingsLocalDataSource {
+    private val state = MutableStateFlow(enabled)
+    override fun observeEnabled(): Flow<Boolean> = state
+    override fun isEnabled(): Boolean = state.value
+    override suspend fun setEnabled(enabled: Boolean) {
+        state.value = enabled
+    }
 }
 
 private class InMemoryScheduleRecordDataSource : ScheduleRecordDataSource {

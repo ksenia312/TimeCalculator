@@ -10,11 +10,13 @@ import com.xenikii.timecalculator.data.schedule.alarm.buildRoutineDetailPendingI
 import com.xenikii.timecalculator.data.schedule.alarm.stableNotificationId
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import kotlin.time.Instant
 
 class RoutineNotificationPresenter(
     private val context: Context,
+    private val notificationSettings: NotificationSettingsLocalDataSource,
 ) : RoutineNotificationGateway {
 
     private val notificationManager = NotificationManagerCompat.from(context)
@@ -37,14 +39,14 @@ class RoutineNotificationPresenter(
         plan: RoutineSchedule,
         now: Instant,
     ) {
+        if (!notificationSettings.isEnabled()) return
         if (!notificationManager.areNotificationsEnabled()) return
         val task = plan.taskAt(now) ?: return
-        val text = routine.title
         val notification = NotificationCompat.Builder(context, CHANNEL_PROGRESS)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle(task.title)
-            .setContentText(text)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setContentTitle("${context.getString(R.string.notification_routine_title)}: ${routine.title}")
+            .setContentText(task.title)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(task.title))
             .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
             .setOngoing(true)
             .setOnlyAlertOnce(true)

@@ -10,10 +10,14 @@ import com.xenikii.timecalculator.data.auth.SupabaseClientProvider
 import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.MIGRATION_1_2
 import com.xenikii.timecalculator.data.db.MIGRATION_2_3
+import com.xenikii.timecalculator.data.notification.settings.NotificationSettingsRepositoryImpl
+import com.xenikii.timecalculator.data.notification.settings.PreferencesNotificationSettingsLocalDataSource
+import com.xenikii.timecalculator.data.notification.settings.SystemNotificationPermissionChecker
 import com.xenikii.timecalculator.data.onboarding.OnboardingRepositoryImpl
 import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboardingLocalDataSource
 import com.xenikii.timecalculator.data.repository.RoutineRepositoryImpl
 import com.xenikii.timecalculator.data.repository.TasksRepositoryImpl
+import com.xenikii.timecalculator.data.schedule.RefreshRoutineNotificationsUseCase
 import com.xenikii.timecalculator.data.schedule.alarm.AlarmManagerRoutineAlarmGateway
 import com.xenikii.timecalculator.data.schedule.notification.RoutineNotificationPresenter
 import com.xenikii.timecalculator.data.schedule.persistence.PreferencesScheduleRecordDataSource
@@ -24,6 +28,9 @@ import com.xenikii.timecalculator.data.sync.SyncEngine
 import com.xenikii.timecalculator.data.sync.SyncTrigger
 import com.xenikii.timecalculator.data.sync.remote.SupabaseRemoteDataSource
 import com.xenikii.timecalculator.domain.repository.AuthRepository
+import com.xenikii.timecalculator.domain.repository.NotificationPermissionChecker
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
 import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
 import com.xenikii.timecalculator.domain.repository.OnboardingRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
@@ -71,6 +78,16 @@ object AppModule {
         single { AuthUserPreferences(context) }
         single<OnboardingLocalDataSource> { PreferencesOnboardingLocalDataSource(context) }
         single<OnboardingRepository> { OnboardingRepositoryImpl(localDataSource = get()) }
+        single<NotificationSettingsLocalDataSource> {
+            PreferencesNotificationSettingsLocalDataSource(context)
+        }
+        single<NotificationPermissionChecker> { SystemNotificationPermissionChecker(context) }
+        single<NotificationSettingsRepository> {
+            NotificationSettingsRepositoryImpl(
+                localDataSource = get(),
+                permissionChecker = get(),
+            )
+        }
         single { SyncCursorStore(context) }
         single { SyncTrigger() }
         single { SupabaseRemoteDataSource(get()) }
@@ -129,12 +146,24 @@ object AppModule {
 
         single<RoutineAlarmGateway> { AlarmManagerRoutineAlarmGateway(context) }
         single<ScheduleRecordDataSource> { PreferencesScheduleRecordDataSource(context) }
-        single<RoutineNotificationGateway> { RoutineNotificationPresenter(context) }
+        single<RoutineNotificationGateway> {
+            RoutineNotificationPresenter(
+                context = context,
+                notificationSettings = get(),
+            )
+        }
         single<RoutineScheduleRepository> {
             RoutineScheduleRepositoryImpl(
                 alarmGateway = get(),
                 notificationGateway = get(),
                 scheduleRecordDataSource = get(),
+                notificationSettings = get(),
+            )
+        }
+        single {
+            RefreshRoutineNotificationsUseCase(
+                routineRepository = get(),
+                scheduleRepository = get(),
             )
         }
 
@@ -142,9 +171,12 @@ object AppModule {
 
         factory {
             val logoutUseCase: LogoutUseCase = get()
+            val refreshRoutineNotifications: RefreshRoutineNotificationsUseCase = get()
             SettingsViewModel(
                 logoutUseCase = { logoutUseCase() },
                 authRepository = get(),
+                notificationSettingsRepository = get(),
+                refreshNotifications = { refreshRoutineNotifications() },
             )
         }
 

@@ -5,8 +5,10 @@ import com.xenikii.timecalculator.app.di.appModule
 import com.xenikii.timecalculator.app.schedule.RoutineExactAlarmPermissionRequester
 import com.xenikii.timecalculator.app.schedule.RoutineScheduleInitializer
 import com.xenikii.timecalculator.apphost.BuildConfig
+import com.xenikii.timecalculator.data.schedule.RefreshRoutineNotificationsUseCase
 import com.xenikii.timecalculator.data.sync.SyncManager
 import com.xenikii.timecalculator.di.AppModule
+import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
@@ -33,6 +35,8 @@ class TimeCalculatorApplication : Application() {
             scheduleRepository = koinApplication.koin.get<RoutineScheduleRepository>(),
             alarmGateway = koinApplication.koin.get<RoutineAlarmGateway>(),
             permissionRequester = RoutineExactAlarmPermissionRequester(applicationContext),
+            notificationSettingsRepository = koinApplication.koin.get<NotificationSettingsRepository>(),
+            refreshRoutineNotifications = koinApplication.koin.get<RefreshRoutineNotificationsUseCase>(),
         ).start()
     }
 }
