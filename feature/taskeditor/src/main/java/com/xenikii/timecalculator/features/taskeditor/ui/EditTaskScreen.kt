@@ -3,6 +3,7 @@ package com.xenikii.timecalculator.features.taskeditor.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -28,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewState
+import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
 import com.xenikii.timecalculator.shared.features.AddDurationButton
 import com.xenikii.timecalculator.shared.features.DurationInput
 import com.xenikii.timecalculator.shared.features.DurationRow
@@ -35,7 +37,6 @@ import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
 import com.xenikii.timecalculator.shared.features.SaveTaskButton
 import com.xenikii.timecalculator.shared.features.TaskNameField
 import com.xenikii.timecalculator.shared.features.selectedIndexAfterRemove
-import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
 import com.xenikii.timecalculator.shared.navigator.EditTaskArguments
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -68,7 +69,9 @@ fun EditTaskScreen(
             ) { padding ->
                 Text(
                     text = stringResource(R.string.top_bar_error),
-                    modifier = Modifier.padding(padding).padding(16.dp),
+                    modifier = Modifier
+                        .padding(padding)
+                        .padding(16.dp),
                 )
             }
         }
@@ -165,6 +168,7 @@ fun EditTaskScreen(
                     item {
                         SaveTaskButton(
                             enabled = durations.isNotEmpty() && durations.all(DurationInput::hasAnyValue),
+                            modifier = Modifier.fillMaxWidth(),
                             onConfirm = {
                                 val durationsRes = durations.mapNotNull { it.totalMinutesOrNull()?.minutes }
                                 if (durationsRes.size == durations.size) {

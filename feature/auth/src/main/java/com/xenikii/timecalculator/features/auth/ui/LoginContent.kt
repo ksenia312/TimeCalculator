@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.auth.presentation.AuthFormState
-import com.xenikii.timecalculator.shared.components.AppButtonExpressive
+import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.BackButton
@@ -106,10 +106,10 @@ fun LoginContent(
                 )
             }
             Spacer(Modifier.height(AuthSpacing.ActionSpacing))
-            AppButtonExpressive(
+            AppButtonMedium(
                 onClick = onSubmit,
                 enabled = !state.isLoading,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if (state.isLoading) {
                     CircularProgressIndicator(

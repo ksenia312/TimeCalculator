@@ -33,9 +33,9 @@ import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.features.landing.presentation.LandingCardTaskViewItem
 import com.xenikii.timecalculator.features.landing.presentation.LandingRoutineState
 import com.xenikii.timecalculator.shared.animation.routineCardSharedKey
-import com.xenikii.timecalculator.shared.features.RoutineRecurrenceBadge
 import com.xenikii.timecalculator.shared.features.RoutineCardStatusRow
 import com.xenikii.timecalculator.shared.features.RoutineCardTimeInfo
+import com.xenikii.timecalculator.shared.features.RoutineRecurrenceBadge
 import com.xenikii.timecalculator.shared.features.routineCard
 
 @Composable

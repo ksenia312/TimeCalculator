@@ -1,12 +1,12 @@
 package com.xenikii.timecalculator.app
 
 import android.app.Application
-import com.xenikii.timecalculator.apphost.BuildConfig
 import com.xenikii.timecalculator.app.di.appModule
-import com.xenikii.timecalculator.data.sync.SyncManager
-import com.xenikii.timecalculator.di.AppModule
 import com.xenikii.timecalculator.app.schedule.RoutineExactAlarmPermissionRequester
 import com.xenikii.timecalculator.app.schedule.RoutineScheduleInitializer
+import com.xenikii.timecalculator.apphost.BuildConfig
+import com.xenikii.timecalculator.data.sync.SyncManager
+import com.xenikii.timecalculator.di.AppModule
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository

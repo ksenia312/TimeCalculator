@@ -1,8 +1,8 @@
 package com.xenikii.timecalculator.data.sync.remote
 
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.EncodeDefault
 
 @Serializable
 data class RemoteTask(

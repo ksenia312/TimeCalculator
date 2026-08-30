@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.data.mapper
 
+import com.xenikii.timecalculator.data.db.RoutinePopulated
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineLink
 import com.xenikii.timecalculator.domain.model.RoutineRecurrence
@@ -7,7 +8,6 @@ import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
-import com.xenikii.timecalculator.data.db.RoutinePopulated
 import kotlin.time.Instant
 
 fun RoutinePopulated.toDomain(): Routine {

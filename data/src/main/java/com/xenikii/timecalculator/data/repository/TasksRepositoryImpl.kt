@@ -1,18 +1,18 @@
 package com.xenikii.timecalculator.data.repository
 
+import androidx.room.withTransaction
+import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.SyncDao
 import com.xenikii.timecalculator.data.db.TasksDao
-import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.model.PendingDeletionEntity
+import com.xenikii.timecalculator.data.model.SubDataEntity
+import com.xenikii.timecalculator.data.model.TaskEntity
+import com.xenikii.timecalculator.data.sync.SyncTrigger
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
 import com.xenikii.timecalculator.domain.model.TaskRequest
 import com.xenikii.timecalculator.domain.model.TaskUpdateRequest
 import com.xenikii.timecalculator.domain.repository.TasksRepository
-import com.xenikii.timecalculator.data.model.SubDataEntity
-import com.xenikii.timecalculator.data.model.TaskEntity
-import com.xenikii.timecalculator.data.sync.SyncTrigger
-import androidx.room.withTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

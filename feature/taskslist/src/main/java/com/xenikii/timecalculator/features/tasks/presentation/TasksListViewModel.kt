@@ -3,7 +3,6 @@ package com.xenikii.timecalculator.features.tasks.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.model.Task
-import com.xenikii.timecalculator.domain.model.TaskUpdateRequest
 import com.xenikii.timecalculator.domain.repository.TasksRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

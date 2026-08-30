@@ -1,6 +1,8 @@
 package com.xenikii.timecalculator.features.taskeditor.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -12,6 +14,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -106,6 +109,7 @@ fun CreateTaskScreen(
             item {
                 SaveTaskButton(
                     enabled = durations.isNotEmpty() && durations.all(DurationInput::hasAnyValue),
+                    modifier = Modifier.fillMaxWidth(),
                     onConfirm = {
                         val durationsRes = durations.mapNotNull { it.totalMinutesOrNull()?.minutes }
                         if (durationsRes.size == durations.size) {
@@ -113,7 +117,7 @@ fun CreateTaskScreen(
                                 TaskRequest(
                                     title = title,
                                     description = "",
-                                    durations = durationsRes.filterNotNull()
+                                    durations = durationsRes
                                 ),
                                 selectedDurationIndex = selectedIndex,
                             )

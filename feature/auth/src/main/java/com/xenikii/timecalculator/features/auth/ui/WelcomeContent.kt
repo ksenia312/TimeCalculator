@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.auth.presentation.WelcomeState
 import com.xenikii.timecalculator.shared.components.AppButtonExpressive
-import com.xenikii.timecalculator.shared.components.AppOutlinedButtonMedium
+import com.xenikii.timecalculator.shared.components.AppTextButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
@@ -76,7 +76,7 @@ fun WelcomeContent(
                         Text(stringResource(R.string.auth_welcome_register))
                     }
                     Spacer(Modifier.height(AuthSpacing.LinkSpacing))
-                    AppOutlinedButtonMedium(
+                    AppTextButtonMedium(
                         onClick = onNavigateToLogin,
                         modifier = Modifier.fillMaxWidth(0.7f),
                     ) {

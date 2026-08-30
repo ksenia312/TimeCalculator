@@ -2,7 +2,6 @@ package com.xenikii.timecalculator.shared.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -11,9 +10,9 @@ import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.theme.TimeCalculatorTheme
 
 val AppButtonShape = RoundedCornerShape(1000.dp)
@@ -81,6 +81,7 @@ fun AppButtonMedium(
             }
         },
     )
+
 }
 
 @Composable
@@ -109,21 +110,28 @@ fun AppElevatedButtonMedium(
             }
         },
     )
+
 }
 
 @Composable
-fun AppOutlinedButtonMedium(
+fun AppTextButtonMedium(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = AppButtonShape,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
-    elevation: ButtonElevation? = null,
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(
+        defaultElevation = 0.dp,
+        pressedElevation = 0.dp,
+        focusedElevation = 0.dp,
+        disabledElevation = 0.dp,
+        hoveredElevation = 0.dp,
+    ),
     contentPadding: PaddingValues = AppButtonContentMediumPadding,
     defaultTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     content: @Composable RowScope.() -> Unit,
 ) {
-    OutlinedButton(
+    TextButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
@@ -137,6 +145,7 @@ fun AppOutlinedButtonMedium(
             }
         },
     )
+
 }
 
 @Preview
@@ -146,7 +155,6 @@ private fun AppButtonExpressivePreview() {
         Surface {
             AppButtonExpressive(
                 onClick = {},
-                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Primary")
             }
@@ -155,15 +163,15 @@ private fun AppButtonExpressivePreview() {
 }
 
 @Preview
+@PreviewAll
 @Composable
 private fun AppButtonMediumPreview() {
     TimeCalculatorTheme {
         Surface {
             AppButtonMedium(
                 onClick = {},
-                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Primary Medium")
+                Text("P")
             }
         }
     }
@@ -176,7 +184,6 @@ private fun AppElevatedButtonMediumPreview() {
         Surface {
             AppElevatedButtonMedium(
                 onClick = {},
-                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Elevated Medium")
             }
@@ -186,12 +193,11 @@ private fun AppElevatedButtonMediumPreview() {
 
 @Preview
 @Composable
-private fun AppOutlinedButtonMediumPreview() {
+private fun AppTextButtonMediumPreview() {
     TimeCalculatorTheme {
         Surface {
-            AppOutlinedButtonMedium(
+            AppTextButtonMedium(
                 onClick = {},
-                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Outlined Medium")
             }

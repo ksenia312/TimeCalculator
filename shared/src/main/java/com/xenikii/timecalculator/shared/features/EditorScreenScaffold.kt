@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.components.AddNewButton
@@ -33,6 +34,7 @@ import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.BackButton
 import com.xenikii.timecalculator.shared.components.SmallIconButton
+import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,10 +188,11 @@ fun AddDurationButton(
 @Composable
 fun SaveTaskButton(
     enabled: Boolean,
+    modifier: Modifier = Modifier,
     onConfirm: () -> Unit,
 ) {
     AppButtonMedium(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         enabled = enabled,
         onClick = onConfirm,
         colors = ButtonDefaults.elevatedButtonColors(
@@ -212,5 +215,21 @@ fun selectedIndexAfterRemove(
         current == removedIndex -> newLastIndex
         current > removedIndex -> current - 1
         else -> current.coerceAtMost(newLastIndex)
+    }
+}
+
+@Preview
+@Composable
+private fun EditorScreenScaffoldPreview() {
+    PreviewTheme {
+        EditorScreenScaffold(
+            screenTitle = "Edit Task",
+            onDismiss = {},
+        ) { padding ->
+            Text(
+                text = "Content goes here",
+                modifier = Modifier.padding(padding),
+            )
+        }
     }
 }

@@ -10,11 +10,11 @@ import androidx.compose.ui.res.stringResource
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
-import com.xenikii.timecalculator.shared.navigator.AppRoute
-import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import com.xenikii.timecalculator.features.routine.ui.components.tasksselection.TasksBottomSheet
 import com.xenikii.timecalculator.shared.components.FabItem
 import com.xenikii.timecalculator.shared.components.FabMenu
+import com.xenikii.timecalculator.shared.navigator.AppRoute
+import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 
 @Composable
 fun EditRoutineFloatingButton(

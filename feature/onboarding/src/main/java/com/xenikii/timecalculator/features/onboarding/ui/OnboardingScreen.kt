@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.xenikii.timecalculator.features.onboarding.presentation.OnboardingViewModel
-import com.xenikii.timecalculator.features.onboarding.presentation.onboardingImages
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
