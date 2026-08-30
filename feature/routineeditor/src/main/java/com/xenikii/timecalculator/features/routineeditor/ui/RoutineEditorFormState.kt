@@ -23,11 +23,23 @@ data class RoutineEditorFormState(
     val time: LocalTime = LocalTime(7, 0),
 )
 
+/** ISO day-of-week numbers (1 = Monday .. 7 = Sunday) accepted by the weekly recurrence editor. */
+private val ISO_DAYS_OF_WEEK = 1..7
+
 fun Routine.toRoutineEditorFormState(zoneId: ZoneId = ZoneId.systemDefault()): RoutineEditorFormState {
     val initialDateTime = java.time.Instant
         .ofEpochMilli(scheduledAt.toEpochMilliseconds())
         .atZone(zoneId)
         .toLocalDateTime()
+
+    val date = initialDateTime.toLocalDate()
+    val recurrenceDaysOfWeek = recurrence.daysOfWeek
+        .filter { it in ISO_DAYS_OF_WEEK }
+        .toSet()
+        .ifEmpty {
+            if (recurrence.unit == RoutineRecurrenceUnit.WEEK) setOf(date.dayOfWeek.value)
+            else emptySet()
+        }
 
     return RoutineEditorFormState(
         isVisible = true,
@@ -36,33 +48,66 @@ fun Routine.toRoutineEditorFormState(zoneId: ZoneId = ZoneId.systemDefault()): R
         anchor = scheduledAtAnchor,
         recurrenceUnit = recurrence.unit,
         recurrenceInterval = recurrence.interval,
-        recurrenceDaysOfWeek = recurrence.daysOfWeek,
-        date = initialDateTime.toLocalDate(),
-        time = LocalTime(initialDateTime.hour, initialDateTime.minute, 0, 0),
+        recurrenceDaysOfWeek = recurrenceDaysOfWeek,
+        date = date,
+        time = LocalTime(initialDateTime.hour, initialDateTime.minute),
     )
 }
 
 /**
- * The weekdays the routine repeats on, but only when weekly recurrence is active. Prevents stale
- * day selections from leaking into non-weekly recurrences. When no day has been picked yet, the
- * weekday of the selected start [date] is used as the default, so "repeat weekly from Sep 1
- * (Tuesday)" implies every Tuesday until the user changes the selection.
+ * The weekdays the routine repeats on, but only while weekly recurrence is active. Any other
+ * recurrence unit yields an empty set so stale day selections can't leak into non-weekly
+ * recurrences. Values outside the ISO range (1 = Monday .. 7 = Sunday) are dropped.
  */
 fun RoutineEditorFormState.effectiveRecurrenceDaysOfWeek(): Set<Int> =
     if (recurrenceUnit == RoutineRecurrenceUnit.WEEK) {
         recurrenceDaysOfWeek
-            .filter { it in 1..7 }
+            .filter { it in ISO_DAYS_OF_WEEK }
             .toSet()
-            .ifEmpty { setOf(date.dayOfWeek.value) }
     } else {
         emptySet()
     }
+
+/**
+ * Applies a [recurrenceUnit] change. When weekly recurrence is switched on and no valid day is
+ * currently selected, the selected [date]'s weekday is seeded as a default, mirroring the one-time
+ * seeding in [toRoutineEditorFormState]. Existing selections are preserved as-is.
+ */
+fun RoutineEditorFormState.withRecurrenceUnit(unit: RoutineRecurrenceUnit): RoutineEditorFormState {
+    val activatingWeekly = unit == RoutineRecurrenceUnit.WEEK && recurrenceUnit != RoutineRecurrenceUnit.WEEK
+    val seededDays = if (activatingWeekly && recurrenceDaysOfWeek.none { it in ISO_DAYS_OF_WEEK }) {
+        setOf(date.dayOfWeek.value)
+    } else {
+        recurrenceDaysOfWeek
+    }
+    return copy(recurrenceUnit = unit, recurrenceDaysOfWeek = seededDays)
+}
+
+/**
+ * Applies a [date] change. While weekly recurrence is active the day selection follows the picked
+ * date, collapsing to that date's weekday; for every other recurrence unit the current selection is
+ * left untouched.
+ */
+fun RoutineEditorFormState.withDate(date: LocalDate): RoutineEditorFormState {
+    val seededDays = if (recurrenceUnit == RoutineRecurrenceUnit.WEEK) {
+        setOf(date.dayOfWeek.value)
+    } else {
+        recurrenceDaysOfWeek
+    }
+    return copy(date = date, recurrenceDaysOfWeek = seededDays)
+}
+
+fun RoutineEditorFormState.toRoutineRecurrence(): RoutineRecurrence = RoutineRecurrence(
+    interval = recurrenceInterval.coerceAtLeast(1),
+    unit = recurrenceUnit,
+    daysOfWeek = effectiveRecurrenceDaysOfWeek(),
+)
 
 fun RoutineEditorFormState.toScheduledAtInstant(
     zoneId: ZoneId = ZoneId.systemDefault(),
 ): Instant {
     val scheduledAtMillis = LocalDateTime
-        .of(date, java.time.LocalTime.of(time.hour, time.minute, 0, 0))
+        .of(date, java.time.LocalTime.of(time.hour, time.minute))
         .atZone(zoneId)
         .toInstant()
         .toEpochMilli()
@@ -79,9 +124,5 @@ fun Routine.applyRoutineEditorFormState(
     title = routineEditorFormState.title,
     scheduledAt = routineEditorFormState.toScheduledAtInstant(zoneId),
     scheduledAtAnchor = routineEditorFormState.anchor,
-    recurrence = RoutineRecurrence(
-        interval = routineEditorFormState.recurrenceInterval.coerceAtLeast(1),
-        unit = routineEditorFormState.recurrenceUnit,
-        daysOfWeek = routineEditorFormState.effectiveRecurrenceDaysOfWeek(),
-    ),
+    recurrence = routineEditorFormState.toRoutineRecurrence(),
 )

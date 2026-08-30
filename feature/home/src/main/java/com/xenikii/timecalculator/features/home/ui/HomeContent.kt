@@ -35,8 +35,8 @@ fun HomeContent(
             .fillMaxSize()
             .padding(
                 top = paddingValues.calculateTopPadding(),
-                start = paddingValues.calculateStartPadding(layoutDirection = layoutDirection) + 12.dp,
-                end = paddingValues.calculateEndPadding(layoutDirection = layoutDirection) + 12.dp,
+                start = paddingValues.calculateStartPadding(layoutDirection = layoutDirection),
+                end = paddingValues.calculateEndPadding(layoutDirection = layoutDirection),
             )
     ) {
         when (current) {

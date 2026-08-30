@@ -2,11 +2,10 @@ package com.xenikii.timecalculator.features.routineeditor.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.xenikii.timecalculator.domain.model.RoutineRecurrence
 import com.xenikii.timecalculator.domain.model.RoutineRequest
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.features.routineeditor.ui.RoutineEditorFormState
-import com.xenikii.timecalculator.features.routineeditor.ui.effectiveRecurrenceDaysOfWeek
+import com.xenikii.timecalculator.features.routineeditor.ui.toRoutineRecurrence
 import com.xenikii.timecalculator.features.routineeditor.ui.toScheduledAtInstant
 import com.xenikii.timecalculator.shared.extensions.toHexString
 import com.xenikii.timecalculator.shared.utils.RoutineColorPicker
@@ -35,11 +34,7 @@ class CreateRoutineViewModel(
                     title = state.title,
                     scheduledAt = state.toScheduledAtInstant(),
                     scheduledAtAnchor = state.anchor,
-                    recurrence = RoutineRecurrence(
-                        interval = state.recurrenceInterval.coerceAtLeast(1),
-                        unit = state.recurrenceUnit,
-                        daysOfWeek = state.effectiveRecurrenceDaysOfWeek(),
-                    ),
+                    recurrence = state.toRoutineRecurrence(),
                     color = RoutineColorPicker.pick().toHexString(),
                 )
             )

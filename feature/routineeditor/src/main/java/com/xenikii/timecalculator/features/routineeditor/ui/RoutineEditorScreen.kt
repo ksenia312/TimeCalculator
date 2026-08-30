@@ -243,7 +243,7 @@ private fun RoutineEditorScreen(
                     initialDate = resolvedDate,
                     onDateChange = {
                         onStateChange(
-                            viewState.copy(date = it)
+                            viewState.withDate(it)
                         )
                     }
                 )
@@ -302,20 +302,21 @@ private fun RoutineEditorScreen(
                         unit = resolvedRecurrenceUnit,
                         onChanged = {
                             onStateChange(
-                                viewState.copy(recurrenceUnit = it)
+                                viewState.withRecurrenceUnit(it)
                             )
                         },
                     )
 
                     if (resolvedRecurrenceUnit == RoutineRecurrenceUnit.WEEK) {
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(16.dp))
 
                         Text(
                             text = stringResource(R.string.routine_repeat_on_days_label),
                             style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 12.dp)
                         )
 
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(12.dp))
 
                         RoutineDaysOfWeekSelector(
                             selectedDays = viewState.effectiveRecurrenceDaysOfWeek(),

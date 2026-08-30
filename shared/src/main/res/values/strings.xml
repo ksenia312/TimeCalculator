@@ -92,6 +92,7 @@
     <string name="routine_recurrence_summary_every">Repeats every %1$s</string>
     <string name="routine_recurrence_summary_on_days">%1$s:\n%2$s</string>
     <string name="routine_recurrence_weekdays">Weekdays</string>
+    <string name="routine_recurrence_weekends">Weekends</string>
     <string name="routine_status_running">Running</string>
     <string name="routine_status_completed">Completed</string>
     <string name="routine_status_planned">Planned</string>

@@ -119,6 +119,10 @@ private fun recurrenceDaysLabel(daysOfWeek: Set<Int>): String? {
         return stringResource(R.string.routine_recurrence_weekdays)
     }
 
+    if (days == WEEKENDS) {
+        return stringResource(R.string.routine_recurrence_weekends)
+    }
+
     val configuration = LocalConfiguration.current
     val locale = configuration.locales.get(0) ?: Locale.getDefault()
     return days.joinToString(separator = ", ") { value ->
@@ -127,3 +131,4 @@ private fun recurrenceDaysLabel(daysOfWeek: Set<Int>): String? {
 }
 
 private val WEEKDAYS: Set<Int> = sortedSetOf(1, 2, 3, 4, 5)
+private val WEEKENDS: Set<Int> = sortedSetOf(6, 7)
