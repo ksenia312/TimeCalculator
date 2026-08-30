@@ -5,12 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-val secretsProperties = Properties()
-val secretsPropertiesFile = rootProject.file("secrets.properties")
-if (secretsPropertiesFile.exists()) {
-    secretsPropertiesFile.inputStream().use { secretsProperties.load(it) }
-}
-
 android {
     namespace = "com.xenikii.timecalculator.apphost"
     compileSdk = 37
@@ -34,12 +28,12 @@ android {
         buildConfigField(
             "String",
             "SUPABASE_URL",
-            "\"${secretsProperties.getProperty("SUPABASE_URL", "")}\"",
+            "\"${secrets.getProperty("SUPABASE_URL", "")}\"",
         )
         buildConfigField(
             "String",
             "SUPABASE_KEY",
-            "\"${secretsProperties.getProperty("SUPABASE_KEY", "")}\"",
+            "\"${secrets.getProperty("SUPABASE_KEY", "")}\"",
         )
     }
 
