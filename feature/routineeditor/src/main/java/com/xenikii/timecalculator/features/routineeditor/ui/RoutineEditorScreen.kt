@@ -340,7 +340,7 @@ private fun RoutineEditorScreen(
                     onClick = {
                         onConfirm()
                     }
-                ) { Text(stringResource(R.string.action_ok)) }
+                ) { Text(stringResource(R.string.action_save)) }
 
                 Spacer(Modifier.height(16.dp))
             }
