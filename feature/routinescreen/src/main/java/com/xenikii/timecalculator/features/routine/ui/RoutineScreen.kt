@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
@@ -17,6 +18,7 @@ import com.xenikii.timecalculator.features.routine.ui.components.EditRoutineFloa
 import com.xenikii.timecalculator.features.routine.ui.components.RoutineColorWrapper
 import com.xenikii.timecalculator.features.routine.ui.components.TasksListView
 import com.xenikii.timecalculator.features.routine.ui.components.topbar.RoutineTopBar
+import com.xenikii.timecalculator.features.routine.ui.components.topbar.rememberCollapsingTopBarState
 import com.xenikii.timecalculator.shared.components.AppScaffold
 import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
@@ -33,11 +35,14 @@ fun RoutineScreen(
 ) {
     val navigator = LocalNavigator.current
     val viewState by viewModel.viewState.collectAsState()
+    val collapsingTopBar = rememberCollapsingTopBarState()
+
     RoutineColorWrapper(viewState) {
         AppScaffold(
             topBar = {
                 RoutineTopBar(
                     viewState = viewState,
+                    collapseFraction = collapsingTopBar.fraction,
                     onShowEditDialog = {
                         navigator.navigateTo(
                             AppRoute.EditRoutine(
@@ -53,7 +58,11 @@ fun RoutineScreen(
                 if (routine != null) EditRoutineFloatingButton(routine, viewModel)
             }) {
 
-            Box(modifier = Modifier.padding(it)) {
+            Box(
+                modifier = Modifier
+                    .padding(it)
+                    .nestedScroll(collapsingTopBar.nestedScrollConnection)
+            ) {
                 when (val viewState = viewState) {
                     is RoutineViewState.Loading -> {
                         CircularProgressIndicator()

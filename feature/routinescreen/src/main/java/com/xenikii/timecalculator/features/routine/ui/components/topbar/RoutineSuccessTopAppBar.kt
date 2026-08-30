@@ -1,18 +1,24 @@
 package com.xenikii.timecalculator.features.routine.ui.components.topbar
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewState
 import com.xenikii.timecalculator.shared.animation.routineCardSharedKey
-import com.xenikii.timecalculator.shared.components.CustomTopBar
 import com.xenikii.timecalculator.shared.features.routineCard
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
@@ -22,28 +28,51 @@ import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 @Composable
 fun RoutineSuccessTopAppBar(
     viewState: RoutineViewState.Success,
+    collapseFraction: Float = 0f,
     onShowEditDialog: () -> Unit = { },
 ) {
+    val fraction = collapseFraction.coerceIn(0f, 1f)
     val viewItem = viewState.cardViewItem
 
-    CustomTopBar(
-        onAccentColor = Color.White,
+    // Cross-fade the expanded card and the collapsed title over the second half of the collapse.
+    val expandedProgress = ((fraction - 0.5f) / 0.5f).coerceIn(0f, 1f)
+    val cardAlpha = 1f - expandedProgress
+    val collapsedOwnsTitle = expandedProgress > cardAlpha
+
+    Column(
         modifier = Modifier
             .routineCard(
-                verticalPadding = 24.dp,
+                verticalPadding = lerp(24.dp, 12.dp, fraction),
                 horizontalPadding = 0.dp,
                 viewItem = viewItem,
                 sharedKey = routineCardSharedKey(viewState.routine.id),
                 shape = RoundedCornerShape(
                     bottomEnd = 28.dp,
                     bottomStart = 28.dp
-                )
-            ) {
-                onShowEditDialog()
-            },
-        showNavigationIcon = true,
+                ),
+                onClick = onShowEditDialog,
+            )
+            .statusBarsPadding()
     ) {
-        RoutineCard(viewItem)
+        RoutineCollapsingHeader(
+            title = viewItem.title,
+            collapsedTitleAlpha = expandedProgress,
+            ownsTitleForA11y = collapsedOwnsTitle,
+        )
+
+        Spacer(Modifier.height(lerp(16.dp, 0.dp, fraction)))
+
+        RoutineCard(
+            viewItem = viewItem,
+            collapseFraction = fraction,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .graphicsLayer { alpha = cardAlpha }
+                .collapseVertically(expandedProgress)
+                .then(
+                    if (collapsedOwnsTitle) Modifier.clearAndSetSemantics { } else Modifier
+                ),
+        )
     }
 }
 

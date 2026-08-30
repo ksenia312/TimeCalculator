@@ -8,12 +8,14 @@ import com.xenikii.timecalculator.features.routine.presentation.RoutineViewState
 @Composable
 fun RoutineTopBar(
     viewState: RoutineViewState,
+    collapseFraction: Float = 0f,
     onShowEditDialog: () -> Unit,
 ) {
     when (viewState) {
         is RoutineViewState.Success -> {
             RoutineSuccessTopAppBar(
                 viewState,
+                collapseFraction = collapseFraction,
                 onShowEditDialog = onShowEditDialog
             )
         }

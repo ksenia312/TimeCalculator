@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.features.settings.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -10,11 +11,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -24,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -41,6 +48,8 @@ fun SettingsContent(
     onLogoutClick: () -> Unit,
     onNotificationsEnabledChange: (Boolean) -> Unit,
     onOpenSystemNotificationSettings: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit,
+    onTermsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val email = viewState.user?.email ?: stringResource(R.string.settings_email_placeholder)
@@ -48,7 +57,8 @@ fun SettingsContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 24.dp),
+            .padding(horizontal = 12.dp, vertical = 24.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
     ) {
         AppListItem(
@@ -82,6 +92,24 @@ fun SettingsContent(
             viewState = viewState,
             onEnabledChange = onNotificationsEnabledChange,
             onOpenSystemNotificationSettings = onOpenSystemNotificationSettings,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LinkSettingsItem(
+            label = stringResource(R.string.settings_privacy_policy_label),
+            supporting = stringResource(R.string.settings_privacy_policy_supporting),
+            icon = Icons.Filled.PrivacyTip,
+            onClick = onPrivacyPolicyClick,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LinkSettingsItem(
+            label = stringResource(R.string.settings_terms_label),
+            supporting = stringResource(R.string.settings_terms_supporting),
+            icon = Icons.AutoMirrored.Filled.Article,
+            onClick = onTermsClick,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -129,7 +157,6 @@ private fun ColumnScope.NotificationSettingsItem(
     onOpenSystemNotificationSettings: () -> Unit,
 ) {
     val allowed = viewState.areSystemNotificationsAllowed
-
 
     AppListItem(
         headlineContent = {
@@ -184,6 +211,45 @@ private fun ColumnScope.NotificationSettingsItem(
     }
 }
 
+@Composable
+private fun LinkSettingsItem(
+    label: String,
+    supporting: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
+    AppListItem(
+        modifier = Modifier.clickable(onClick = onClick),
+        headlineContent = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        },
+        supportingContent = {
+            Text(
+                text = supporting,
+                style = MaterialTheme.typography.bodyMedium,
+                color = LocalCustomColorScheme.current.label,
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                Modifier.size(24.dp),
+            )
+        },
+        trailingContent = {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                Modifier.size(24.dp),
+            )
+        },
+    )
+}
+
 @PreviewAll
 @Composable
 private fun SettingsContentPreview() {
@@ -193,6 +259,8 @@ private fun SettingsContentPreview() {
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
             onOpenSystemNotificationSettings = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
         )
     }
 }
@@ -206,6 +274,8 @@ private fun SettingsContentNotificationsBlockedPreview() {
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
             onOpenSystemNotificationSettings = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
         )
     }
 }
@@ -219,6 +289,8 @@ private fun SettingsContentLoggingOutPreview() {
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
             onOpenSystemNotificationSettings = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
         )
     }
 }

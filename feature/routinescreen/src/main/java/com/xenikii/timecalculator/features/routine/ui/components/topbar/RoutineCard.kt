@@ -1,6 +1,5 @@
 package com.xenikii.timecalculator.features.routine.ui.components.topbar
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.shared.features.RoutineCardStatusRow
 import com.xenikii.timecalculator.shared.features.RoutineCardTimeInfo
@@ -25,11 +25,11 @@ import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 fun RoutineCard(
     viewItem: RoutineCardViewItem,
     modifier: Modifier = Modifier,
+    collapseFraction: Float = 0f,
 ) {
+    val fraction = collapseFraction.coerceIn(0f, 1f)
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .animateContentSize(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -43,25 +43,32 @@ fun RoutineCard(
                 color = MaterialTheme.colorScheme.surface
             )
 
-            Spacer(Modifier.height(8.dp))
-
-            if (viewItem.recurrence.unit != RoutineRecurrenceUnit.NONE) {
-                RoutineRecurrenceBadge(
-                    recurrence = viewItem.recurrence,
-                    contentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                )
-
+            Column(modifier = Modifier.fadeCollapse(fraction)) {
                 Spacer(Modifier.height(8.dp))
+
+                if (viewItem.recurrence.unit != RoutineRecurrenceUnit.NONE) {
+                    RoutineRecurrenceBadge(
+                        recurrence = viewItem.recurrence,
+                        contentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                RoutineCardStatusRow(
+                    isOngoing = viewItem.isOngoing,
+                    isCompleted = viewItem.isCompleted
+                )
             }
-
-            RoutineCardStatusRow(
-                isOngoing = viewItem.isOngoing,
-                isCompleted = viewItem.isCompleted
-            )
         }
-        Spacer(Modifier.width(16.dp))
+        Spacer(Modifier.width(lerp(16.dp, 0.dp, fraction)))
 
-        RoutineCardTimeInfo(viewItem, modifier = Modifier.weight(1f))
+        RoutineCardTimeInfo(
+            viewItem,
+            modifier = Modifier
+                .weight((1f - fraction).coerceAtLeast(0.0001f))
+                .fadeCollapse(fraction)
+        )
     }
 }

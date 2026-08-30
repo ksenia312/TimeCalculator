@@ -3,7 +3,9 @@ package com.xenikii.timecalculator.features.taskeditor.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -117,9 +119,12 @@ fun EditTaskScreen(
                 LazyColumn(
                     modifier = Modifier
                         .padding(padding)
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                    }
                     item {
                         TaskNameField(
                             title = title,
@@ -192,6 +197,9 @@ fun EditTaskScreen(
                                 modifier = Modifier.padding(top = 8.dp),
                             )
                         }
+                    }
+                    item {
+                        Spacer(Modifier.height(16.dp))
                     }
                 }
             }

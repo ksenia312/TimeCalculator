@@ -155,6 +155,12 @@
     <string name="settings_notifications_supporting">Live progress notifications for routines and tasks</string>
     <string name="settings_notifications_blocked">Notifications are turned off in system settings</string>
     <string name="settings_notifications_open_system_settings">Open system settings</string>
+    <string name="settings_privacy_policy_label">Privacy Policy</string>
+    <string name="settings_privacy_policy_supporting">Learn how we collect and use your data</string>
+    <string name="settings_privacy_policy_url">https://ksenia312.github.io/morning-calculator-docs/privacy-policy.html</string>
+    <string name="settings_terms_label">Terms &amp; Conditions</string>
+    <string name="settings_terms_supporting">Read the rules for using the app</string>
+    <string name="settings_terms_url">https://ksenia312.github.io/morning-calculator-docs/terms-and-conditions.html</string>
 
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>
