@@ -48,7 +48,10 @@ fun RoutineCollapsingHeader(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .graphicsLayer { alpha = collapsedTitleAlpha }
+                    .graphicsLayer {
+                        alpha = collapsedTitleAlpha
+                        translationY = (1f - collapsedTitleAlpha) * 10.dp.toPx()
+                    }
                     .padding(end = 16.dp)
                     .then(
                         if (ownsTitleForA11y) Modifier else Modifier.clearAndSetSemantics { }

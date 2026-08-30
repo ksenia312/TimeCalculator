@@ -34,10 +34,10 @@ fun RoutineSuccessTopAppBar(
     val fraction = collapseFraction.coerceIn(0f, 1f)
     val viewItem = viewState.cardViewItem
 
-    // Cross-fade the expanded card and the collapsed title over the second half of the collapse.
-    val expandedProgress = ((fraction - 0.5f) / 0.5f).coerceIn(0f, 1f)
-    val cardAlpha = 1f - expandedProgress
-    val collapsedOwnsTitle = expandedProgress > cardAlpha
+    val cardFade = ((fraction - 0.1f) / 0.35f).coerceIn(0f, 1f)
+    val cardCollapse = (fraction / 0.85f).coerceIn(0f, 1f)
+    val titleEnter = ((fraction - 0.5f) / 0.5f).coerceIn(0f, 1f)
+    val collapsedOwnsTitle = titleEnter > 0f
 
     Column(
         modifier = Modifier
@@ -56,7 +56,7 @@ fun RoutineSuccessTopAppBar(
     ) {
         RoutineCollapsingHeader(
             title = viewItem.title,
-            collapsedTitleAlpha = expandedProgress,
+            collapsedTitleAlpha = titleEnter,
             ownsTitleForA11y = collapsedOwnsTitle,
         )
 
@@ -67,8 +67,8 @@ fun RoutineSuccessTopAppBar(
             collapseFraction = fraction,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .graphicsLayer { alpha = cardAlpha }
-                .collapseVertically(expandedProgress)
+                .graphicsLayer { alpha = 1f - cardFade }
+                .collapseVertically(cardCollapse)
                 .then(
                     if (collapsedOwnsTitle) Modifier.clearAndSetSemantics { } else Modifier
                 ),
