@@ -5,10 +5,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.inputStream().use { localProperties.load(it) }
+val secretsProperties = Properties()
+val secretsPropertiesFile = rootProject.file("secrets.properties")
+if (secretsPropertiesFile.exists()) {
+    secretsPropertiesFile.inputStream().use { secretsProperties.load(it) }
 }
 
 android {
@@ -34,12 +34,12 @@ android {
         buildConfigField(
             "String",
             "SUPABASE_URL",
-            "\"${localProperties.getProperty("SUPABASE_URL", "")}\"",
+            "\"${secretsProperties.getProperty("SUPABASE_URL", "")}\"",
         )
         buildConfigField(
             "String",
             "SUPABASE_KEY",
-            "\"${localProperties.getProperty("SUPABASE_KEY", "")}\"",
+            "\"${secretsProperties.getProperty("SUPABASE_KEY", "")}\"",
         )
     }
 
