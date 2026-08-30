@@ -1,7 +1,5 @@
 package com.xenikii.timecalculator.features.settings.ui
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -24,13 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,7 +31,6 @@ import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewState
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppListItem
-import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
@@ -48,20 +40,10 @@ fun SettingsContent(
     viewState: SettingsViewState,
     onLogoutClick: () -> Unit,
     onNotificationsEnabledChange: (Boolean) -> Unit,
+    onOpenSystemNotificationSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val email = viewState.user?.email ?: stringResource(R.string.settings_email_placeholder)
-    var showLogoutDialog by remember { mutableStateOf(false) }
-
-    if (showLogoutDialog) {
-        DeleteConfirmationDialog(
-            title = stringResource(R.string.settings_logout_dialog_title),
-            message = stringResource(R.string.settings_logout_dialog_message),
-            confirmText = stringResource(R.string.settings_logout_dialog_confirm),
-            onConfirm = onLogoutClick,
-            onDismiss = { showLogoutDialog = false },
-        )
-    }
 
     Column(
         modifier = modifier
@@ -99,12 +81,13 @@ fun SettingsContent(
         NotificationSettingsItem(
             viewState = viewState,
             onEnabledChange = onNotificationsEnabledChange,
+            onOpenSystemNotificationSettings = onOpenSystemNotificationSettings,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         AppButtonMedium(
-            onClick = { showLogoutDialog = true },
+            onClick = onLogoutClick,
             enabled = !viewState.isLoggingOut,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -143,8 +126,8 @@ fun SettingsContent(
 private fun ColumnScope.NotificationSettingsItem(
     viewState: SettingsViewState,
     onEnabledChange: (Boolean) -> Unit,
+    onOpenSystemNotificationSettings: () -> Unit,
 ) {
-    val context = LocalContext.current
     val allowed = viewState.areSystemNotificationsAllowed
 
 
@@ -189,13 +172,7 @@ private fun ColumnScope.NotificationSettingsItem(
     if (!allowed) {
         Spacer(modifier = Modifier.height(12.dp))
         AppButtonMedium(
-            onClick = {
-                context.startActivity(
-                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                    },
-                )
-            },
+            onClick = onOpenSystemNotificationSettings,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .fillMaxWidth(),
@@ -215,6 +192,7 @@ private fun SettingsContentPreview() {
             viewState = SettingsViewState(),
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
+            onOpenSystemNotificationSettings = {},
         )
     }
 }
@@ -227,6 +205,7 @@ private fun SettingsContentNotificationsBlockedPreview() {
             viewState = SettingsViewState(areSystemNotificationsAllowed = false),
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
+            onOpenSystemNotificationSettings = {},
         )
     }
 }
@@ -239,6 +218,7 @@ private fun SettingsContentLoggingOutPreview() {
             viewState = SettingsViewState(isLoggingOut = true),
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
+            onOpenSystemNotificationSettings = {},
         )
     }
 }
