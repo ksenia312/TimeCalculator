@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Time Calculator</string>
+    <string name="app_name">Калькулятор времени</string>
     <string name="action_ok">ОК</string>
     <string name="action_cancel">Отмена</string>
     <string name="action_save">Сохранить</string>
     <string name="action_delete">Удалить</string>
 
-    <string name="auth_welcome_title">Time Calculator</string>
+    <string name="auth_welcome_title">Калькулятор времени</string>
     <string name="auth_welcome_subtitle">Планируйте свой день и управляйте временем эффективно</string>
     <string name="auth_welcome_login">Вход</string>
     <string name="auth_welcome_register">Регистрация</string>
