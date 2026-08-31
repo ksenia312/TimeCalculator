@@ -13,9 +13,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.xenikii.timecalculator.shared.composition.LocalBottomIndent
 import kotlin.math.roundToInt
 
-fun Modifier.bottomIndent(): Modifier = this.padding(bottom = 120.dp)
+@Composable
+fun Modifier.bottomIndent(): Modifier = this.padding(bottom = LocalBottomIndent.current)
 
 /**
  * Makes an item in a reorderable list draggable via long-press.
