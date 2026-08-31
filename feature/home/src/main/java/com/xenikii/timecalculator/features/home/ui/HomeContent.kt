@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -16,6 +17,7 @@ import com.xenikii.timecalculator.features.landing.ui.LandingScreen
 import com.xenikii.timecalculator.features.routineslist.ui.RoutinesListScreen
 import com.xenikii.timecalculator.features.settings.ui.SettingsScreen
 import com.xenikii.timecalculator.features.tasks.ui.TasksListScreen
+import com.xenikii.timecalculator.shared.composition.LocalBottomIndent
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 
@@ -39,20 +41,24 @@ fun HomeContent(
                 end = paddingValues.calculateEndPadding(layoutDirection = layoutDirection),
             )
     ) {
-        when (current) {
-            HomeTab.LANDING -> LandingScreen(
-                onCreateRoutineClick = onCreateRoutineClick,
-                isSyncing = isSyncing,
-            )
-            HomeTab.ROUTINES -> RoutinesListScreen(
-                onCreateRoutineClick = onCreateRoutineClick,
-                isSyncing = isSyncing,
-            )
-            HomeTab.TASKS -> TasksListScreen(
-                onCreateTaskClick = onCreateTaskClick,
-                isSyncing = isSyncing,
-            )
-            HomeTab.SETTINGS -> SettingsScreen()
+        CompositionLocalProvider(
+            LocalBottomIndent provides paddingValues.calculateBottomPadding() + 12.dp
+        ) {
+            when (current) {
+                HomeTab.LANDING -> LandingScreen(
+                    onCreateRoutineClick = onCreateRoutineClick,
+                    isSyncing = isSyncing,
+                )
+                HomeTab.ROUTINES -> RoutinesListScreen(
+                    onCreateRoutineClick = onCreateRoutineClick,
+                    isSyncing = isSyncing,
+                )
+                HomeTab.TASKS -> TasksListScreen(
+                    onCreateTaskClick = onCreateTaskClick,
+                    isSyncing = isSyncing,
+                )
+                HomeTab.SETTINGS -> SettingsScreen()
+            }
         }
     }
 }
