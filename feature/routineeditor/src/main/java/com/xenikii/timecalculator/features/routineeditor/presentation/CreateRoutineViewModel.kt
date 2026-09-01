@@ -26,10 +26,10 @@ class CreateRoutineViewModel(
         _viewState.value = newState
     }
 
-    fun saveRoutine() {
+    fun saveRoutine(onSaved: (routineId: String) -> Unit) {
         val state = _viewState.value
         viewModelScope.launch {
-            routineRepository.addRoutine(
+            val routineId = routineRepository.addRoutine(
                 RoutineRequest(
                     title = state.title,
                     scheduledAt = state.toScheduledAtInstant(),
@@ -38,6 +38,7 @@ class CreateRoutineViewModel(
                     color = RoutineColorPicker.pick().toHexString(),
                 )
             )
+            onSaved(routineId)
         }
         _viewState.update { it.copy(isVisible = false) }
     }

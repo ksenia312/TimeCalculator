@@ -64,6 +64,8 @@
     <string name="fab_routine">Рутина</string>
     <string name="fab_add_task">Создать задачу</string>
     <string name="fab_manage_tasks">Выбрать из библиотеки задач</string>
+    <string name="routine_tasks_empty_title">В этой рутине пока нет задач</string>
+    <string name="routine_tasks_empty_subtitle">Нажмите кнопку внизу, чтобы создать новую задачу или выбрать её из уже существующих.</string>
     <string name="fab_add_item">Добавить элемент</string>
 
     <string name="routine_anchor_start_at">Время начала</string>
@@ -105,12 +107,12 @@
     <string name="routines_list_status_planned_for">рутина запланирована на</string>
     <string name="routines_list_no_routines_scheduled">Нет запланированных рутин</string>
     <string name="landing_empty_title">Ещё нет рутин</string>
-    <string name="landing_empty_subtitle">Создайте вашу первую рутину, чтобы начать планировать день.</string>
+    <string name="landing_empty_subtitle">Приложение помогает планировать день с помощью рутин. Рутина состоит из задач: сначала создайте рутину, затем добавьте в неё задачи.</string>
     <string name="landing_empty_action">Создать первую рутину</string>
     <string name="landing_show_all_tasks">Показать все задачи</string>
     <string name="landing_hide_all_tasks">Скрыть задачи</string>
     <string name="routines_empty_title">Ещё нет рутин</string>
-    <string name="routines_empty_subtitle">Создайте вашу первую рутину и держите день в порядке.</string>
+    <string name="routines_empty_subtitle">Рутина — это набор задач, выполняемых по порядку, например утром или вечером.</string>
     <string name="routines_empty_action">Создать рутину</string>
 
     <string name="routine_card_started_at">Начало</string>
@@ -139,7 +141,7 @@
     <string name="tasks_manage_title">Управление задачами</string>
     <string name="tasks_create_new">Создать новую задачу</string>
     <string name="tasks_empty_title">Ещё нет задач</string>
-    <string name="tasks_empty_subtitle">Создайте вашу первую задачу, чтобы быстрее создавать рутины.</string>
+    <string name="tasks_empty_subtitle">Задача — это отдельный шаг с длительностью, который можно добавить в любую рутину.</string>
     <string name="tasks_empty_action">Создать задачу</string>
     <string name="settings_profile_title">Профиль</string>
     <string name="settings_email_label">Электронная почта</string>
@@ -177,41 +179,49 @@
         <item quantity="one">%d сек</item>
         <item quantity="few">%d сек</item>
         <item quantity="other">%d сек</item>
+        <item quantity="many">%d сек</item>
     </plurals>
     <plurals name="duration_minutes">
         <item quantity="one">%d мин</item>
         <item quantity="few">%d мин</item>
         <item quantity="other">%d мин</item>
+        <item quantity="many">%d мин</item>
     </plurals>
     <plurals name="duration_hours">
         <item quantity="one">%d ч</item>
         <item quantity="few">%d ч</item>
         <item quantity="other">%d ч</item>
+        <item quantity="many">%d ч</item>
     </plurals>
     <plurals name="duration_days">
         <item quantity="one">%d день</item>
         <item quantity="few">%d дня</item>
         <item quantity="other">%d дней</item>
+        <item quantity="many">%d дней</item>
     </plurals>
     <plurals name="routine_recurrence_days">
         <item quantity="one">%d день</item>
         <item quantity="few">%d дня</item>
         <item quantity="other">%d дней</item>
+        <item quantity="many">%d дней</item>
     </plurals>
     <plurals name="routine_recurrence_weeks">
         <item quantity="one">%d неделя</item>
         <item quantity="few">%d недели</item>
         <item quantity="other">%d недель</item>
+        <item quantity="many">%d недель</item>
     </plurals>
     <plurals name="routine_recurrence_months">
         <item quantity="one">%d месяц</item>
         <item quantity="few">%d месяца</item>
         <item quantity="other">%d месяцев</item>
+        <item quantity="many">%d месяцев</item>
     </plurals>
     <plurals name="routine_recurrence_years">
         <item quantity="one">%d год</item>
         <item quantity="few">%d года</item>
         <item quantity="other">%d лет</item>
+        <item quantity="many">%d лет</item>
     </plurals>
 
     <string name="notification_routine_title">Рутина в процессе</string>

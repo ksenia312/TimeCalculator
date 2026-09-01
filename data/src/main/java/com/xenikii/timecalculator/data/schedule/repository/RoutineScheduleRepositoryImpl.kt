@@ -63,7 +63,7 @@ class RoutineScheduleRepositoryImpl(
                 val schedule = computeSchedule(routine, now)
                 val isActive = schedule.phaseAt(now) == RoutineSchedulePhase.ACTIVE
                 if (enabled && isActive) {
-                    notificationGateway.postProgress(routine, schedule, now)
+                    notificationGateway.postProgress(routine, schedule, now, alert = false)
                 } else {
                     notificationGateway.cancelProgress(routine.id)
                 }

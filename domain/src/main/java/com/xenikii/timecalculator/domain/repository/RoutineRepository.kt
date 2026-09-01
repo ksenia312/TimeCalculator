@@ -11,7 +11,7 @@ interface RoutineRepository {
 
     fun getRoutineFlow(id: String): Flow<Routine?>
 
-    suspend fun addRoutine(request: RoutineRequest)
+    suspend fun addRoutine(request: RoutineRequest): String
 
     suspend fun updateRoutine(routine: Routine)
 

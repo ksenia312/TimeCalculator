@@ -51,6 +51,7 @@ import com.xenikii.timecalculator.shared.components.SmallIconButton
 import com.xenikii.timecalculator.shared.components.TimePickerField
 import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
 import com.xenikii.timecalculator.shared.navigator.AppRoute
+import com.xenikii.timecalculator.shared.navigator.BackstackBehavior
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import kotlinx.datetime.LocalTime
 import org.koin.androidx.compose.koinViewModel
@@ -67,8 +68,12 @@ fun CreateRoutineScreen(
         viewState = form,
         onStateChange = viewModel::onStateChange,
         onConfirm = {
-            viewModel.saveRoutine()
-            navigator.navigateBack()
+            viewModel.saveRoutine { routineId ->
+                navigator.navigateTo(
+                    AppRoute.Routine(routineId = routineId),
+                    backstackBehavior = BackstackBehavior.RemoveCurrent,
+                )
+            }
         },
         onDismiss = navigator::navigateBack,
     )

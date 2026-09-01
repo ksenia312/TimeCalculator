@@ -38,6 +38,7 @@ class RoutineNotificationPresenter(
         routine: Routine,
         plan: RoutineSchedule,
         now: Instant,
+        alert: Boolean,
     ) {
         if (!notificationSettings.isEnabled()) return
         if (!notificationManager.areNotificationsEnabled()) return
@@ -49,7 +50,7 @@ class RoutineNotificationPresenter(
             .setStyle(NotificationCompat.BigTextStyle().bigText(task.title))
             .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
             .setOngoing(true)
-            .setOnlyAlertOnce(true)
+            .setOnlyAlertOnce(!alert)
             .setUsesChronometer(true)
             .setChronometerCountDown(true)
             .setWhen(task.end.toEpochMilliseconds())

@@ -41,7 +41,7 @@ interface RoutineAlarmGateway {
 interface RoutineNotificationGateway {
     fun cancelRoutineNotifications(routineId: String)
     fun cancelProgress(routineId: String)
-    fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant)
+    fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean = true)
 }
 
 interface ScheduleRecordDataSource {

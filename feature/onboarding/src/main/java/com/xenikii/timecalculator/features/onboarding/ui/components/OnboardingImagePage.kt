@@ -33,6 +33,7 @@ internal fun OnboardingImagePage(
                 painter = painterResource(imageRes),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

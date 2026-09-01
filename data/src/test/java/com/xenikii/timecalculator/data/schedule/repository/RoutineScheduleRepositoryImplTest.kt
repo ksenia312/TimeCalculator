@@ -326,7 +326,7 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
         cancelProgressCalls += routineId
     }
 
-    override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant) = Unit
+    override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean) = Unit
 }
 
 private class FakeNotificationSettingsLocalDataSource(

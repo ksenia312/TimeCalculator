@@ -3,12 +3,12 @@ package com.xenikii.timecalculator.features.onboarding.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Text
@@ -27,8 +27,8 @@ import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingIm
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingNotificationPage
 import com.xenikii.timecalculator.features.onboarding.ui.components.OnboardingPagerDots
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
-import com.xenikii.timecalculator.shared.components.AppTextButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
+import com.xenikii.timecalculator.shared.components.AppTextButtonMedium
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -74,8 +74,8 @@ fun OnboardingContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
+            Spacer(Modifier.height(32.dp))
             HorizontalPager(
                 state = pagerState,
                 contentPadding = PaddingValues(horizontal = 8.dp),
@@ -93,6 +93,7 @@ fun OnboardingContent(
                     )
                 }
             }
+            Spacer(Modifier.height(12.dp))
 
             OnboardingPagerDots(
                 count = pageCount,
@@ -100,48 +101,53 @@ fun OnboardingContent(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
 
+            Spacer(Modifier.height(16.dp))
+
             if (isNotificationPage) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AppTextButtonMedium(
-                        onClick = onSkipNotificationsClick,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(stringResource(R.string.onboarding_notifications_skip))
-                    }
                     AppButtonMedium(
                         onClick = onAllowNotificationsClick,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(stringResource(R.string.onboarding_notifications_allow))
                     }
+                    AppTextButtonMedium(
+                        onClick = onSkipNotificationsClick,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.onboarding_notifications_skip))
+                    }
                 }
             } else {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AppTextButtonMedium(
-                        onClick = onSkipClick,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(stringResource(R.string.onboarding_skip))
-                    }
                     AppButtonMedium(
                         onClick = onNextClick,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(stringResource(R.string.onboarding_next))
                     }
+                    AppTextButtonMedium(
+                        onClick = onSkipClick,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.onboarding_skip))
+                    }
                 }
             }
-            Spacer(Modifier.height(24.dp))
+
+            Spacer(Modifier.height(12.dp))
         }
     }
 }

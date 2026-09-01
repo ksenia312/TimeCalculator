@@ -49,7 +49,7 @@ class RoutineRepositoryImpl(
         routinesDao.getRoutinesPopulatedOnce().map { it.toDomain() }
     }
 
-    override suspend fun addRoutine(request: RoutineRequest) {
+    override suspend fun addRoutine(request: RoutineRequest): String {
         val scheduledAt = request.scheduledAt.withZeroSeconds()
         val routineEntity = RoutineEntity(
             id = UUID.randomUUID().toString(),
@@ -67,6 +67,7 @@ class RoutineRepositoryImpl(
             routinesDao.insertRoutine(routineEntity)
             syncTrigger.emit()
         }
+        return routineEntity.id
     }
 
     override suspend fun updateRoutine(routine: Routine) {

@@ -1,6 +1,7 @@
 package com.xenikii.timecalculator.features.routine.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,8 +62,9 @@ fun RoutineScreen(
 
             Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(it)
-                    .nestedScroll(collapsingTopBar.nestedScrollConnection)
+                    .nestedScroll(collapsingTopBar.nestedScrollConnection),
             ) {
                 when (val viewState = viewState) {
                     is RoutineViewState.Loading -> {

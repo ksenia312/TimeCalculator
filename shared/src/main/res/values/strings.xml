@@ -63,6 +63,8 @@
     <string name="fab_routine">Routine</string>
     <string name="fab_add_task">Create task</string>
     <string name="fab_manage_tasks">Link existing tasks</string>
+    <string name="routine_tasks_empty_title">No tasks in this routine yet</string>
+    <string name="routine_tasks_empty_subtitle">Tap the button below to create a new task or choose one you already have.</string>
     <string name="fab_add_item">Add Item</string>
 
     <string name="routine_anchor_start_at">Time start at</string>
@@ -104,12 +106,12 @@
     <string name="routines_list_status_planned_for">planned for</string>
     <string name="routines_list_no_routines_scheduled">No routines scheduled</string>
     <string name="landing_empty_title">No routines yet</string>
-    <string name="landing_empty_subtitle">Create your first routine to start planning your day.</string>
+    <string name="landing_empty_subtitle">This app helps you plan your day with routines. A routine is made of tasks: first create a routine, then add tasks to it.</string>
     <string name="landing_empty_action">Create first routine</string>
     <string name="landing_show_all_tasks">Show all tasks</string>
     <string name="landing_hide_all_tasks">Hide tasks</string>
     <string name="routines_empty_title">No routines yet</string>
-    <string name="routines_empty_subtitle">Create your first routine and keep your day structured.</string>
+    <string name="routines_empty_subtitle">A routine is a set of tasks done in order, like a morning or evening routine.</string>
     <string name="routines_empty_action">Create routine</string>
 
     <string name="routine_card_started_at">Started at</string>
@@ -138,7 +140,7 @@
     <string name="tasks_manage_title">Manage tasks</string>
     <string name="tasks_create_new">Create a new task</string>
     <string name="tasks_empty_title">No tasks yet</string>
-    <string name="tasks_empty_subtitle">Create your first task to build routines faster.</string>
+    <string name="tasks_empty_subtitle">A task is a single step with a duration that you can add to any routine.</string>
     <string name="tasks_empty_action">Create task</string>
     <string name="settings_profile_title">Profile</string>
     <string name="settings_email_label">Email</string>
