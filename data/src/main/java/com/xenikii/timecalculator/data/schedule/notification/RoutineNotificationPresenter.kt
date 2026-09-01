@@ -66,7 +66,7 @@ class RoutineNotificationPresenter(
             NotificationChannel(
                 CHANNEL_PROGRESS,
                 context.getString(R.string.notification_channel_routine_progress),
-                NotificationManager.IMPORTANCE_LOW,
+                NotificationManager.IMPORTANCE_HIGH,
             ).apply {
                 description = context.getString(R.string.notification_channel_routine_progress_description)
                 setShowBadge(false)
