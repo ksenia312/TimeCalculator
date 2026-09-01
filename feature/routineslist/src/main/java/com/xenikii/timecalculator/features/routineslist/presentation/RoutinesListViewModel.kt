@@ -10,7 +10,11 @@ import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 import com.xenikii.timecalculator.shared.viewitem.toViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
@@ -20,15 +24,35 @@ class RoutinesListViewModel(
     private val routineScheduleRepository: RoutineScheduleRepository,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<RoutinesListState>(RoutinesListState.Loading)
-    val viewState: StateFlow<RoutinesListState> = _viewState
+    val viewState: StateFlow<RoutinesListState> = routineRepository.routinesFlow
+        .map { routines ->
+            runCatching {
+                val sort = RoutinesListState.Sort.DEFAULT
+                RoutinesListState.Success(
+                    items = sortRoutines(
+                        sort,
+                        routines,
+                        Instant.fromEpochMilliseconds(System.currentTimeMillis()),
+                        routineScheduleRepository,
+                    ),
+                    sort = sort,
+                )
+            }
+        }
+        .scan<Result<RoutinesListState.Success>, RoutinesListState>(RoutinesListState.Loading) { previous, result ->
+            result.getOrElse { error ->
+                previous as? RoutinesListState.Success
+                    ?: RoutinesListState.Error(error.message.orEmpty())
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = RoutinesListState.Loading,
+        )
 
     private val _selectedIds = MutableStateFlow<Set<String>>(emptySet())
     val selectedIds: StateFlow<Set<String>> = _selectedIds
-
-    init {
-        loadRoutines()
-    }
 
     fun toggleSelection(id: String) {
         _selectedIds.update { current ->
@@ -46,23 +70,6 @@ class RoutinesListViewModel(
                 routineRepository.deleteRoutine(id)
             }
             _selectedIds.value = emptySet()
-        }
-    }
-
-    private fun loadRoutines() {
-        viewModelScope.launch {
-            routineRepository.routinesFlow.collect {
-                val sort = RoutinesListState.Sort.DEFAULT
-                _viewState.value = RoutinesListState.Success(
-                    items = sortRoutines(
-                        sort,
-                        it,
-                        Instant.fromEpochMilliseconds(System.currentTimeMillis()),
-                        routineScheduleRepository
-                    ),
-                    sort = sort
-                )
-            }
         }
     }
 }

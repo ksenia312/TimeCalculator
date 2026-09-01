@@ -97,6 +97,14 @@ class SyncEngine(
     }
 
     private suspend fun pullInto() {
+        val pendingDeletions = syncDao.getPendingDeletions()
+        val pendingTaskDeletions = pendingDeletions
+            .filter { it.entityType == TYPE_TASK }
+            .associate { it.id to it.modifiedAt }
+        val pendingRoutineDeletions = pendingDeletions
+            .filter { it.entityType == TYPE_ROUTINE }
+            .associate { it.id to it.modifiedAt }
+
         val initialTaskCursor = syncCursorStore.getTasksCursor()
         var taskOffset = 0
         var latestTaskCursor = initialTaskCursor
@@ -110,7 +118,7 @@ class SyncEngine(
 
             for (remoteTask in remoteTasks) {
                 if (!isAfterCursor(remoteTask.updatedAt, remoteTask.id, initialTaskCursor)) continue
-                applyRemoteTask(remoteTask)
+                applyRemoteTask(remoteTask, pendingTaskDeletions[remoteTask.id])
                 val updatedAt = remoteTask.updatedAt ?: continue
                 latestTaskCursor = SyncCursor(updatedAt = updatedAt, lastEntityId = remoteTask.id)
             }
@@ -135,7 +143,7 @@ class SyncEngine(
 
             for (remoteRoutine in remoteRoutines) {
                 if (!isAfterCursor(remoteRoutine.updatedAt, remoteRoutine.id, initialRoutineCursor)) continue
-                applyRemoteRoutine(remoteRoutine)
+                applyRemoteRoutine(remoteRoutine, pendingRoutineDeletions[remoteRoutine.id])
                 val updatedAt = remoteRoutine.updatedAt ?: continue
                 latestRoutineCursor = SyncCursor(updatedAt = updatedAt, lastEntityId = remoteRoutine.id)
             }
@@ -148,7 +156,7 @@ class SyncEngine(
         }
     }
 
-    private suspend fun applyRemoteTask(remoteTask: RemoteTask) {
+    private suspend fun applyRemoteTask(remoteTask: RemoteTask, pendingDeletionModifiedAt: Long?) {
         val localTask = tasksDao.getTaskById(remoteTask.id)
         val localModifiedAt = localTask?.modifiedAt ?: 0L
         when {
@@ -158,6 +166,10 @@ class SyncEngine(
                 }
             }
 
+            // A locally-deleted entity must not be resurrected by pull while its deletion is
+            // still pending, unless the remote change is strictly newer than the deletion.
+            pendingDeletionModifiedAt != null && pendingDeletionModifiedAt >= remoteTask.modifiedAt -> Unit
+
             localTask == null || remoteTask.modifiedAt > localModifiedAt -> {
                 val (taskEntity, subDataEntities) = remoteTask.toEntities()
                 tasksDao.applyRemoteTask(taskEntity, subDataEntities)
@@ -165,7 +177,7 @@ class SyncEngine(
         }
     }
 
-    private suspend fun applyRemoteRoutine(remoteRoutine: RemoteRoutine) {
+    private suspend fun applyRemoteRoutine(remoteRoutine: RemoteRoutine, pendingDeletionModifiedAt: Long?) {
         val localRoutine = routinesDao.getRoutineById(remoteRoutine.id)
         val localModifiedAt = localRoutine?.modifiedAt ?: 0L
         when {
@@ -174,6 +186,10 @@ class SyncEngine(
                     routinesDao.deleteRoutine(remoteRoutine.id)
                 }
             }
+
+            // A locally-deleted entity must not be resurrected by pull while its deletion is
+            // still pending, unless the remote change is strictly newer than the deletion.
+            pendingDeletionModifiedAt != null && pendingDeletionModifiedAt >= remoteRoutine.modifiedAt -> Unit
 
             localRoutine == null || remoteRoutine.modifiedAt > localModifiedAt -> {
                 val (routineEntity, routineItemEntities) = remoteRoutine.toEntities()

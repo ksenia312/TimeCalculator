@@ -3,14 +3,18 @@ package com.xenikii.timecalculator.features.landing.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
+import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
 import com.xenikii.timecalculator.features.routineslist.presentation.RoutinesListState
 import com.xenikii.timecalculator.features.routineslist.presentation.sortRoutines
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.stateIn
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
@@ -19,69 +23,70 @@ class LandingViewModel(
     private val routineScheduleRepository: RoutineScheduleRepository,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<LandingState>(LandingState.Loading)
-    val viewState: StateFlow<LandingState> = _viewState
-
-    private val _now = MutableStateFlow(Instant.fromEpochMilliseconds(System.currentTimeMillis()))
-
-    init {
-        startTimer()
-        loadRoutines()
-    }
-
-    private fun startTimer() {
-        viewModelScope.launch {
-            while (true) {
-                delay(1000.milliseconds)
-                _now.value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-            }
+    private val nowTicker: Flow<Instant> = flow {
+        while (true) {
+            emit(Instant.fromEpochMilliseconds(System.currentTimeMillis()))
+            delay(1000.milliseconds)
         }
     }
 
-    private fun loadRoutines() {
-        viewModelScope.launch {
-            combine(routineRepository.routinesFlow, _now) { routines, now ->
-                Pair(routines, now)
-            }.collect { (routines, now) ->
-                val sorted = sortRoutines(
-                    routines = routines,
-                    now = now,
-                    routineScheduleRepository = routineScheduleRepository,
-                    sort = RoutinesListState.Sort(
-                        RoutinesListState.Sort.SortType.DATE,
-                        RoutinesListState.Sort.SortOrder.DESCENDING
-                    )
-                )
-                val routineStates = sorted.take(3).map { item ->
-                    val schedule = item.schedule
-                    val taskCount = schedule.tasks.size
-                    val isOngoing = item.cardViewItem.isOngoing
-                    val currentIndex = when {
-                        taskCount == 0 -> null
-                        isOngoing -> schedule.taskIndexAt(now)
-                        else -> 0
-                    }
-                    val taskViewItems = schedule.tasks.map { task ->
-                        createLandingCardTaskViewItem(task = task, now = now)
-                    }
-                    val validCurrentIndex = currentIndex?.takeIf { it in taskViewItems.indices }
-                    val taskDistribution = distributeTasks(
-                        taskViewItems = taskViewItems,
-                        isRoutineOngoing = isOngoing,
-                        currentTaskIndex = validCurrentIndex,
-                    )
-                    LandingRoutineState(
-                        routineId = item.routine.id,
-                        cardViewItem = item.cardViewItem,
-                        completedTasks = taskDistribution.completedTasks,
-                        previewTasks = taskDistribution.previewTasks,
-                        futureTasks = taskDistribution.futureTasks,
-                        hasHiddenTasks = taskDistribution.hasHiddenTasks,
-                    )
+    val viewState: StateFlow<LandingState> =
+        combine(routineRepository.routinesFlow, nowTicker) { routines, now ->
+            runCatching { buildState(routines, now) }
+        }
+            .scan<Result<LandingState>, LandingState>(LandingState.Loading) { previous, result ->
+                result.getOrElse { error ->
+                    previous as? LandingState.Success
+                        ?: LandingState.Error(error.message.orEmpty())
                 }
-                _viewState.value = LandingState.Success(routineStates = routineStates)
             }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = LandingState.Loading,
+            )
+
+    private fun buildState(
+        routines: List<Routine>,
+        now: Instant,
+    ): LandingState {
+        val sorted = sortRoutines(
+            routines = routines,
+            now = now,
+            routineScheduleRepository = routineScheduleRepository,
+            sort = RoutinesListState.Sort(
+                RoutinesListState.Sort.SortType.DATE,
+                RoutinesListState.Sort.SortOrder.DESCENDING
+            )
+        )
+        val routineStates = sorted.take(3).map { item ->
+            val schedule = item.schedule
+            val taskCount = schedule.tasks.size
+            val isOngoing = item.cardViewItem.isOngoing
+            val currentIndex = when {
+                taskCount == 0 -> null
+                isOngoing -> schedule.taskIndexAt(now)
+                else -> 0
+            }
+            val taskViewItems = schedule.tasks.map { task ->
+                createLandingCardTaskViewItem(task = task, now = now)
+            }
+            val validCurrentIndex = currentIndex?.takeIf { it in taskViewItems.indices }
+            val taskDistribution = distributeTasks(
+                taskViewItems = taskViewItems,
+                isRoutineOngoing = isOngoing,
+                currentTaskIndex = validCurrentIndex,
+            )
+            LandingRoutineState(
+                routineId = item.routine.id,
+                cardViewItem = item.cardViewItem,
+                completedTasks = taskDistribution.completedTasks,
+                previewTasks = taskDistribution.previewTasks,
+                futureTasks = taskDistribution.futureTasks,
+                hasHiddenTasks = taskDistribution.hasHiddenTasks,
+            )
         }
+        return LandingState.Success(routineStates = routineStates)
     }
 }
 
