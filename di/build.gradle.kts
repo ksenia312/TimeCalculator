@@ -39,4 +39,5 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
 }

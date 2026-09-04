@@ -1,6 +1,7 @@
 package com.xenikii.timecalculator.di
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.room.Room
 import com.xenikii.timecalculator.data.auth.AuthRepositoryImpl
 import com.xenikii.timecalculator.data.auth.AuthSessionStateMemoryDataSource
@@ -168,7 +169,9 @@ object AppModule {
             )
         }
 
-        factory { HomeViewModel(syncStateProvider = get()) }
+        factory { (savedStateHandle: SavedStateHandle) ->
+            HomeViewModel(savedStateHandle = savedStateHandle, syncStateProvider = get())
+        }
 
         factory {
             val logoutUseCase: LogoutUseCase = get()
