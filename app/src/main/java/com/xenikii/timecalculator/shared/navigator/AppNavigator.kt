@@ -173,6 +173,7 @@ fun AppNavigator(
                                     NavEntry(key = key) {
                                         EditRoutineScreen(
                                             routineId = key.routineId,
+                                            fromRoutineScreen = key.fromRoutineScreen
                                         )
                                     }
                                 }

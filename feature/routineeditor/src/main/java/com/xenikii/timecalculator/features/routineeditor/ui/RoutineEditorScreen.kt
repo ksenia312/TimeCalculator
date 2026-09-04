@@ -82,6 +82,7 @@ fun CreateRoutineScreen(
 @Composable
 fun EditRoutineScreen(
     routineId: String,
+    fromRoutineScreen: Boolean,
     viewModel: EditRoutineViewModel = koinViewModel(
         parameters = { parametersOf(routineId) }
     ),
@@ -116,7 +117,14 @@ fun EditRoutineScreen(
                 onDismiss = navigator::navigateBack,
                 onDelete = {
                     viewModel.deleteRoutine()
-                    navigator.navigateTo(AppRoute.Home)
+                    if (fromRoutineScreen) {
+                        // The Routine screen below this one on the back stack shows the
+                        // routine we just deleted, so pop it too instead of leaving it
+                        // reachable via back navigation.
+                        navigator.navigateTo(AppRoute.Home, backstackBehavior = BackstackBehavior.Clear)
+                    } else {
+                        navigator.navigateBack()
+                    }
                 },
             )
         }
