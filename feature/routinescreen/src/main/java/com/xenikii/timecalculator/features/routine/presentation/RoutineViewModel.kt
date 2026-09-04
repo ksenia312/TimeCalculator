@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 class RoutineViewModel(
@@ -52,7 +53,7 @@ class RoutineViewModel(
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                delay(1000)
+                delay(1000.milliseconds)
                 _now.value = Instant.fromEpochMilliseconds(System.currentTimeMillis())
             }
         }

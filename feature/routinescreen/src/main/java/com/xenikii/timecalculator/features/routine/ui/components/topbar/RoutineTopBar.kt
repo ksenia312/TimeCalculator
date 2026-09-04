@@ -24,6 +24,6 @@ fun RoutineTopBar(
         }
 
         is RoutineViewState.Error -> NonSuccessTopAppBar(stringResource(R.string.top_bar_error))
-        is RoutineViewState.Loading -> NonSuccessTopAppBar(stringResource(R.string.top_bar_loading))
+        is RoutineViewState.Loading -> NonSuccessTopAppBar()
     }
 }
