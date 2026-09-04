@@ -84,7 +84,7 @@
     <string name="routine_repeat_unit_label">Repeat unit</string>
     <string name="routine_repeat_on_days_label">Repeat on</string>
     <string name="routine_recurrence_unit_day">Day</string>
-    <string name="routine_recurrence_unit_week">Week</string>
+    <string name="routine_recurrence_unit_week">Days of week</string>
     <string name="routine_recurrence_unit_month">Month</string>
     <string name="routine_recurrence_unit_year">Year</string>
     <string name="routine_recurrence_summary_daily">Repeats daily</string>

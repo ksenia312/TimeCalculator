@@ -85,7 +85,7 @@
     <string name="routine_repeat_unit_label">Единица повтора</string>
     <string name="routine_repeat_on_days_label">Повторять по дням недели</string>
     <string name="routine_recurrence_unit_day">День</string>
-    <string name="routine_recurrence_unit_week">Неделя</string>
+    <string name="routine_recurrence_unit_week">Дни недели</string>
     <string name="routine_recurrence_unit_month">Месяц</string>
     <string name="routine_recurrence_unit_year">Год</string>
     <string name="routine_recurrence_summary_daily">Каждый день</string>

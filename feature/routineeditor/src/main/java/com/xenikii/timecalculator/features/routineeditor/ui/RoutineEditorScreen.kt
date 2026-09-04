@@ -233,17 +233,15 @@ private fun RoutineEditorScreen(
 
                 val onCheckerChange: (Boolean) -> Unit = { enabled ->
                     onStateChange(
-                        viewState.copy(
-                            recurrenceUnit = if (enabled) {
-                                if (resolvedRecurrenceUnit == RoutineRecurrenceUnit.NONE) {
-                                    RoutineRecurrenceUnit.DAY
-                                } else {
-                                    resolvedRecurrenceUnit
-                                }
+                        if (enabled) {
+                            if (resolvedRecurrenceUnit == RoutineRecurrenceUnit.NONE) {
+                                viewState.withRecurrenceUnit(RoutineRecurrenceUnit.WEEK)
                             } else {
-                                RoutineRecurrenceUnit.NONE
-                            },
-                        )
+                                viewState
+                            }
+                        } else {
+                            viewState.copy(recurrenceUnit = RoutineRecurrenceUnit.NONE)
+                        }
                     )
                 }
 
@@ -320,29 +318,35 @@ private fun RoutineEditorScreen(
                         },
                     )
 
-                    if (resolvedRecurrenceUnit == RoutineRecurrenceUnit.WEEK) {
-                        Spacer(Modifier.height(16.dp))
+                    val daysOfWeekEnabled = resolvedRecurrenceUnit == RoutineRecurrenceUnit.WEEK
 
-                        Text(
-                            text = stringResource(R.string.routine_repeat_on_days_label),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 12.dp)
-                        )
+                    Spacer(Modifier.height(16.dp))
 
-                        Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(R.string.routine_repeat_on_days_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (daysOfWeekEnabled) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
 
-                        RoutineDaysOfWeekSelector(
-                            selectedDays = viewState.effectiveRecurrenceDaysOfWeek(),
-                            onToggle = { day ->
-                                val updated = viewState.effectiveRecurrenceDaysOfWeek()
-                                    .toMutableSet()
-                                    .apply { if (!add(day)) remove(day) }
-                                onStateChange(
-                                    viewState.copy(recurrenceDaysOfWeek = updated)
-                                )
-                            },
-                        )
-                    }
+                    Spacer(Modifier.height(12.dp))
+
+                    RoutineDaysOfWeekSelector(
+                        selectedDays = viewState.effectiveRecurrenceDaysOfWeek(),
+                        enabled = daysOfWeekEnabled,
+                        onToggle = { day ->
+                            val updated = viewState.effectiveRecurrenceDaysOfWeek()
+                                .toMutableSet()
+                                .apply { if (!add(day)) remove(day) }
+                            onStateChange(
+                                viewState.copy(recurrenceDaysOfWeek = updated)
+                            )
+                        },
+                    )
                 }
 
                 Spacer(Modifier.height(12.dp))
