@@ -63,7 +63,7 @@
     <string name="fab_task">Задача</string>
     <string name="fab_routine">Рутина</string>
     <string name="fab_add_task">Создать задачу</string>
-    <string name="fab_manage_tasks">Выбрать из библиотеки задач</string>
+    <string name="fab_manage_tasks">Выбрать из списка задач</string>
     <string name="routine_tasks_empty_title">В этой рутине пока нет задач</string>
     <string name="routine_tasks_empty_subtitle">Нажмите кнопку внизу, чтобы создать новую задачу или выбрать её из уже существующих.</string>
     <string name="fab_add_item">Добавить элемент</string>
@@ -98,13 +98,13 @@
     <string name="routine_recurrence_weekends">Выходные</string>
     <string name="routine_status_running">В процессе</string>
     <string name="routine_status_completed">Рутина завершена</string>
-    <string name="routine_status_planned">Рутина запланирована</string>
+    <string name="routine_status_planned">Назначена</string>
     <string name="routine_time_will_start_in">Начнётся через</string>
     <string name="routine_time_ends_in">Заканчивается через</string>
 
     <string name="routines_list_status_completed_on">рутина завершена</string>
     <string name="routines_list_status_running_ends_on">выполняется, заканчивается</string>
-    <string name="routines_list_status_planned_for">рутина запланирована на</string>
+    <string name="routines_list_status_planned_for">рутина назначена на</string>
     <string name="routines_list_no_routines_scheduled">Нет запланированных рутин</string>
     <string name="landing_empty_title">Ещё нет рутин</string>
     <string name="landing_empty_subtitle">Приложение помогает планировать день с помощью рутин. Рутина состоит из задач: сначала создайте рутину, затем добавьте в неё задачи.</string>

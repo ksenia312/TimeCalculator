@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,37 +27,42 @@ fun RoutineCardTimeInfo(
     val context = LocalContext.current
     val ongoingRemaining = (viewItem.endInstant - viewItem.startInstant + viewItem.willStartIn)
         .coerceAtLeast(kotlin.time.Duration.ZERO)
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End
     ) {
-        if (!viewItem.isCompleted) {
-            Text(
-                text = stringResource(
-                    if (viewItem.isOngoing) {
-                        R.string.routine_time_ends_in
-                    } else {
-                        R.string.routine_time_will_start_in
-                    }
-                ),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
-                textAlign = TextAlign.End
-            )
-            Text(
-                text = if (viewItem.isOngoing) {
-                    ongoingRemaining.stringValue(context)
+        val alphaModifier = Modifier.alpha(if (viewItem.isCompleted) 0f else 1f)
+        Text(
+            text = stringResource(
+                if (viewItem.isOngoing) {
+                    R.string.routine_time_ends_in
                 } else {
-                    viewItem.willStartIn.stringValue(context)
-                },
-                color = MaterialTheme.colorScheme.surface,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                textAlign = TextAlign.End
-            )
-            Spacer(Modifier.height(10.dp))
-        }
+                    R.string.routine_time_will_start_in
+                }
+            ),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.75f),
+            textAlign = TextAlign.End,
+            modifier = alphaModifier
+        )
+        Text(
+            text = if (viewItem.isOngoing) {
+                ongoingRemaining.stringValue(context)
+            } else {
+                viewItem.willStartIn.stringValue(context)
+            },
+            color = MaterialTheme.colorScheme.surface,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            textAlign = TextAlign.End,
+            modifier = alphaModifier
+        )
+
+        Spacer(Modifier
+            .height(10.dp)
+            .then(alphaModifier))
 
         Text(
             text = stringResource(viewItem.startLabelRes),

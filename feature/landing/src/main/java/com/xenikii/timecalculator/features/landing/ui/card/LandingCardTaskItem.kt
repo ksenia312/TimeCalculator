@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.shared.extensions.stringTime
 import com.xenikii.timecalculator.shared.extensions.stringValue
+import com.xenikii.timecalculator.shared.features.routineCardBackground
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -41,30 +40,31 @@ fun LandingCardTaskItem(
     progress: Float,
     isOngoing: Boolean,
     isCompleted: Boolean,
+    routineIsOngoing: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val header = stringResource(headerRes, remaining.stringValue(context))
 
-    val cardBg = if (isOngoing) {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.16f)
-    } else {
+    val cardBackground = routineCardBackground(
+        isOngoing = routineIsOngoing,
+        isCompleted = isCompleted,
+    )
+    val lightenOverlay = if (isOngoing) {
         Color.Transparent
+    } else {
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.24f)
     }
-
-    val cardBorderColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.16f)
     val textColor = MaterialTheme.colorScheme.surface
     val subTextColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f)
 
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(cardBg)
-            .border(
-                2.dp, cardBorderColor, RoundedCornerShape(16.dp)
-            )
-            .padding(10.dp)
-            .alpha(if (isCompleted) 0.5f else 1f)
+            .clip(RoundedCornerShape(28.dp))
+            .background(cardBackground)
+            .background(lightenOverlay)
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 12.dp)
     ) {
         Text(
             text = header, style = MaterialTheme.typography.labelSmall,
@@ -76,7 +76,7 @@ fun LandingCardTaskItem(
             ), color = textColor
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -108,12 +108,12 @@ fun LandingCardTaskItem(
 
         LinearProgressIndicator(
             progress = { animatedProgress },
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.surface,
             trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.20f),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 2.dp)
-                .height(3.dp)
+                .height(6.dp)
                 .clip(RoundedCornerShape(50))
         )
 

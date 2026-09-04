@@ -2,13 +2,12 @@ package com.xenikii.timecalculator.features.landing.ui.card
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -34,10 +33,12 @@ import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.features.landing.presentation.LandingCardTaskViewItem
 import com.xenikii.timecalculator.features.landing.presentation.LandingRoutineState
 import com.xenikii.timecalculator.shared.animation.routineCardSharedKey
+import com.xenikii.timecalculator.shared.extensions.bottomIndent
 import com.xenikii.timecalculator.shared.features.RoutineCardStatusRow
 import com.xenikii.timecalculator.shared.features.RoutineCardTimeInfo
 import com.xenikii.timecalculator.shared.features.RoutineRecurrenceBadge
 import com.xenikii.timecalculator.shared.features.routineCard
+import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 
 @Composable
 fun LandingCard(
@@ -48,49 +49,51 @@ fun LandingCard(
     val viewItem = routineState.cardViewItem
     var expanded by rememberSaveable(routineState.routineId) { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .routineCard(
-                viewItem = viewItem,
-                horizontalPadding = PaddingValues(horizontal = 16.dp),
-                sharedKey = routineCardSharedKey(routineState.routineId),
-            ) {
-                onNavigate(routineState.routineId)
-            },
-    ) {
-        // --- Header ---
-        Row(verticalAlignment = Alignment.Top) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = viewItem.title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                    maxLines = 3,
-                    color = MaterialTheme.colorScheme.surface,
-                )
-                if (viewItem.recurrence.unit != RoutineRecurrenceUnit.NONE) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .routineCard(
+                    viewItem = viewItem,
+                    horizontalPadding = PaddingValues(horizontal = 16.dp),
+                    sharedKey = routineCardSharedKey(routineState.routineId),
+                ) {
+                    onNavigate(routineState.routineId)
+                },
+        ) {
+            // --- Header ---
+            Row(verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = viewItem.title,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        maxLines = 3,
+                        color = MaterialTheme.colorScheme.surface,
+                    )
+                    if (viewItem.recurrence.unit != RoutineRecurrenceUnit.NONE) {
+                        Spacer(Modifier.height(4.dp))
+                        RoutineRecurrenceBadge(
+                            recurrence = viewItem.recurrence,
+                            contentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                            textStyle = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                     Spacer(Modifier.height(4.dp))
-                    RoutineRecurrenceBadge(
-                        recurrence = viewItem.recurrence,
-                        contentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                        textStyle = MaterialTheme.typography.bodyMedium,
+                    RoutineCardStatusRow(
+                        isOngoing = viewItem.isOngoing,
+                        isCompleted = viewItem.isCompleted,
                     )
                 }
-                Spacer(Modifier.height(4.dp))
-                RoutineCardStatusRow(
-                    isOngoing = viewItem.isOngoing,
-                    isCompleted = viewItem.isCompleted,
-                )
+                Spacer(Modifier.width(16.dp))
+                RoutineCardTimeInfo(viewItem, modifier = Modifier.weight(1f))
             }
-            Spacer(Modifier.width(16.dp))
-            RoutineCardTimeInfo(viewItem, modifier = Modifier.weight(1f))
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(10.dp))
 
-        LandingCardBody(
+        LandingCardTasksSection(
             isRoutineOngoing = viewItem.isOngoing,
             isRoutineCompleted = viewItem.isCompleted,
             expanded = expanded && routineState.hasHiddenTasks,
@@ -100,11 +103,13 @@ fun LandingCard(
             previewTasks = routineState.previewTasks,
             futureTasks = routineState.futureTasks,
         )
+
+        Spacer(Modifier.bottomIndent())
     }
 }
 
 @Composable
-private fun ColumnScope.LandingCardBody(
+private fun LandingCardTasksSection(
     isRoutineOngoing: Boolean,
     isRoutineCompleted: Boolean,
     expanded: Boolean,
@@ -123,59 +128,57 @@ private fun ColumnScope.LandingCardBody(
         }
     }
 
-    val tasksModifier = Modifier
-        .weight(1f)
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState())
-
     Column(
-        modifier = tasksModifier,
-        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            if (expanded) {
-                completedTasks.forEach { task ->
-                    TaskItem(
-                        task = task,
-                        isCompleted = true
-                    )
-                }
-            }
-            previewTasks.forEachIndexed { index, task ->
-                val isCurrentTask = isRoutineOngoing && index == 0
+        if (expanded) {
+            completedTasks.forEach { task ->
                 TaskItem(
                     task = task,
-                    isOngoing = isCurrentTask,
-                    isCompleted = isRoutineCompleted,
-                    modifier = if (isCurrentTask) {
-                        Modifier.bringIntoViewRequester(currentTaskBringIntoViewRequester)
-                    } else {
-                        Modifier
-                    },
+                    isCompleted = true,
+                    routineIsOngoing = isRoutineOngoing,
                 )
             }
-            if (expanded) {
-                futureTasks.forEach { task ->
-                    TaskItem(
-                        task = task,
-                        isCompleted = isRoutineCompleted
-                    )
-                }
+        }
+        previewTasks.forEachIndexed { index, task ->
+            val isCurrentTask = isRoutineOngoing && index == 0
+            TaskItem(
+                task = task,
+                isOngoing = isCurrentTask,
+                isCompleted = isRoutineCompleted,
+                routineIsOngoing = isRoutineOngoing,
+                modifier = if (isCurrentTask) {
+                    Modifier.bringIntoViewRequester(currentTaskBringIntoViewRequester)
+                } else {
+                    Modifier
+                },
+            )
+        }
+        if (expanded) {
+            futureTasks.forEach { task ->
+                TaskItem(
+                    task = task,
+                    isCompleted = isRoutineCompleted,
+                    routineIsOngoing = isRoutineOngoing,
+                )
             }
         }
     }
 
     if (hasHiddenTasks) {
-        ExpandToggle(expanded = expanded, onToggle = onToggle)
+        ExpandToggle(
+            expanded = expanded,
+            onToggle = onToggle,
+            modifier = Modifier.padding(top = 10.dp),
+        )
     }
 }
 
 @Composable
 private fun TaskItem(
     task: LandingCardTaskViewItem,
+    routineIsOngoing: Boolean,
     isOngoing: Boolean = false,
     isCompleted: Boolean = false,
     modifier: Modifier = Modifier,
@@ -188,8 +191,9 @@ private fun TaskItem(
         end = task.end,
         progress = task.progress,
         isOngoing = isOngoing,
+        isCompleted = isCompleted,
+        routineIsOngoing = routineIsOngoing,
         modifier = modifier.fillMaxWidth(),
-        isCompleted = isCompleted
     )
 }
 
@@ -199,7 +203,7 @@ private fun ExpandToggle(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val contentColor = MaterialTheme.colorScheme.surface
+    val contentColor = LocalCustomColorScheme.current.accent
 
     TextButton(
         onClick = onToggle,
