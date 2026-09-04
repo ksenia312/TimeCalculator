@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
@@ -45,12 +46,13 @@ fun LandingCard(
     routineState: LandingRoutineState,
     onNavigate: (routineId: String) -> Unit,
     modifier: Modifier = Modifier,
+    topSpacing: Dp = 16.dp,
 ) {
     val viewItem = routineState.cardViewItem
     var expanded by rememberSaveable(routineState.routineId) { mutableStateOf(false) }
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(topSpacing))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,6 +108,7 @@ fun LandingCard(
         )
 
         Spacer(Modifier.bottomIndent())
+        Spacer(Modifier.height(56.dp))
     }
 }
 

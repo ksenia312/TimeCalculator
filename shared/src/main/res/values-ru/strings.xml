@@ -88,10 +88,10 @@
     <string name="routine_recurrence_unit_week">Неделя</string>
     <string name="routine_recurrence_unit_month">Месяц</string>
     <string name="routine_recurrence_unit_year">Год</string>
-    <string name="routine_recurrence_summary_daily">Ежедневно</string>
-    <string name="routine_recurrence_summary_weekly">Еженедельно</string>
-    <string name="routine_recurrence_summary_monthly">Ежемесячно</string>
-    <string name="routine_recurrence_summary_yearly">Ежегодно</string>
+    <string name="routine_recurrence_summary_daily">Каждый день</string>
+    <string name="routine_recurrence_summary_weekly">Каждую неделю</string>
+    <string name="routine_recurrence_summary_monthly">Каждый месяц</string>
+    <string name="routine_recurrence_summary_yearly">Каждый год</string>
     <string name="routine_recurrence_summary_every">Каждые %1$s</string>
     <string name="routine_recurrence_summary_on_days">%1$s:\n%2$s</string>
     <string name="routine_recurrence_weekdays">Рабочие дни</string>
