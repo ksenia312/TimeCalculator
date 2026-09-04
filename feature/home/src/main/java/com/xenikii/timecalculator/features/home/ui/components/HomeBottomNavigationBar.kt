@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.preview.PreviewAll
@@ -78,7 +79,8 @@ fun HomeBottomNavigationBar(
                                     FontWeight.Bold
                                 else
                                     FontWeight.Normal
-                            )
+                            ),
+                            textAlign = TextAlign.Center
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(

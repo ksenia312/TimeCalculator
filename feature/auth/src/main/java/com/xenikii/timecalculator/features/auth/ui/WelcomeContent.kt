@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -21,8 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.features.auth.presentation.WelcomeState
 import com.xenikii.timecalculator.shared.components.AppButtonExpressive
-import com.xenikii.timecalculator.shared.components.AppTextButtonMedium
 import com.xenikii.timecalculator.shared.components.AppScaffold
+import com.xenikii.timecalculator.shared.components.AppTextButtonMedium
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 
@@ -71,14 +70,12 @@ fun WelcomeContent(
                     Spacer(Modifier.height(AuthSpacing.ContentSpacing))
                     AppButtonExpressive(
                         onClick = onNavigateToRegister,
-                        modifier = Modifier.fillMaxWidth(0.7f),
                     ) {
                         Text(stringResource(R.string.auth_welcome_register))
                     }
                     Spacer(Modifier.height(AuthSpacing.LinkSpacing))
                     AppTextButtonMedium(
                         onClick = onNavigateToLogin,
-                        modifier = Modifier.fillMaxWidth(0.7f),
                     ) {
                         Text(
                             stringResource(R.string.auth_welcome_login),

@@ -18,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.shared.preview.PreviewAll
@@ -37,6 +38,7 @@ fun AppButtonExpressive(
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     contentPadding: PaddingValues = AppButtonContentLargePadding,
     defaultTextStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    defaultTextAlign: TextAlign = TextAlign.Center,
     content: @Composable RowScope.() -> Unit,
 ) {
     Button(
@@ -48,7 +50,7 @@ fun AppButtonExpressive(
         elevation = elevation,
         contentPadding = contentPadding,
         content = {
-            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle) {
+            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle.copy(textAlign = defaultTextAlign)) {
                 content()
             }
         },
@@ -65,6 +67,7 @@ fun AppButtonMedium(
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     contentPadding: PaddingValues = AppButtonContentMediumPadding,
     defaultTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    defaultTextAlign: TextAlign = TextAlign.Center,
     content: @Composable RowScope.() -> Unit,
 ) {
     Button(
@@ -76,7 +79,7 @@ fun AppButtonMedium(
         elevation = elevation,
         contentPadding = contentPadding,
         content = {
-            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle) {
+            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle.copy(textAlign = defaultTextAlign)) {
                 content()
             }
         },
@@ -94,6 +97,7 @@ fun AppElevatedButtonMedium(
     elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
     contentPadding: PaddingValues = AppButtonContentMediumPadding,
     defaultTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    defaultTextAlign: TextAlign = TextAlign.Center,
     content: @Composable RowScope.() -> Unit,
 ) {
     ElevatedButton(
@@ -105,7 +109,7 @@ fun AppElevatedButtonMedium(
         elevation = elevation,
         contentPadding = contentPadding,
         content = {
-            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle) {
+            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle.copy(textAlign = defaultTextAlign)) {
                 content()
             }
         },
@@ -129,6 +133,7 @@ fun AppTextButtonMedium(
     ),
     contentPadding: PaddingValues = AppButtonContentMediumPadding,
     defaultTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    defaultTextAlign: TextAlign = TextAlign.Center,
     content: @Composable RowScope.() -> Unit,
 ) {
     TextButton(
@@ -140,7 +145,7 @@ fun AppTextButtonMedium(
         elevation = elevation,
         contentPadding = contentPadding,
         content = {
-            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle) {
+            CompositionLocalProvider(LocalTextStyle provides defaultTextStyle.copy(textAlign = defaultTextAlign)) {
                 content()
             }
         },

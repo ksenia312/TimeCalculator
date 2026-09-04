@@ -57,7 +57,7 @@
     <string name="home_tab_home">Главная</string>
     <string name="home_tab_routines">Рутины</string>
     <string name="home_tab_tasks">Задачи</string>
-    <string name="home_tab_settings">Параметры</string>
+    <string name="home_tab_settings">Профиль</string>
     <string name="home_tab_landing">Главная</string>
 
     <string name="fab_task">Задача</string>
