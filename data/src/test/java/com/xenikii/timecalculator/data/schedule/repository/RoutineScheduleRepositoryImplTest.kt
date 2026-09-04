@@ -187,6 +187,62 @@ class RoutineScheduleRepositoryImplTest {
     }
 
     @Test
+    fun `resyncs notification instead of dropping it when a TASK alarm trigger no longer matches the schedule`() {
+        runBlocking {
+            val notificationGateway = RecordingNotificationGateway()
+            val repository = RoutineScheduleRepositoryImpl(
+                alarmGateway = RecordingAlarmGateway(),
+                notificationGateway = notificationGateway,
+                scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
+                notificationSettings = FakeNotificationSettingsLocalDataSource(),
+            )
+            val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
+            // Inside the routine's single 5-minute task (09:00-09:05), so the routine is ACTIVE.
+            val now = instant(day = 1, hour = 9, minute = 2)
+
+            repository.handleAlarm(
+                routine = routine,
+                kind = RoutineAlarmKind.TASK,
+                boundaryIndex = 0,
+                triggerAtMillis = now.toEpochMilliseconds() - 1, // stale trigger, won't match expectedTrigger
+                now = now,
+            )
+
+            // A missed/stale alarm must never be dropped silently while the routine is still
+            // active: it has to repaint the notification against the real current task instead.
+            assertTrue(notificationGateway.postProgressCalls.isNotEmpty())
+            assertTrue(notificationGateway.cancelProgressCalls.isEmpty())
+        }
+    }
+
+    @Test
+    fun `cancels notification when a mismatched alarm fires after the routine already finished`() {
+        runBlocking {
+            val notificationGateway = RecordingNotificationGateway()
+            val repository = RoutineScheduleRepositoryImpl(
+                alarmGateway = RecordingAlarmGateway(),
+                notificationGateway = notificationGateway,
+                scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
+                notificationSettings = FakeNotificationSettingsLocalDataSource(),
+            )
+            val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
+            // After the routine's 09:00-09:05 window, so the routine has already finished.
+            val now = instant(day = 1, hour = 9, minute = 10)
+
+            repository.handleAlarm(
+                routine = routine,
+                kind = RoutineAlarmKind.TASK,
+                boundaryIndex = 0,
+                triggerAtMillis = now.toEpochMilliseconds() - 1,
+                now = now,
+            )
+
+            assertTrue(notificationGateway.cancelProgressCalls.contains(routine.id))
+            assertTrue(notificationGateway.postProgressCalls.isEmpty())
+        }
+    }
+
+    @Test
     fun `computes weekly on selected days next cycle`() {
         val repository = createRepository()
         // 2026-01-05 is a Monday. Repeat on Monday and Wednesday.
@@ -321,12 +377,15 @@ private class RecordingAlarmGateway : RoutineAlarmGateway {
 
 private class RecordingNotificationGateway : RoutineNotificationGateway {
     val cancelProgressCalls = mutableListOf<String>()
+    val postProgressCalls = mutableListOf<RoutineSchedule>()
     override fun cancelRoutineNotifications(routineId: String) = Unit
     override fun cancelProgress(routineId: String) {
         cancelProgressCalls += routineId
     }
 
-    override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean) = Unit
+    override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean) {
+        postProgressCalls += plan
+    }
 }
 
 private class FakeNotificationSettingsLocalDataSource(

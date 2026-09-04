@@ -20,10 +20,12 @@ class RoutineScheduleReconcileWorker(
 
     override suspend fun doWork(): Result {
         val routines = routineRepository.routinesFlow.first()
-        scheduleRepository.reconcile(
-            routines = routines,
-            now = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
-        )
+        val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+        scheduleRepository.reconcile(routines = routines, now = now)
+        // reconcile() is a no-op whenever a routine's signature hasn't changed, so it alone can't
+        // repair an ongoing notification stuck on an elapsed task because of a missed alarm.
+        // refreshNotifications() always resyncs it against the real current task, unconditionally.
+        scheduleRepository.refreshNotifications(routines = routines, now = now)
         return Result.success()
     }
 }

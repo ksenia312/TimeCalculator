@@ -42,7 +42,13 @@ class RoutineNotificationPresenter(
     ) {
         if (!notificationSettings.isEnabled()) return
         if (!notificationManager.areNotificationsEnabled()) return
-        val task = plan.taskAt(now) ?: return
+        val task = plan.taskAt(now)
+        if (task == null) {
+            // No task covers `now` (routine ended or fell in a gap): never leave a stale
+            // ongoing notification ticking down on an elapsed task.
+            notificationManager.cancel(progressNotificationId(routine.id))
+            return
+        }
         val notification = NotificationCompat.Builder(context, CHANNEL_PROGRESS)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle("${context.getString(R.string.notification_routine_title)}: ${routine.title}")

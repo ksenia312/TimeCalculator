@@ -58,16 +58,25 @@ class RoutineScheduleRepositoryImpl(
         now: Instant,
     ) {
         mutex.withLock {
-            val enabled = notificationSettings.isEnabled()
             routines.forEach { routine ->
-                val schedule = computeSchedule(routine, now)
-                val isActive = schedule.phaseAt(now) == RoutineSchedulePhase.ACTIVE
-                if (enabled && isActive) {
-                    notificationGateway.postProgress(routine, schedule, now, alert = false)
-                } else {
-                    notificationGateway.cancelProgress(routine.id)
-                }
+                syncNotification(routine, computeSchedule(routine, now), now)
             }
+        }
+    }
+
+    /**
+     * Resyncs the ongoing notification with the ground truth of `schedule`, regardless of what
+     * (if anything) is currently showing. This is the self-healing path: it must be safe to call
+     * whenever we're not sure the notification reflects the current task, e.g. after a missed or
+     * stale alarm, so a stuck notification is never left ticking down on an elapsed task forever.
+     */
+    private fun syncNotification(routine: Routine, schedule: RoutineSchedule, now: Instant) {
+        val enabled = notificationSettings.isEnabled()
+        val isActive = schedule.phaseAt(now) == RoutineSchedulePhase.ACTIVE
+        if (enabled && isActive) {
+            notificationGateway.postProgress(routine, schedule, now, alert = false)
+        } else {
+            notificationGateway.cancelProgress(routine.id)
         }
     }
 
@@ -98,7 +107,13 @@ class RoutineScheduleRepositoryImpl(
                 RoutineAlarmKind.END -> schedule.end.toEpochMilliseconds()
             } ?: return
 
-            if (triggerAtMillis >= 0 && triggerAtMillis != expectedTrigger) return
+            if (triggerAtMillis >= 0 && triggerAtMillis != expectedTrigger) {
+                // The schedule shifted since this alarm was armed (routine edited, recurrence
+                // rolled over, etc). Don't just drop the alarm silently: resync the notification
+                // to whatever is actually true right now instead of leaving a stale one behind.
+                syncNotification(routine, schedule, now)
+                return
+            }
 
             when (kind) {
                 RoutineAlarmKind.START -> {
