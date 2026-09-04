@@ -273,7 +273,7 @@ private fun RoutineEditorScreen(
                         }
                         .padding(horizontal = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(R.string.routine_repeat_label),
@@ -333,20 +333,21 @@ private fun RoutineEditorScreen(
                         modifier = Modifier.padding(start = 12.dp)
                     )
 
-                    Spacer(Modifier.height(12.dp))
+                    if (daysOfWeekEnabled) {
+                        Spacer(Modifier.height(12.dp))
 
-                    RoutineDaysOfWeekSelector(
-                        selectedDays = viewState.effectiveRecurrenceDaysOfWeek(),
-                        enabled = daysOfWeekEnabled,
-                        onToggle = { day ->
-                            val updated = viewState.effectiveRecurrenceDaysOfWeek()
-                                .toMutableSet()
-                                .apply { if (!add(day)) remove(day) }
-                            onStateChange(
-                                viewState.copy(recurrenceDaysOfWeek = updated)
-                            )
-                        },
-                    )
+                        RoutineDaysOfWeekSelector(
+                            selectedDays = viewState.effectiveRecurrenceDaysOfWeek(),
+                            onToggle = { day ->
+                                val updated = viewState.effectiveRecurrenceDaysOfWeek()
+                                    .toMutableSet()
+                                    .apply { if (!add(day)) remove(day) }
+                                onStateChange(
+                                    viewState.copy(recurrenceDaysOfWeek = updated)
+                                )
+                            },
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(12.dp))

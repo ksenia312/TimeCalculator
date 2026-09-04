@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
@@ -33,14 +32,11 @@ fun RoutineDaysOfWeekSelector(
     selectedDays: Set<Int>,
     onToggle: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
 ) {
     val locale = currentLocale()
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .alpha(if (enabled) 1f else 0.4f),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         WeekDays.forEach { day ->
@@ -48,7 +44,6 @@ fun RoutineDaysOfWeekSelector(
             DayCircle(
                 label = day.getDisplayName(TextStyle.NARROW, locale),
                 selected = selectedDays.contains(value),
-                enabled = enabled,
                 onClick = { onToggle(value) },
                 modifier = Modifier.weight(1f),
             )
@@ -62,7 +57,6 @@ private fun DayCircle(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
 ) {
     val containerColor = if (selected) {
         MaterialTheme.colorScheme.primary
@@ -91,7 +85,7 @@ private fun DayCircle(
                     )
                 }
             )
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(onClick = onClick)
             .padding(4.dp),
         contentAlignment = Alignment.Center,
     ) {
