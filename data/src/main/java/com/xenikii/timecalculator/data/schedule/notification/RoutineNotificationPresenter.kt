@@ -61,7 +61,12 @@ class RoutineNotificationPresenter(
             .setChronometerCountDown(true)
             .setWhen(task.end.toEpochMilliseconds())
             .setAutoCancel(false)
-            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            // CATEGORY_PROGRESS (download/install-style progress) is excluded by design from
+            // being bridged to paired wearables (Wear OS / Samsung's Galaxy Wearable), the same
+            // way a file-download notification never reaches a watch. This notification is a
+            // countdown reminder of the current task, so CATEGORY_REMINDER both fits semantically
+            // and is one of the categories that does get mirrored to a watch.
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .build()
 
         notificationManager.notify(progressNotificationId(routine.id), notification)
