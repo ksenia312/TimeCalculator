@@ -224,7 +224,8 @@
         <item quantity="many">%d лет</item>
     </plurals>
 
-    <string name="notification_routine_title">Рутина в процессе</string>
+    <string name="notification_progress_title">Прогресс задачи в «%1$s»</string>
+    <string name="notification_alert_title">Задача началась в «%1$s»</string>
     <string name="notification_channel_routine_progress">Прогресс рутины</string>
     <string name="notification_channel_routine_progress_description">Показывает активную рутину и обратный отсчёт текущей задачи</string>
     <string name="notification_channel_task_alerts">Оповещения о задачах</string>

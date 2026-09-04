@@ -208,7 +208,8 @@
         <item quantity="other">%d years</item>
     </plurals>
 
-    <string name="notification_routine_title">Routine in progress</string>
+    <string name="notification_progress_title">Task progress in %1$s</string>
+    <string name="notification_alert_title">Task started in %1$s</string>
     <string name="notification_channel_routine_progress">Routine progress</string>
     <string name="notification_channel_routine_progress_description">Shows the active routine and current task countdown</string>
     <string name="notification_channel_task_alerts">Task alerts</string>

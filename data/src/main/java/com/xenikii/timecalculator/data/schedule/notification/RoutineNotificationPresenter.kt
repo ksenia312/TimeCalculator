@@ -51,12 +51,18 @@ class RoutineNotificationPresenter(
         }
         val notification = NotificationCompat.Builder(context, CHANNEL_PROGRESS)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("${context.getString(R.string.notification_routine_title)}: ${routine.title}")
+            .setContentTitle(context.getString(R.string.notification_progress_title, routine.title))
             .setContentText(task.title)
             .setStyle(NotificationCompat.BigTextStyle().bigText(task.title))
             .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
             .setOngoing(true)
-            .setOnlyAlertOnce(!alert)
+            // This notification must never itself alert: postAlert() below is now the single
+            // source of sound/vibration/heads-up for a transition. Without this, both it and the
+            // alert notification would alert together every time a task changes. setSilent(true)
+            // forces silence regardless of channel importance, so this holds even on installs
+            // that already created CHANNEL_PROGRESS at IMPORTANCE_HIGH before this change.
+            .setOnlyAlertOnce(true)
+            .setSilent(true)
             .setUsesChronometer(true)
             .setChronometerCountDown(true)
             .setWhen(task.end.toEpochMilliseconds())
@@ -70,18 +76,59 @@ class RoutineNotificationPresenter(
             .build()
 
         notificationManager.notify(progressNotificationId(routine.id), notification)
+
+        if (alert) {
+            postAlert(routine, task.title)
+        }
+    }
+
+    /**
+     * The ongoing progress notification above carries FLAG_ONGOING_EVENT, which companion-device
+     * bridges (Wear OS, Samsung's Galaxy Wearable) treat as a local device-status indicator and
+     * never forward to a paired watch, no matter its category - the same reason a download's
+     * progress notification never reaches a watch. This is not a per-app setting anyone can turn
+     * back on; it's the platform's default treatment of any ongoing notification. Only a normal,
+     * dismissible, one-shot notification gets mirrored, so every real transition (routine start,
+     * task change) also posts one of those here, on the previously-unused "alert" channel/id.
+     */
+    private fun postAlert(routine: Routine, taskTitle: String) {
+        val alertNotification = NotificationCompat.Builder(context, CHANNEL_ALERT)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle(context.getString(R.string.notification_alert_title, routine.title))
+            .setContentText(taskTitle)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(taskTitle))
+            .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        notificationManager.notify(alertNotificationId(routine.id), alertNotification)
     }
 
     private fun createChannels() {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(
+            // LOW: this channel is a silent, persistent status display now that CHANNEL_ALERT
+            // owns alerting for real transitions - it should never itself make sound/vibrate.
+            // (An already-existing HIGH channel from before this change can't be downgraded here;
+            // postProgress()'s setSilent(true) is what covers those installs.)
             NotificationChannel(
                 CHANNEL_PROGRESS,
                 context.getString(R.string.notification_channel_routine_progress),
-                NotificationManager.IMPORTANCE_HIGH,
+                NotificationManager.IMPORTANCE_LOW,
             ).apply {
                 description = context.getString(R.string.notification_channel_routine_progress_description)
                 setShowBadge(false)
+            }
+        )
+        manager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_ALERT,
+                context.getString(R.string.notification_channel_task_alerts),
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply {
+                description = context.getString(R.string.notification_channel_task_alerts_description)
             }
         )
     }
@@ -96,5 +143,6 @@ class RoutineNotificationPresenter(
 
     companion object {
         private const val CHANNEL_PROGRESS = "routine_progress"
+        private const val CHANNEL_ALERT = "routine_task_alerts"
     }
 }
