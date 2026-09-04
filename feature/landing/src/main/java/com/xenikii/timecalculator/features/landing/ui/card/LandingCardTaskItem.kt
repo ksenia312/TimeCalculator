@@ -53,7 +53,7 @@ fun LandingCardTaskItem(
     val lightenOverlay = if (isOngoing) {
         Color.Transparent
     } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.28f)
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.40f)
     }
     val textColor = MaterialTheme.colorScheme.surface
     val subTextColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f)
