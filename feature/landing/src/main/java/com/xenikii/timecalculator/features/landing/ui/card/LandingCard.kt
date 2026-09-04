@@ -50,6 +50,7 @@ fun LandingCard(
     var expanded by rememberSaveable(routineState.routineId) { mutableStateOf(false) }
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+        Spacer(Modifier.height(16.dp))
         Column(
             modifier = Modifier
                 .fillMaxWidth()

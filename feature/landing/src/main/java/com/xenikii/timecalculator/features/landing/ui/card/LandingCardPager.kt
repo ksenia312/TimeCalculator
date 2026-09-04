@@ -2,10 +2,9 @@ package com.xenikii.timecalculator.features.landing.ui.card
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +38,7 @@ fun LandingCardPager(
                 selectedTabIndex = pagerState.currentPage,
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 16.dp)
             ) {
                 routineStates.forEachIndexed { index, routineState ->
                     Tab(
@@ -59,7 +59,6 @@ fun LandingCardPager(
                     )
                 }
             }
-            Spacer(Modifier.height(16.dp))
         }
         HorizontalPager(
             state = pagerState,
