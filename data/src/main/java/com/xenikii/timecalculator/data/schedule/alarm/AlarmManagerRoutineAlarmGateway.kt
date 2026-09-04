@@ -97,22 +97,18 @@ class AlarmManagerRoutineAlarmGateway(
             boundaryIndex = boundaryIndex,
             triggerAtMillis = triggerAtMillis,
         )
-        if (canScheduleExactAlarms()) {
-            AlarmManagerCompat.setExactAndAllowWhileIdle(
-                alarmManager,
-                AlarmManager.RTC_WAKEUP,
-                triggerAtMillis,
-                operation,
-            )
-        } else {
-            val showIntent = buildRoutineDetailPendingIntent(context, routineId)
-            AlarmManagerCompat.setAlarmClock(
-                alarmManager,
-                triggerAtMillis,
-                showIntent,
-                operation,
-            )
-        }
+        // Always setAlarmClock (like scheduleStart), not just as an exact-alarm-permission
+        // fallback: for a recurring routine, this alarm is what arms the *next* occurrence's
+        // alarms, so it's the single point of failure for the routine ever firing again. It needs
+        // the delivery guarantees Android reserves for real alarm clocks (immune to Doze and to
+        // OEM battery/task killers), not the weaker ones setExactAndAllowWhileIdle gets.
+        val showIntent = buildRoutineDetailPendingIntent(context, routineId)
+        AlarmManagerCompat.setAlarmClock(
+            alarmManager,
+            triggerAtMillis,
+            showIntent,
+            operation,
+        )
     }
 
     private fun cancelPendingIntent(

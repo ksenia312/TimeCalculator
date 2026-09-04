@@ -41,10 +41,15 @@ class RoutineScheduleInitializer(
                     if (!alarmGateway.canScheduleExactAlarms() && routines.any { it.data.isNotEmpty() }) {
                         permissionRequester.promptIfNeeded()
                     }
-                    scheduleRepository.reconcile(
-                        routines = routines,
-                        now = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
-                    )
+                    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+                    scheduleRepository.reconcile(routines = routines, now = now)
+                    // reconcile() no-ops whenever a routine's schedule signature hasn't changed -
+                    // the common case on a cold app start, since today's alarms were already
+                    // correctly armed ahead of time. That means it alone can't repaint a progress
+                    // notification that a killed/missed alarm failed to post. Unconditionally
+                    // resync every time the app starts (or routines change) instead of only doing
+                    // so when the user happens to toggle the notification setting.
+                    scheduleRepository.refreshNotifications(routines = routines, now = now)
                 }
         }
         scope.launch {
