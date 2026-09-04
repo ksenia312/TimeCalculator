@@ -35,8 +35,10 @@ class SettingsViewModel(
         if (_viewState.value.isLoggingOut) return
         viewModelScope.launch {
             _viewState.update { it.copy(isLoggingOut = true) }
-            logoutUseCase()
-            _viewState.update { it.copy(isLoggingOut = false) }
+            val result = logoutUseCase()
+            if (result.isFailure) {
+                _viewState.update { it.copy(isLoggingOut = false) }
+            }
         }
     }
 
