@@ -12,6 +12,10 @@ fun RoutineTopBar(
     collapseFraction: Float = 0f,
     scrollableState: ScrollableState? = null,
     onShowEditDialog: () -> Unit,
+    isEditMode: Boolean = false,
+    selectedCount: Int = 0,
+    onExitEditMode: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
 ) {
     when (viewState) {
         is RoutineViewState.Success -> {
@@ -19,7 +23,11 @@ fun RoutineTopBar(
                 viewState,
                 collapseFraction = collapseFraction,
                 scrollableState = scrollableState,
-                onShowEditDialog = onShowEditDialog
+                onShowEditDialog = onShowEditDialog,
+                isEditMode = isEditMode,
+                selectedCount = selectedCount,
+                onExitEditMode = onExitEditMode,
+                onDeleteClick = onDeleteClick,
             )
         }
 

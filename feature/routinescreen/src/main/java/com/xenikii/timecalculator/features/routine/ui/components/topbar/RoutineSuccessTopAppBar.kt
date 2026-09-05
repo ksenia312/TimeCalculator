@@ -35,6 +35,10 @@ fun RoutineSuccessTopAppBar(
     collapseFraction: Float = 0f,
     scrollableState: ScrollableState? = null,
     onShowEditDialog: () -> Unit = { },
+    isEditMode: Boolean = false,
+    selectedCount: Int = 0,
+    onExitEditMode: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
 ) {
     val fraction = collapseFraction.coerceIn(0f, 1f)
     val viewItem = viewState.cardViewItem
@@ -73,6 +77,10 @@ fun RoutineSuccessTopAppBar(
             collapsedTitleAlpha = titleEnter,
             ownsTitleForA11y = collapsedOwnsTitle,
             onSettingsClick = onShowEditDialog,
+            isEditMode = isEditMode,
+            selectedCount = selectedCount,
+            onExitEditMode = onExitEditMode,
+            onDeleteClick = onDeleteClick,
         )
 
         Spacer(Modifier.height(lerp(16.dp, 0.dp, fraction)))

@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,8 +36,10 @@ class RoutineViewModel(
     private val _tasksState = MutableStateFlow<List<Task>>(emptyList())
     private val _now = MutableStateFlow(Instant.fromEpochMilliseconds(System.currentTimeMillis()))
     private val _draftOrder = MutableStateFlow<List<String>?>(null)
+    private val _selectedIds = MutableStateFlow<Set<String>>(emptySet())
 
     val viewState: StateFlow<RoutineViewState> = _viewState
+    val selectedIds: StateFlow<Set<String>> = _selectedIds
     val tasks: StateFlow<List<Task>> = combine(
         _tasksState, _viewState
     ) { tasks, _ ->
@@ -87,6 +90,26 @@ class RoutineViewModel(
 
     fun cancelReorder() {
         _draftOrder.value = null
+    }
+
+    fun toggleSelection(id: String) {
+        _selectedIds.update { current ->
+            if (id in current) current - id else current + id
+        }
+    }
+
+    fun clearSelection() {
+        _selectedIds.value = emptySet()
+    }
+
+    fun deleteSelected() {
+        viewModelScope.launch {
+            _viewState.asSuccess { r ->
+                val remaining = r.routine.data.filterNot { it.id in _selectedIds.value }
+                editRoutine(r.routine.copy(data = remaining))
+            }
+            _selectedIds.value = emptySet()
+        }
     }
 
     fun editLinksInRoutine(links: List<RoutineLink>) {

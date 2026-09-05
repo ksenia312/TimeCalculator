@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +31,12 @@ import com.xenikii.timecalculator.shared.components.BackButton
  * The title is only laid out once it starts appearing ([collapsedTitleAlpha] > 0), and its
  * accessibility text is cleared unless it is the currently visible title ([ownsTitleForA11y]),
  * so screen readers never announce a duplicated or hidden title.
+ *
+ * [isEditMode] reflects whether any task is selected — there's no edit mode without a
+ * selection. While true, the title is replaced by the selection count, the back button clears
+ * the selection instead of navigating back, and the settings action is replaced by delete
+ * (shown only once something is selected). Clearing the selection (by deselecting every task,
+ * deleting them, or via back) is what exits edit mode.
  */
 @Composable
 fun RoutineCollapsingHeader(
@@ -38,17 +45,28 @@ fun RoutineCollapsingHeader(
     ownsTitleForA11y: Boolean,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isEditMode: Boolean = false,
+    selectedCount: Int = 0,
+    onExitEditMode: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BackButton(color = MaterialTheme.colorScheme.onPrimary)
+        BackButton(
+            color = MaterialTheme.colorScheme.onPrimary,
+            overrideOnBack = if (isEditMode) onExitEditMode else null,
+        )
 
         Box(modifier = Modifier.weight(1f)) {
-            if (collapsedTitleAlpha > 0f) {
+            if (isEditMode || collapsedTitleAlpha > 0f) {
                 Text(
-                    text = title,
+                    text = if (isEditMode) {
+                        stringResource(R.string.routine_tasks_selected_count, selectedCount)
+                    } else {
+                        title
+                    },
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold
                     ),
@@ -57,23 +75,35 @@ fun RoutineCollapsingHeader(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .graphicsLayer {
-                            alpha = collapsedTitleAlpha
-                            translationY = (1f - collapsedTitleAlpha) * 10.dp.toPx()
+                            alpha = if (isEditMode) 1f else collapsedTitleAlpha
+                            translationY = if (isEditMode) 0f else (1f - collapsedTitleAlpha) * 10.dp.toPx()
                         }
                         .padding(end = 16.dp)
                         .then(
-                            if (ownsTitleForA11y) Modifier else Modifier.clearAndSetSemantics { }
+                            if (isEditMode || ownsTitleForA11y) Modifier else Modifier.clearAndSetSemantics { }
                         ),
                 )
             }
         }
 
-        IconButton(onClick = onSettingsClick) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = stringResource(R.string.content_desc_routine_settings),
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
+        if (isEditMode) {
+            if (selectedCount > 0) {
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.content_desc_delete),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        } else {
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.content_desc_routine_settings),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }

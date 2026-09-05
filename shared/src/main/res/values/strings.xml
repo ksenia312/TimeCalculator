@@ -36,6 +36,7 @@
 
     <string name="content_desc_delete">Delete</string>
     <string name="content_desc_routine_settings">Routine settings</string>
+    <string name="content_desc_reorder_task">Reorder task</string>
     <string name="content_desc_back">Back</string>
     <string name="content_desc_close">Close</string>
     <string name="content_desc_open_menu">Open menu</string>
@@ -66,6 +67,11 @@
     <string name="fab_copy_from_routine">Copy from routine</string>
     <string name="routine_tasks_empty_title">No tasks in this routine yet</string>
     <string name="routine_tasks_empty_subtitle">Tap the button below to create a new task or choose one you already have.</string>
+    <string name="routine_tasks_selected_count">%1$d selected</string>
+    <string name="routine_tasks_remove_single_title">Remove \"%1$s\" from routine?</string>
+    <string name="routine_tasks_remove_multiple_title">Remove %1$d tasks from routine?</string>
+    <string name="routine_tasks_remove_single_message">The task will be removed from this routine.</string>
+    <string name="routine_tasks_remove_multiple_message">%1$s\n\nThese tasks will be removed from this routine.</string>
     <string name="copy_routine_pick_title">Choose a routine</string>
     <string name="copy_routine_pick_empty">There are no other routines yet</string>
     <string name="copy_routine_tasks_title">Tasks in \"%1$s\"</string>

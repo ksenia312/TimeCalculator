@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,6 +74,8 @@ fun BoxScope.TasksListView(
     val whenToGetUp = schedule.effectiveStart.stringTime()
     val draggingIndex = remember { mutableStateOf<Int?>(null) }
     val dragOffsetY = remember { mutableFloatStateOf(0f) }
+    val selectedIds by viewModel.selectedIds.collectAsState()
+    val isEditMode = selectedIds.isNotEmpty()
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -98,6 +102,9 @@ fun BoxScope.TasksListView(
                 dragOffsetY = dragOffsetY,
                 isCurrent = currentTaskIndex == index,
                 isCompleted = currentTaskIndex != null && index < currentTaskIndex,
+                isEditMode = isEditMode,
+                isSelected = link.id in selectedIds,
+                onToggleSelect = { viewModel.toggleSelection(link.id) },
                 onEditClick = {
                     navigator.navigateTo(
                         AppRoute.EditTask(

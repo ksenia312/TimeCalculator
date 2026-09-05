@@ -1,6 +1,6 @@
 package com.xenikii.timecalculator.shared.extensions
 
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -20,7 +20,21 @@ import kotlin.math.roundToInt
 fun Modifier.bottomIndent(): Modifier = this.padding(bottom = LocalBottomIndent.current)
 
 /**
- * Makes an item in a reorderable list draggable via long-press.
+ * Applies the visual offset for the item currently being dragged in a reorderable list.
+ * Put this on the item's row; pair it with [dragHandle] on the affordance that actually
+ * drives [draggingIndex]/[dragOffsetY].
+ */
+@Composable
+fun Modifier.dragOffset(
+    index: Int,
+    draggingIndex: MutableState<Int?>,
+    dragOffsetY: MutableState<Float>,
+): Modifier = this.offset {
+    IntOffset(0, if (draggingIndex.value == index) dragOffsetY.value.roundToInt() else 0)
+}
+
+/**
+ * Makes a drag handle reorder the list it belongs to as it's dragged.
  *
  * The modifier owns none of the domain state — it only reports intent:
  *  - [itemCount]: total number of items, used to clamp the drag target.
@@ -34,7 +48,7 @@ fun Modifier.bottomIndent(): Modifier = this.padding(bottom = LocalBottomIndent.
  *   into index deltas.
  */
 @Composable
-fun Modifier.draggableItem(
+fun Modifier.dragHandle(
     index: Int,
     draggingIndex: MutableState<Int?>,
     dragOffsetY: MutableState<Float>,
@@ -44,7 +58,6 @@ fun Modifier.draggableItem(
     onDrop: () -> Unit,
     onCancel: () -> Unit = {},
 ): Modifier {
-    val isDragging = draggingIndex.value == index
     val density = LocalDensity.current
     val itemHeightPx = with(density) { itemHeight.toPx() }
     val currentIndex by rememberUpdatedState(index)
@@ -53,41 +66,36 @@ fun Modifier.draggableItem(
     val currentOnDrop by rememberUpdatedState(onDrop)
     val currentOnCancel by rememberUpdatedState(onCancel)
 
-    return this
-        .offset {
-            IntOffset(0, if (isDragging) dragOffsetY.value.roundToInt() else 0)
-        }
-        .pointerInput(Unit) {
-            detectDragGesturesAfterLongPress(
-                onDragStart = {
-                    draggingIndex.value = currentIndex
-                    dragOffsetY.value = 0f
-                },
-                onDrag = { change, dragAmount ->
-                    change.consume()
-                    val current = draggingIndex.value
-                        ?: return@detectDragGesturesAfterLongPress
-                    val newOffset = dragOffsetY.value + dragAmount.y
-                    val delta = (newOffset / itemHeightPx).roundToInt()
-                    val target = (current + delta).coerceIn(0, currentItemCount - 1)
-                    if (target != current) {
-                        currentOnMove(current, target)
-                        draggingIndex.value = target
-                        dragOffsetY.value = newOffset - delta * itemHeightPx
-                    } else {
-                        dragOffsetY.value = newOffset
-                    }
-                },
-                onDragEnd = {
-                    currentOnDrop()
-                    draggingIndex.value = null
-                    dragOffsetY.value = 0f
-                },
-                onDragCancel = {
-                    currentOnCancel()
-                    draggingIndex.value = null
-                    dragOffsetY.value = 0f
-                },
-            )
-        }
+    return this.pointerInput(Unit) {
+        detectDragGestures(
+            onDragStart = {
+                draggingIndex.value = currentIndex
+                dragOffsetY.value = 0f
+            },
+            onDrag = { change, dragAmount ->
+                change.consume()
+                val current = draggingIndex.value ?: return@detectDragGestures
+                val newOffset = dragOffsetY.value + dragAmount.y
+                val delta = (newOffset / itemHeightPx).roundToInt()
+                val target = (current + delta).coerceIn(0, currentItemCount - 1)
+                if (target != current) {
+                    currentOnMove(current, target)
+                    draggingIndex.value = target
+                    dragOffsetY.value = newOffset - delta * itemHeightPx
+                } else {
+                    dragOffsetY.value = newOffset
+                }
+            },
+            onDragEnd = {
+                currentOnDrop()
+                draggingIndex.value = null
+                dragOffsetY.value = 0f
+            },
+            onDragCancel = {
+                currentOnCancel()
+                draggingIndex.value = null
+                dragOffsetY.value = 0f
+            },
+        )
+    }
 }

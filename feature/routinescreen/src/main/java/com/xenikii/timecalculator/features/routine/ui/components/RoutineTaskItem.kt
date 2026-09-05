@@ -1,8 +1,9 @@
 package com.xenikii.timecalculator.features.routine.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -10,43 +11,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineLink
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
-import com.xenikii.timecalculator.shared.components.AppCircleIndicator
-import com.xenikii.timecalculator.shared.components.AppElevatedButtonMedium
-import com.xenikii.timecalculator.shared.extensions.draggableItem
+import com.xenikii.timecalculator.shared.extensions.dragOffset
 import com.xenikii.timecalculator.shared.extensions.stringTime
-import com.xenikii.timecalculator.shared.extensions.shortStringValue
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Fixed height for the row's trailing slot (duration dropdown / drag handle), so switching
+ * between them on entering or leaving edit mode doesn't change the row's overall height.
+ */
+private val TrailingContentHeight = 56.dp
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RoutineTaskItem(
     link: RoutineLink,
@@ -60,11 +51,12 @@ fun RoutineTaskItem(
     onEditClick: () -> Unit,
     isCurrent: Boolean,
     isCompleted: Boolean,
+    isEditMode: Boolean,
+    isSelected: Boolean,
+    onToggleSelect: () -> Unit,
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
     val scheduledTask = schedule.tasks[index]
     val timeFormatted = scheduledTask.end.stringTime()
-    val selectedDuration = link.subData?.duration ?: kotlin.time.Duration.ZERO
     val shape = RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp)
     val bgColor = if (isCurrent) {
         LocalCustomColorScheme.current.accentLight
@@ -93,30 +85,24 @@ fun RoutineTaskItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .weight(1f)
-                .draggableItem(
+                .dragOffset(
                     index = index,
                     draggingIndex = draggingIndex,
                     dragOffsetY = dragOffsetY,
-                    itemCount = itemCount,
-                    onMove = { from, to -> viewModel.previewReorder(from, to) },
-                    onDrop = { viewModel.commitReorder() },
-                    onCancel = { viewModel.cancelReorder() },
                 )
                 .clip(shape)
-                .background(
-                    color = bgColor
-                )
+                .background(color = bgColor)
                 .border(1.dp, borderColor, shape)
-                .clickable {
-                    onEditClick()
-                }
+                .combinedClickable(
+                    onClick = { if (isEditMode) onToggleSelect() else onEditClick() },
+                    onLongClick = { onToggleSelect() },
+                )
                 .padding(24.dp, 12.dp, 8.dp, 12.dp),
         ) {
-            val accentColor = LocalRoutineColor.current
-            val onAccentColor = LocalRoutineColor.current.copy(alpha = 0.05f)
-            AppCircleIndicator(
-                backgroundColor = if (isCompleted) accentColor else onAccentColor,
-                foregroundColor = if (isCompleted) MaterialTheme.colorScheme.onPrimary else accentColor,
+            RoutineTaskSelectionIndicator(
+                isEditMode = isEditMode,
+                isSelected = isSelected,
+                isCompleted = isCompleted,
             )
             Box(
                 modifier = Modifier
@@ -127,57 +113,25 @@ fun RoutineTaskItem(
                 Text(link.task.title)
             }
 
-            ExposedDropdownMenuBox(
-                expanded = menuExpanded,
-                onExpandedChange = { menuExpanded = !menuExpanded },
+            Box(
+                modifier = Modifier.height(TrailingContentHeight),
+                contentAlignment = Alignment.Center,
             ) {
-                AppElevatedButtonMedium(
-                    onClick = { },
-                    contentPadding = ButtonDefaults.ContentPadding,
-                    modifier = Modifier.menuAnchor(
-                        type = ExposedDropdownMenuAnchorType.PrimaryEditable,
-                        enabled = true,
-                    ),
-                ) {
-                    Box {
-                        Text(
-                            selectedDuration.takeIf { it > kotlin.time.Duration.ZERO }?.shortStringValue()
-                                ?: stringResource(R.string.task_set_duration),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (selectedDuration > kotlin.time.Duration.ZERO) {
-                                MaterialTheme.colorScheme.onBackground
-                            } else {
-                                MaterialTheme.colorScheme.error
-                            },
-                        )
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = menuExpanded,
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .offset(24.dp),
-                        )
-                    }
-                }
-
-                ExposedDropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false },
-                ) {
-                    link.task.dataSortedByDuration.forEach { sub ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(sub.duration.shortStringValue())
-                            },
-                            onClick = {
-                                menuExpanded = false
-                                viewModel.addOrEditTaskInRoutine(
-                                    link.copy(
-                                        subData = sub,
-                                    ),
-                                )
-                            },
-                        )
-                    }
+                if (isEditMode) {
+                    RoutineTaskDragHandle(
+                        index = index,
+                        itemCount = itemCount,
+                        draggingIndex = draggingIndex,
+                        dragOffsetY = dragOffsetY,
+                        onMove = { from, to -> viewModel.previewReorder(from, to) },
+                        onDrop = { viewModel.commitReorder() },
+                        onCancel = { viewModel.cancelReorder() },
+                    )
+                } else {
+                    RoutineTaskDurationDropdown(
+                        link = link,
+                        onDurationSelected = { sub -> viewModel.addOrEditTaskInRoutine(link.copy(subData = sub)) },
+                    )
                 }
             }
         }

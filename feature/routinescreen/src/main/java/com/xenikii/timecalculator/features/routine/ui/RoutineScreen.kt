@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.features.routine.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,6 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -18,6 +22,7 @@ import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewState
 import com.xenikii.timecalculator.features.routine.ui.components.EditRoutineFloatingButton
 import com.xenikii.timecalculator.features.routine.ui.components.RoutineColorWrapper
+import com.xenikii.timecalculator.features.routine.ui.components.RoutineTasksDeleteDialog
 import com.xenikii.timecalculator.features.routine.ui.components.TasksListView
 import com.xenikii.timecalculator.features.routine.ui.components.topbar.RoutineTopBar
 import com.xenikii.timecalculator.features.routine.ui.components.topbar.rememberCollapsingTopBarState
@@ -37,7 +42,12 @@ fun RoutineScreen(
 ) {
     val navigator = LocalNavigator.current
     val viewState by viewModel.viewState.collectAsState()
+    val selectedIds by viewModel.selectedIds.collectAsState()
+    val isEditMode = selectedIds.isNotEmpty()
     val collapsingTopBar = rememberCollapsingTopBarState()
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = isEditMode) { viewModel.clearSelection() }
 
     RoutineColorWrapper(viewState) {
         AppScaffold(
@@ -54,6 +64,10 @@ fun RoutineScreen(
                             )
                         )
                     },
+                    isEditMode = isEditMode,
+                    selectedCount = selectedIds.size,
+                    onExitEditMode = viewModel::clearSelection,
+                    onDeleteClick = { showDeleteConfirmation = true },
                 )
             },
             floatingActionButton = {
@@ -89,6 +103,16 @@ fun RoutineScreen(
                     }
                 }
             }
+        }
+
+        val routine = (viewState as? RoutineViewState.Success)?.routine
+        if (showDeleteConfirmation && routine != null) {
+            RoutineTasksDeleteDialog(
+                routine = routine,
+                selectedIds = selectedIds,
+                onConfirm = viewModel::deleteSelected,
+                onDismiss = { showDeleteConfirmation = false },
+            )
         }
     }
 }

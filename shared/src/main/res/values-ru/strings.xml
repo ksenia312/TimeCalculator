@@ -37,6 +37,7 @@
 
     <string name="content_desc_delete">Удалить</string>
     <string name="content_desc_routine_settings">Параметры рутины</string>
+    <string name="content_desc_reorder_task">Изменить порядок задачи</string>
     <string name="content_desc_back">Назад</string>
     <string name="content_desc_close">Закрыть</string>
     <string name="content_desc_open_menu">Открыть меню</string>
@@ -67,6 +68,11 @@
     <string name="fab_copy_from_routine">Скопировать из рутины</string>
     <string name="routine_tasks_empty_title">В этой рутине пока нет задач</string>
     <string name="routine_tasks_empty_subtitle">Нажмите кнопку внизу, чтобы создать новую задачу или выбрать её из уже существующих.</string>
+    <string name="routine_tasks_selected_count">Выбрано: %1$d</string>
+    <string name="routine_tasks_remove_single_title">Удалить «%1$s» из рутины?</string>
+    <string name="routine_tasks_remove_multiple_title">Удалить %1$d задач из рутины?</string>
+    <string name="routine_tasks_remove_single_message">Задача будет удалена из этой рутины.</string>
+    <string name="routine_tasks_remove_multiple_message">%1$s\n\nЭти задачи будут удалены из этой рутины.</string>
     <string name="copy_routine_pick_title">Выберите рутину</string>
     <string name="copy_routine_pick_empty">Других рутин пока нет</string>
     <string name="copy_routine_tasks_title">Задачи в «%1$s»</string>
