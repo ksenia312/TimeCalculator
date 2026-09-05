@@ -63,8 +63,14 @@
     <string name="fab_routine">Routine</string>
     <string name="fab_add_task">Create task</string>
     <string name="fab_manage_tasks">Link existing tasks</string>
+    <string name="fab_copy_from_routine">Copy from routine</string>
     <string name="routine_tasks_empty_title">No tasks in this routine yet</string>
     <string name="routine_tasks_empty_subtitle">Tap the button below to create a new task or choose one you already have.</string>
+    <string name="copy_routine_pick_title">Choose a routine</string>
+    <string name="copy_routine_pick_empty">There are no other routines yet</string>
+    <string name="copy_routine_tasks_title">Tasks in \"%1$s\"</string>
+    <string name="copy_routine_tasks_empty">This routine has no tasks yet</string>
+    <string name="copy_routine_tasks_confirm">Add %1$d tasks</string>
     <string name="fab_add_item">Add Item</string>
 
     <string name="routine_anchor_start_at">Time start at</string>

@@ -17,8 +17,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
@@ -44,6 +46,13 @@ class RoutineViewModel(
         started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
+    val otherRoutines: StateFlow<List<Routine>> = routineRepository.routinesFlow
+        .map { routines -> routines.filter { it.id != id } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     init {
         startTimer()
@@ -111,6 +120,16 @@ class RoutineViewModel(
                     )
                 }
                 editRoutine(newRoutineCombined)
+            }
+        }
+    }
+
+    fun copyLinksFromRoutine(links: List<RoutineLink>) {
+        if (links.isEmpty()) return
+        viewModelScope.launch {
+            _viewState.asSuccess { r ->
+                val newLinks = links.map { it.copy(id = UUID.randomUUID().toString()) }
+                editRoutine(r.routine.copy(data = r.routine.data + newLinks))
             }
         }
     }

@@ -3,13 +3,17 @@ package com.xenikii.timecalculator.features.routine.ui.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
+import com.xenikii.timecalculator.features.routine.ui.components.tasksselection.CopyFromRoutineBottomSheet
 import com.xenikii.timecalculator.features.routine.ui.components.tasksselection.TasksBottomSheet
 import com.xenikii.timecalculator.shared.components.FabItem
 import com.xenikii.timecalculator.shared.components.FabMenu
@@ -24,6 +28,8 @@ fun EditRoutineFloatingButton(
     val navigator = LocalNavigator.current
     val isBarExpanded = rememberSaveable { mutableStateOf(false) }
     val showTasksSheet = remember { mutableStateOf(false) }
+    val showCopyFromRoutineSheet = remember { mutableStateOf(false) }
+    val otherRoutines by viewModel.otherRoutines.collectAsState()
 
     if (showTasksSheet.value) {
         TasksBottomSheet(
@@ -33,6 +39,16 @@ fun EditRoutineFloatingButton(
                 navigator.navigateTo(AppRoute.CreateTask(routineId = routine.id))
             },
             viewModel = viewModel
+        )
+    }
+
+    if (showCopyFromRoutineSheet.value) {
+        CopyFromRoutineBottomSheet(
+            routines = otherRoutines,
+            onDismiss = { showCopyFromRoutineSheet.value = false },
+            onConfirm = { links ->
+                viewModel.copyLinksFromRoutine(links)
+            },
         )
     }
 
@@ -54,6 +70,13 @@ fun EditRoutineFloatingButton(
                 contentDescription = stringResource(R.string.fab_manage_tasks),
                 onClick = {
                     showTasksSheet.value = true
+                }),
+            FabItem(
+                title = stringResource(R.string.fab_copy_from_routine),
+                iconRes = R.drawable.routine,
+                contentDescription = stringResource(R.string.fab_copy_from_routine),
+                onClick = {
+                    showCopyFromRoutineSheet.value = true
                 }),
         )
     )

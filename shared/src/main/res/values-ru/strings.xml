@@ -64,8 +64,14 @@
     <string name="fab_routine">Рутина</string>
     <string name="fab_add_task">Создать задачу</string>
     <string name="fab_manage_tasks">Выбрать из списка задач</string>
+    <string name="fab_copy_from_routine">Скопировать из рутины</string>
     <string name="routine_tasks_empty_title">В этой рутине пока нет задач</string>
     <string name="routine_tasks_empty_subtitle">Нажмите кнопку внизу, чтобы создать новую задачу или выбрать её из уже существующих.</string>
+    <string name="copy_routine_pick_title">Выберите рутину</string>
+    <string name="copy_routine_pick_empty">Других рутин пока нет</string>
+    <string name="copy_routine_tasks_title">Задачи в «%1$s»</string>
+    <string name="copy_routine_tasks_empty">В этой рутине пока нет задач</string>
+    <string name="copy_routine_tasks_confirm">Добавить задач: %1$d</string>
     <string name="fab_add_item">Добавить элемент</string>
 
     <string name="routine_anchor_start_at">Время начала</string>

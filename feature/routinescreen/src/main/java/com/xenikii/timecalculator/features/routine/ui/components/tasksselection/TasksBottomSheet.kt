@@ -73,9 +73,13 @@ fun TasksBottomSheet(
                 .padding(12.dp, 4.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                stringResource(R.string.tasks_manage_title), style = MaterialTheme.typography.titleLarge
-            )
+            BottomSheetTitleContainer {
+                Text(
+                    stringResource(R.string.tasks_manage_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+            }
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
