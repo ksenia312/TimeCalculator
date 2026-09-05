@@ -55,6 +55,7 @@ class RoutineNotificationPresenter(
             .setContentText(task.title)
             .setStyle(NotificationCompat.BigTextStyle().bigText(task.title))
             .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
+            .setGroup(groupKey(routine.id))
             .setOngoing(true)
             // This notification must never itself alert: postAlert() below is now the single
             // source of sound/vibration/heads-up for a transition. Without this, both it and the
@@ -98,6 +99,7 @@ class RoutineNotificationPresenter(
             .setContentText(taskTitle)
             .setStyle(NotificationCompat.BigTextStyle().bigText(taskTitle))
             .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
+            .setGroup(groupKey(routine.id))
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -139,6 +141,10 @@ class RoutineNotificationPresenter(
 
     private fun alertNotificationId(routineId: String): Int {
         return stableNotificationId(routineId, "alert")
+    }
+
+    private fun groupKey(routineId: String): String {
+        return "routine_group_$routineId"
     }
 
     companion object {
