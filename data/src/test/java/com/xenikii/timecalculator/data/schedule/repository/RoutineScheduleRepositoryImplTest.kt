@@ -182,7 +182,7 @@ class RoutineScheduleRepositoryImplTest {
         val rescheduled = alarmGateway.scheduledPlans.last()
         assertTrue(rescheduled.effectiveStart > initial.effectiveStart)
         assertNotNull(records.getRecord(routine.id))
-        assertTrue(notificationGateway.cancelProgressCalls.contains(routine.id))
+        assertTrue(notificationGateway.cancelRoutineNotificationsCalls.contains(routine.id))
         }
     }
 
@@ -377,8 +377,12 @@ private class RecordingAlarmGateway : RoutineAlarmGateway {
 
 private class RecordingNotificationGateway : RoutineNotificationGateway {
     val cancelProgressCalls = mutableListOf<String>()
+    val cancelRoutineNotificationsCalls = mutableListOf<String>()
     val postProgressCalls = mutableListOf<RoutineSchedule>()
-    override fun cancelRoutineNotifications(routineId: String) = Unit
+    override fun cancelRoutineNotifications(routineId: String) {
+        cancelRoutineNotificationsCalls += routineId
+    }
+
     override fun cancelProgress(routineId: String) {
         cancelProgressCalls += routineId
     }
@@ -386,6 +390,9 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
     override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean) {
         postProgressCalls += plan
     }
+
+    override fun postRoutineStarted(routine: Routine) = Unit
+    override fun postRoutineFinished(routine: Routine) = Unit
 }
 
 private class FakeNotificationSettingsLocalDataSource(

@@ -226,4 +226,10 @@
     <string name="notification_channel_routine_progress_description">Shows the active routine and current task countdown</string>
     <string name="notification_channel_task_alerts">Task alerts</string>
     <string name="notification_channel_task_alerts_description">Notifies when a routine or task starts</string>
+    <string name="notification_routine_started_title">Routine %1$s has started</string>
+    <string name="notification_routine_started_text">Better get moving!</string>
+    <string name="notification_routine_finished_title">Routine %1$s has finished</string>
+    <string name="notification_routine_finished_text">All tasks are complete</string>
+    <string name="notification_channel_routine_events">Routine start &amp; finish</string>
+    <string name="notification_channel_routine_events_description">Alerts when a routine starts or finishes</string>
 </resources>

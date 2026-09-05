@@ -28,6 +28,8 @@ class RoutineNotificationPresenter(
     override fun cancelRoutineNotifications(routineId: String) {
         notificationManager.cancel(progressNotificationId(routineId))
         notificationManager.cancel(alertNotificationId(routineId))
+        notificationManager.cancel(routineStartedNotificationId(routineId))
+        notificationManager.cancel(routineFinishedNotificationId(routineId))
     }
 
     override fun cancelProgress(routineId: String) {
@@ -83,6 +85,48 @@ class RoutineNotificationPresenter(
         }
     }
 
+    override fun postRoutineStarted(routine: Routine) {
+        postEvent(
+            id = routineStartedNotificationId(routine.id),
+            routine = routine,
+            title = context.getString(R.string.notification_routine_started_title, routine.title),
+            text = context.getString(R.string.notification_routine_started_text),
+        )
+    }
+
+    override fun postRoutineFinished(routine: Routine) {
+        postEvent(
+            id = routineFinishedNotificationId(routine.id),
+            routine = routine,
+            title = context.getString(R.string.notification_routine_finished_title, routine.title),
+            text = context.getString(R.string.notification_routine_finished_text),
+        )
+    }
+
+    /**
+     * Routine start/finish are the two moments the user most needs to notice, so they get their
+     * own HIGH-importance channel with vibration on top of sound - louder than a plain task-change
+     * alert. The sound still comes from NotificationChannel's default notification sound, which (
+     * unlike RingtoneManager.TYPE_ALARM) plays once and stops on its own; nothing here loops it or
+     * requires the user to silence it.
+     */
+    private fun postEvent(id: Int, routine: Routine, title: String, text: String) {
+        if (!notificationSettings.isEnabled()) return
+        if (!notificationManager.areNotificationsEnabled()) return
+        val notification = NotificationCompat.Builder(context, CHANNEL_ROUTINE_EVENTS)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setContentIntent(buildRoutineDetailPendingIntent(context, routine.id))
+            .setGroup(groupKey(routine.id))
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        notificationManager.notify(id, notification)
+    }
+
     /**
      * The ongoing progress notification above carries FLAG_ONGOING_EVENT, which companion-device
      * bridges (Wear OS, Samsung's Galaxy Wearable) treat as a local device-status indicator and
@@ -133,6 +177,18 @@ class RoutineNotificationPresenter(
                 description = context.getString(R.string.notification_channel_task_alerts_description)
             }
         )
+        manager.createNotificationChannel(
+            // HIGH + vibration: routine start/finish are the two moments that matter most, so
+            // they alert more noticeably than a plain task-change (CHANNEL_ALERT, sound only).
+            NotificationChannel(
+                CHANNEL_ROUTINE_EVENTS,
+                context.getString(R.string.notification_channel_routine_events),
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply {
+                description = context.getString(R.string.notification_channel_routine_events_description)
+                enableVibration(true)
+            }
+        )
     }
 
     private fun progressNotificationId(routineId: String): Int {
@@ -143,6 +199,14 @@ class RoutineNotificationPresenter(
         return stableNotificationId(routineId, "alert")
     }
 
+    private fun routineStartedNotificationId(routineId: String): Int {
+        return stableNotificationId(routineId, "started")
+    }
+
+    private fun routineFinishedNotificationId(routineId: String): Int {
+        return stableNotificationId(routineId, "finished")
+    }
+
     private fun groupKey(routineId: String): String {
         return "routine_group_$routineId"
     }
@@ -150,5 +214,6 @@ class RoutineNotificationPresenter(
     companion object {
         private const val CHANNEL_PROGRESS = "routine_progress"
         private const val CHANNEL_ALERT = "routine_task_alerts"
+        private const val CHANNEL_ROUTINE_EVENTS = "routine_start_finish_events"
     }
 }

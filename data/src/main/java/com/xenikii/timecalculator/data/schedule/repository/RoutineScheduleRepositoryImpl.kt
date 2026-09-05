@@ -118,6 +118,9 @@ class RoutineScheduleRepositoryImpl(
             when (kind) {
                 RoutineAlarmKind.START -> {
                     notificationGateway.postProgress(routine, schedule, now)
+                    // TODO: re-enable once notification modes (per-task vs start/end-only) land -
+                    // right now this duplicates the task-started alert posted just above.
+                    // notificationGateway.postRoutineStarted(routine)
                 }
 
                 RoutineAlarmKind.TASK -> {
@@ -125,7 +128,11 @@ class RoutineScheduleRepositoryImpl(
                 }
 
                 RoutineAlarmKind.END -> {
-                    notificationGateway.cancelProgress(routine.id)
+                    // Clears the progress notification *and* the last task-started alert, which
+                    // would otherwise never get replaced (there's no next task to post over it)
+                    // and would linger after the routine finished.
+                    notificationGateway.cancelRoutineNotifications(routine.id)
+                    notificationGateway.postRoutineFinished(routine)
                     scheduleRecordDataSource.removeRecord(routine.id)
                     if (routine.recurrence.unit != RoutineRecurrenceUnit.NONE) {
                         rescheduleRoutine(routine = routine, now = now, forceReschedule = true)
