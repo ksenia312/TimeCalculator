@@ -2,6 +2,7 @@ package com.xenikii.timecalculator.features.settings.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.User
 import com.xenikii.timecalculator.domain.repository.AuthRepository
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
@@ -21,6 +22,7 @@ class SettingsViewModel(
     private val _viewState = MutableStateFlow(
         SettingsViewState(
             notificationsEnabled = notificationSettingsRepository.isEnabled(),
+            notificationMode = notificationSettingsRepository.getMode(),
             areSystemNotificationsAllowed = notificationSettingsRepository.areSystemNotificationsAllowed(),
         )
     )
@@ -29,6 +31,7 @@ class SettingsViewModel(
     init {
         startObservingUser()
         startObservingNotificationSettings()
+        startObservingNotificationMode()
     }
 
     fun logout() {
@@ -45,6 +48,12 @@ class SettingsViewModel(
     fun setNotificationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
             notificationSettingsRepository.setEnabled(enabled)
+        }
+    }
+
+    fun setNotificationMode(mode: NotificationMode) {
+        viewModelScope.launch {
+            notificationSettingsRepository.setMode(mode)
         }
     }
 
@@ -75,12 +84,21 @@ class SettingsViewModel(
             }
         }
     }
+
+    private fun startObservingNotificationMode() {
+        viewModelScope.launch {
+            notificationSettingsRepository.observeMode().collect { mode ->
+                _viewState.update { it.copy(notificationMode = mode) }
+            }
+        }
+    }
 }
 
 data class SettingsViewState(
     val isLoggingOut: Boolean = false,
     val user: User? = null,
     val notificationsEnabled: Boolean = false,
+    val notificationMode: NotificationMode = NotificationMode.EVERY_TASK,
     val areSystemNotificationsAllowed: Boolean = true,
 ) {
     val isNotificationsSwitchOn: Boolean

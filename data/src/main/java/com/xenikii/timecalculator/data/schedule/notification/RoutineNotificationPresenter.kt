@@ -8,6 +8,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.data.schedule.alarm.buildRoutineDetailPendingIntent
 import com.xenikii.timecalculator.data.schedule.alarm.stableNotificationId
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
@@ -44,6 +45,9 @@ class RoutineNotificationPresenter(
     ) {
         if (!notificationSettings.isEnabled()) return
         if (!notificationManager.areNotificationsEnabled()) return
+        // START_AND_END mode is deliberately silent about individual tasks: no ongoing progress,
+        // no per-task alert. postRoutineStarted()/postRoutineFinished() are its only notifications.
+        if (notificationSettings.getMode() == NotificationMode.START_AND_END) return
         val task = plan.taskAt(now)
         if (task == null) {
             // No task covers `now` (routine ended or fell in a gap): never leave a stale
@@ -86,6 +90,9 @@ class RoutineNotificationPresenter(
     }
 
     override fun postRoutineStarted(routine: Routine) {
+        // In EVERY_TASK mode, postProgress() above already alerts for the first task starting -
+        // this would just be a redundant second notification for the same moment.
+        if (notificationSettings.getMode() == NotificationMode.EVERY_TASK) return
         postEvent(
             id = routineStartedNotificationId(routine.id),
             routine = routine,

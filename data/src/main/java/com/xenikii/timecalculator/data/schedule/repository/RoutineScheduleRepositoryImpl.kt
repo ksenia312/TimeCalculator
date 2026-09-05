@@ -117,10 +117,10 @@ class RoutineScheduleRepositoryImpl(
 
             when (kind) {
                 RoutineAlarmKind.START -> {
+                    // Whichever of these two actually shows something is decided by the current
+                    // notification mode inside the gateway.
                     notificationGateway.postProgress(routine, schedule, now)
-                    // TODO: re-enable once notification modes (per-task vs start/end-only) land -
-                    // right now this duplicates the task-started alert posted just above.
-                    // notificationGateway.postRoutineStarted(routine)
+                    notificationGateway.postRoutineStarted(routine)
                 }
 
                 RoutineAlarmKind.TASK -> {

@@ -167,6 +167,10 @@
     <string name="settings_notifications_supporting">Live уведомления о прогрессе рутин и задач</string>
     <string name="settings_notifications_blocked">Уведомления отключены в системных параметрах</string>
     <string name="settings_notifications_open_system_settings">Открыть системные параметры</string>
+    <string name="settings_notifications_mode_start_and_end">Базовый</string>
+    <string name="settings_notifications_mode_start_and_end_supporting">Уведомлять о начале и конце</string>
+    <string name="settings_notifications_mode_every_task">Подробный</string>
+    <string name="settings_notifications_mode_every_task_supporting">Уведомлять о начале каждой задачи</string>
     <string name="settings_privacy_policy_label">Политика приватности</string>
     <string name="settings_privacy_policy_supporting">Узнайте, как мы собираем и используем ваши данные</string>
     <string name="settings_privacy_policy_url">https://ksenia312.github.io/morning-calculator-docs/privacy-policy.html</string>
@@ -243,7 +247,7 @@
     <string name="notification_channel_task_alerts">Оповещения о задачах</string>
     <string name="notification_channel_task_alerts_description">Уведомляет при начале рутины или задачи</string>
     <string name="notification_routine_started_title">Рутина «%1$s» началась</string>
-    <string name="notification_routine_started_text">Поспешите успеть сделать свои дела</string>
+    <string name="notification_routine_started_text">Время действовать</string>
     <string name="notification_routine_finished_title">Рутина «%1$s» завершена</string>
     <string name="notification_routine_finished_text">Все задачи выполнены</string>
     <string name="notification_channel_routine_events">Начало и завершение рутины</string>

@@ -51,6 +51,7 @@ fun SettingsScreen(
         viewState = viewState.value,
         onLogoutClick = { showLogoutDialog = true },
         onNotificationsEnabledChange = viewModel::setNotificationsEnabled,
+        onNotificationModeChange = viewModel::setNotificationMode,
         onOpenSystemNotificationSettings = {
             context.startActivity(
                 Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {

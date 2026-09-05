@@ -2,6 +2,7 @@ package com.xenikii.timecalculator.features.settings.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -19,12 +20,15 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,13 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewState
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppListItem
 import com.xenikii.timecalculator.shared.extensions.bottomIndent
-import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 
@@ -48,6 +53,7 @@ fun SettingsContent(
     viewState: SettingsViewState,
     onLogoutClick: () -> Unit,
     onNotificationsEnabledChange: (Boolean) -> Unit,
+    onNotificationModeChange: (NotificationMode) -> Unit,
     onOpenSystemNotificationSettings: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onTermsClick: () -> Unit,
@@ -93,6 +99,7 @@ fun SettingsContent(
         NotificationSettingsItem(
             viewState = viewState,
             onEnabledChange = onNotificationsEnabledChange,
+            onModeChange = onNotificationModeChange,
             onOpenSystemNotificationSettings = onOpenSystemNotificationSettings,
         )
 
@@ -159,6 +166,7 @@ fun SettingsContent(
 private fun ColumnScope.NotificationSettingsItem(
     viewState: SettingsViewState,
     onEnabledChange: (Boolean) -> Unit,
+    onModeChange: (NotificationMode) -> Unit,
     onOpenSystemNotificationSettings: () -> Unit,
 ) {
     val allowed = viewState.areSystemNotificationsAllowed
@@ -214,6 +222,69 @@ private fun ColumnScope.NotificationSettingsItem(
             )
         }
     }
+
+    if (viewState.isNotificationsSwitchOn) {
+        Spacer(modifier = Modifier.height(8.dp))
+        NotificationModeOption(
+            label = stringResource(R.string.settings_notifications_mode_start_and_end),
+            selected = viewState.notificationMode == NotificationMode.START_AND_END,
+            onClick = { onModeChange(NotificationMode.START_AND_END) },
+            supporting = stringResource(R.string.settings_notifications_mode_start_and_end_supporting),
+            icon = Icons.Outlined.NotificationsActive
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        NotificationModeOption(
+            label = stringResource(R.string.settings_notifications_mode_every_task),
+            selected = viewState.notificationMode == NotificationMode.EVERY_TASK,
+            onClick = { onModeChange(NotificationMode.EVERY_TASK) },
+            supporting = stringResource(R.string.settings_notifications_mode_every_task_supporting),
+            icon = Icons.Filled.NotificationsActive
+        )
+    }
+}
+
+@Composable
+private fun NotificationModeOption(
+    label: String,
+    supporting: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector
+) {
+    Box(Modifier.padding(start = 32.dp)) {
+        AppListItem(
+            modifier = Modifier
+                .clickable(onClick = onClick),
+            minHeight = 32.dp,
+            isSelected = selected,
+            headlineContent = {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = supporting,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = LocalCustomColorScheme.current.label,
+                )
+            },
+            trailingContent = {
+                RadioButton(
+                    selected = selected,
+                    onClick = onClick,
+                )
+            },
+            leadingContent = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    Modifier.size(24.dp),
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -255,7 +326,7 @@ private fun LinkSettingsItem(
     )
 }
 
-@PreviewAll
+@Preview
 @Composable
 private fun SettingsContentPreview() {
     PreviewTheme {
@@ -263,6 +334,7 @@ private fun SettingsContentPreview() {
             viewState = SettingsViewState(),
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
             onOpenSystemNotificationSettings = {},
             onPrivacyPolicyClick = {},
             onTermsClick = {},
@@ -270,7 +342,7 @@ private fun SettingsContentPreview() {
     }
 }
 
-@PreviewAll
+@Preview
 @Composable
 private fun SettingsContentNotificationsBlockedPreview() {
     PreviewTheme {
@@ -278,6 +350,7 @@ private fun SettingsContentNotificationsBlockedPreview() {
             viewState = SettingsViewState(areSystemNotificationsAllowed = false),
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
             onOpenSystemNotificationSettings = {},
             onPrivacyPolicyClick = {},
             onTermsClick = {},
@@ -285,14 +358,19 @@ private fun SettingsContentNotificationsBlockedPreview() {
     }
 }
 
-@PreviewAll
+@Preview
 @Composable
 private fun SettingsContentLoggingOutPreview() {
     PreviewTheme {
         SettingsContent(
-            viewState = SettingsViewState(isLoggingOut = true),
+            viewState = SettingsViewState(
+                isLoggingOut = true,
+                notificationsEnabled = true,
+                notificationMode = NotificationMode.START_AND_END
+            ),
             onLogoutClick = {},
             onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
             onOpenSystemNotificationSettings = {},
             onPrivacyPolicyClick = {},
             onTermsClick = {},

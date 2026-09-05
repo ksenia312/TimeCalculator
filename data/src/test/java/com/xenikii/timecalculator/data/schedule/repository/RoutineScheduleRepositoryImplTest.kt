@@ -2,6 +2,7 @@ package com.xenikii.timecalculator.data.schedule.repository
 
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineAlarmKind
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.RoutineLink
 import com.xenikii.timecalculator.domain.model.RoutineRecurrence
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
@@ -397,12 +398,20 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
 
 private class FakeNotificationSettingsLocalDataSource(
     enabled: Boolean = true,
+    mode: NotificationMode = NotificationMode.EVERY_TASK,
 ) : NotificationSettingsLocalDataSource {
     private val state = MutableStateFlow(enabled)
+    private val modeState = MutableStateFlow(mode)
     override fun observeEnabled(): Flow<Boolean> = state
     override fun isEnabled(): Boolean = state.value
     override suspend fun setEnabled(enabled: Boolean) {
         state.value = enabled
+    }
+
+    override fun observeMode(): Flow<NotificationMode> = modeState
+    override fun getMode(): NotificationMode = modeState.value
+    override suspend fun setMode(mode: NotificationMode) {
+        modeState.value = mode
     }
 }
 

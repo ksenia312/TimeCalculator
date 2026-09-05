@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.data.notification.settings
 
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.repository.NotificationPermissionChecker
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
@@ -16,6 +17,14 @@ class NotificationSettingsRepositoryImpl(
 
     override suspend fun setEnabled(enabled: Boolean) {
         localDataSource.setEnabled(enabled)
+    }
+
+    override fun observeMode(): Flow<NotificationMode> = localDataSource.observeMode()
+
+    override fun getMode(): NotificationMode = localDataSource.getMode()
+
+    override suspend fun setMode(mode: NotificationMode) {
+        localDataSource.setMode(mode)
     }
 
     override fun areSystemNotificationsAllowed(): Boolean =
