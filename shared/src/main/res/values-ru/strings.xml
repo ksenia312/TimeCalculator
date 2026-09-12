@@ -167,9 +167,9 @@
     <string name="settings_notifications_supporting">Live уведомления о прогрессе рутин и задач</string>
     <string name="settings_notifications_blocked">Уведомления отключены в системных параметрах</string>
     <string name="settings_notifications_open_system_settings">Открыть системные параметры</string>
-    <string name="settings_notifications_mode_start_and_end">Базовый</string>
+    <string name="settings_notifications_mode_start_and_end">Базовые</string>
     <string name="settings_notifications_mode_start_and_end_supporting">Уведомлять о начале и конце</string>
-    <string name="settings_notifications_mode_every_task">Подробный</string>
+    <string name="settings_notifications_mode_every_task">Подробные</string>
     <string name="settings_notifications_mode_every_task_supporting">Уведомлять о начале каждой задачи</string>
     <string name="settings_privacy_policy_label">Политика приватности</string>
     <string name="settings_privacy_policy_supporting">Узнайте, как мы собираем и используем ваши данные</string>
