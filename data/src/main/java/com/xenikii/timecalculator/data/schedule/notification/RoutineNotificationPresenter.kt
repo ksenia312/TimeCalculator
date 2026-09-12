@@ -11,6 +11,7 @@ import com.xenikii.timecalculator.data.schedule.alarm.stableNotificationId
 import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
+import com.xenikii.timecalculator.domain.model.ScheduledTask
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import kotlin.time.Instant
@@ -42,6 +43,7 @@ class RoutineNotificationPresenter(
         plan: RoutineSchedule,
         now: Instant,
         alert: Boolean,
+        alertTask: ScheduledTask?,
     ) {
         if (!notificationSettings.isEnabled()) return
         if (!notificationManager.areNotificationsEnabled()) return
@@ -84,7 +86,7 @@ class RoutineNotificationPresenter(
 
         notificationManager.notify(progressNotificationId(routine.id), notification)
 
-        if (alert) {
+        if (alert && (alertTask == null || alertTask.index == task.index)) {
             postAlert(routine, task.title)
         }
     }
@@ -161,11 +163,10 @@ class RoutineNotificationPresenter(
 
     private fun createChannels() {
         val manager = context.getSystemService(NotificationManager::class.java)
+        manager.deleteNotificationChannel(LEGACY_CHANNEL_PROGRESS)
         manager.createNotificationChannel(
-            // LOW: this channel is a silent, persistent status display now that CHANNEL_ALERT
-            // owns alerting for real transitions - it should never itself make sound/vibrate.
-            // (An already-existing HIGH channel from before this change can't be downgraded here;
-            // postProgress()'s setSilent(true) is what covers those installs.)
+            // LOW: this channel is a silent, persistent status display - CHANNEL_ALERT owns
+            // alerting for real transitions, so this one should never itself make sound/vibrate.
             NotificationChannel(
                 CHANNEL_PROGRESS,
                 context.getString(R.string.notification_channel_routine_progress),
@@ -219,7 +220,8 @@ class RoutineNotificationPresenter(
     }
 
     companion object {
-        private const val CHANNEL_PROGRESS = "routine_progress"
+        private const val LEGACY_CHANNEL_PROGRESS = "routine_progress"
+        private const val CHANNEL_PROGRESS = "routine_progress_v2"
         private const val CHANNEL_ALERT = "routine_task_alerts"
         private const val CHANNEL_ROUTINE_EVENTS = "routine_start_finish_events"
     }

@@ -71,22 +71,13 @@ class AlarmManagerRoutineAlarmGateway(
             boundaryIndex = boundaryIndex,
             triggerAtMillis = triggerAtMillis,
         )
-        if (canScheduleExactAlarms()) {
-            AlarmManagerCompat.setExactAndAllowWhileIdle(
-                alarmManager,
-                AlarmManager.RTC_WAKEUP,
-                triggerAtMillis,
-                operation,
-            )
-        } else {
-            val showIntent = buildRoutineDetailPendingIntent(context, routineId)
-            AlarmManagerCompat.setAlarmClock(
-                alarmManager,
-                triggerAtMillis,
-                showIntent,
-                operation,
-            )
-        }
+        val showIntent = buildRoutineDetailPendingIntent(context, routineId)
+        AlarmManagerCompat.setAlarmClock(
+            alarmManager,
+            triggerAtMillis,
+            showIntent,
+            operation,
+        )
     }
 
     private fun scheduleEnd(routineId: String, boundaryIndex: Int, triggerAtMillis: Long) {

@@ -4,6 +4,7 @@ import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineAlarmKind
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
+import com.xenikii.timecalculator.domain.model.ScheduledTask
 import kotlin.time.Instant
 
 interface RoutineScheduleRepository {
@@ -41,7 +42,13 @@ interface RoutineAlarmGateway {
 interface RoutineNotificationGateway {
     fun cancelRoutineNotifications(routineId: String)
     fun cancelProgress(routineId: String)
-    fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean = true)
+    fun postProgress(
+        routine: Routine,
+        plan: RoutineSchedule,
+        now: Instant,
+        alert: Boolean = true,
+        alertTask: ScheduledTask? = null,
+    )
     fun postRoutineStarted(routine: Routine)
     fun postRoutineFinished(routine: Routine)
 }

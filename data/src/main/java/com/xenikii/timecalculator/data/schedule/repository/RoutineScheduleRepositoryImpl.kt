@@ -118,13 +118,20 @@ class RoutineScheduleRepositoryImpl(
             when (kind) {
                 RoutineAlarmKind.START -> {
                     // Whichever of these two actually shows something is decided by the current
-                    // notification mode inside the gateway.
-                    notificationGateway.postProgress(routine, schedule, now)
+                    // notification mode inside the gateway. alertTask pins the alert to the task
+                    // this alarm was armed for (index 0), so a delayed delivery can't relabel it
+                    // with whatever task the wall clock has since moved on to.
+                    notificationGateway.postProgress(routine, schedule, now, alertTask = schedule.tasks.firstOrNull())
                     notificationGateway.postRoutineStarted(routine)
                 }
 
                 RoutineAlarmKind.TASK -> {
-                    notificationGateway.postProgress(routine, schedule, now)
+                    notificationGateway.postProgress(
+                        routine,
+                        schedule,
+                        now,
+                        alertTask = schedule.tasks.getOrNull(boundaryIndex),
+                    )
                 }
 
                 RoutineAlarmKind.END -> {

@@ -10,6 +10,7 @@ import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
+import com.xenikii.timecalculator.domain.model.ScheduledTask
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
@@ -217,6 +218,39 @@ class RoutineScheduleRepositoryImplTest {
     }
 
     @Test
+    fun `TASK alarm alerts for the task it was armed for even when delivery is delayed into the next task`() {
+        runBlocking {
+            val notificationGateway = RecordingNotificationGateway()
+            val repository = RoutineScheduleRepositoryImpl(
+                alarmGateway = RecordingAlarmGateway(),
+                notificationGateway = notificationGateway,
+                scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
+                notificationSettings = FakeNotificationSettingsLocalDataSource(),
+            )
+            val routine = multiTaskRoutine(scheduledAt = instant(day = 1, hour = 9))
+            // Task index 1 ("завтрак") is scheduled 09:05-09:10. Simulate a delayed alarm: the
+            // system delivers the TASK alarm armed for its 09:05 start only once we're already at
+            // 09:11, past that task's own end and into task index 2's window.
+            val armedForStart = instant(day = 1, hour = 9, minute = 5)
+            val deliveredAt = instant(day = 1, hour = 9, minute = 11)
+
+            repository.handleAlarm(
+                routine = routine,
+                kind = RoutineAlarmKind.TASK,
+                boundaryIndex = 1,
+                triggerAtMillis = armedForStart.toEpochMilliseconds(),
+                now = deliveredAt,
+            )
+
+            // The alert must be pinned to the task this alarm was armed for (index 1), not
+            // whichever task the wall clock has since rolled forward to (index 2). Regression
+            // test for a bug where a late-delivered "task started" notification announced the
+            // wrong (next) task.
+            assertEquals(1, notificationGateway.postProgressAlertTasks.single()?.index)
+        }
+    }
+
+    @Test
     fun `cancels notification when a mismatched alarm fires after the routine already finished`() {
         runBlocking {
             val notificationGateway = RecordingNotificationGateway()
@@ -355,6 +389,27 @@ class RoutineScheduleRepositoryImplTest {
         )
     }
 
+    private fun multiTaskRoutine(scheduledAt: Instant): Routine {
+        val tasks = listOf("буфер", "завтрак", "душ").map { title ->
+            Task(
+                id = "task-$title",
+                title = title,
+                description = "",
+                data = listOf(SubData(id = "sub-$title", duration = 5.minutes)),
+            )
+        }
+        return Routine(
+            id = "routine-1",
+            title = "тест",
+            scheduledAt = scheduledAt,
+            scheduledAtAnchor = RoutineScheduleAnchor.START,
+            recurrence = RoutineRecurrence(),
+            modifiedAt = 0L,
+            color = "#000000",
+            data = tasks.map { task -> RoutineLink(id = "link-${task.id}", task = task, subData = task.data.first()) },
+        )
+    }
+
     private fun instant(day: Int = 1, hour: Int, minute: Int = 0): Instant {
         val epochMillis = ((day - 1) * 24L * 60L * 60L + hour * 60L * 60L + minute * 60L) * 1000L
         return Instant.fromEpochMilliseconds(epochMillis)
@@ -380,6 +435,7 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
     val cancelProgressCalls = mutableListOf<String>()
     val cancelRoutineNotificationsCalls = mutableListOf<String>()
     val postProgressCalls = mutableListOf<RoutineSchedule>()
+    val postProgressAlertTasks = mutableListOf<ScheduledTask?>()
     override fun cancelRoutineNotifications(routineId: String) {
         cancelRoutineNotificationsCalls += routineId
     }
@@ -388,8 +444,15 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
         cancelProgressCalls += routineId
     }
 
-    override fun postProgress(routine: Routine, plan: RoutineSchedule, now: Instant, alert: Boolean) {
+    override fun postProgress(
+        routine: Routine,
+        plan: RoutineSchedule,
+        now: Instant,
+        alert: Boolean,
+        alertTask: ScheduledTask?,
+    ) {
         postProgressCalls += plan
+        postProgressAlertTasks += alertTask
     }
 
     override fun postRoutineStarted(routine: Routine) = Unit
