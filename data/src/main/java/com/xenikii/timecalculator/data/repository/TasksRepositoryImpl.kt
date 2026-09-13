@@ -53,6 +53,10 @@ class TasksRepositoryImpl(
     override fun getTaskFlow(id: String): Flow<Task?> =
         tasksFlow.map { tasks -> tasks.firstOrNull { it.id == id } }
 
+    override suspend fun getTaskCount(): Int = withContext(Dispatchers.IO) {
+        tasksDao.countTasks()
+    }
+
     override suspend fun updateTask(request: TaskUpdateRequest): Task {
         val taskEntity = TaskEntity(
             id = request.taskId,

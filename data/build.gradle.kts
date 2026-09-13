@@ -37,5 +37,6 @@ dependencies {
     api(libs.supabase.auth)
     implementation(libs.supabase.postgrest)
     implementation(libs.ktor.client.cio)
+    implementation(libs.revenuecat.purchases)
     testImplementation(libs.junit)
 }

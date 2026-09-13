@@ -17,6 +17,9 @@ import com.xenikii.timecalculator.data.notification.settings.PreferencesNotifica
 import com.xenikii.timecalculator.data.notification.settings.SystemNotificationPermissionChecker
 import com.xenikii.timecalculator.data.onboarding.OnboardingRepositoryImpl
 import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboardingLocalDataSource
+import com.xenikii.timecalculator.data.premium.GrantedPremiumDataSource
+import com.xenikii.timecalculator.data.premium.PremiumIdentityCoordinator
+import com.xenikii.timecalculator.data.premium.PremiumRepositoryImpl
 import com.xenikii.timecalculator.data.repository.RoutineRepositoryImpl
 import com.xenikii.timecalculator.data.repository.TasksRepositoryImpl
 import com.xenikii.timecalculator.data.schedule.RefreshRoutineNotificationsUseCase
@@ -35,6 +38,7 @@ import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDat
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
 import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
 import com.xenikii.timecalculator.domain.repository.OnboardingRepository
+import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
@@ -56,6 +60,9 @@ import com.xenikii.timecalculator.features.taskeditor.presentation.CreateTaskVie
 import com.xenikii.timecalculator.features.taskeditor.presentation.EditTaskViewModel
 import com.xenikii.timecalculator.features.tasks.presentation.TasksListViewModel
 import com.xenikii.timecalculator.shared.navigator.EditTaskArguments
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -169,6 +176,24 @@ object AppModule {
             )
         }
 
+        single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+        single { GrantedPremiumDataSource(client = get()) }
+        single<PremiumRepository> {
+            PremiumRepositoryImpl(
+                scope = get(),
+                grantedPremiumDataSource = get(),
+            )
+        }
+        single {
+            PremiumIdentityCoordinator(
+                authRepository = get(),
+                premiumRepository = get(),
+                notificationSettingsRepository = get(),
+                refreshRoutineNotifications = get(),
+                scope = get(),
+            )
+        }
+
         factory { (savedStateHandle: SavedStateHandle) ->
             HomeViewModel(savedStateHandle = savedStateHandle, syncStateProvider = get())
         }
@@ -181,6 +206,7 @@ object AppModule {
                 authRepository = get(),
                 notificationSettingsRepository = get(),
                 refreshNotifications = { refreshRoutineNotifications() },
+                premiumRepository = get(),
             )
         }
 
@@ -218,6 +244,7 @@ object AppModule {
                 routineId = routineId,
                 tasksRepository = get(),
                 routineRepository = get(),
+                premiumRepository = get(),
             )
         }
 
@@ -232,6 +259,7 @@ object AppModule {
         factory {
             CreateRoutineViewModel(
                 routineRepository = get(),
+                premiumRepository = get(),
             )
         }
 

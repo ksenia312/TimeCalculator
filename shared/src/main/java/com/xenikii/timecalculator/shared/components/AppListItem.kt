@@ -54,6 +54,7 @@ fun AppListItem(
             .appListItemContainer(
                 isSelected = isSelected,
                 minHeight = minHeight,
+                overrideContainerColor = colors.containerColor,
             )
             .then(modifier)
             .padding(
@@ -121,6 +122,7 @@ fun AppListItem(
 private fun Modifier.appListItemContainer(
     isSelected: Boolean = false,
     minHeight: Dp = 72.dp,
+    overrideContainerColor: Color? = null,
 ): Modifier {
     val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
@@ -131,10 +133,8 @@ private fun Modifier.appListItemContainer(
     return this
         .heightIn(min = minHeight)
         .clip(appListItemShape)
-        .background(backgroundColor)
+        .background(overrideContainerColor ?: backgroundColor)
 }
 
 @Composable
-private fun appListItemColors(): ListItemColors = ListItemDefaults.colors(
-    containerColor = Color.Transparent,
-)
+fun appListItemColors(): ListItemColors = ListItemDefaults.colors()

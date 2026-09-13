@@ -176,6 +176,14 @@
     <string name="settings_terms_label">Terms &amp; Conditions</string>
     <string name="settings_terms_supporting">Read the rules for using the app</string>
     <string name="settings_terms_url">https://ksenia312.github.io/morning-calculator-docs/terms-and-conditions.html</string>
+    <string name="settings_premium_label">Premium</string>
+    <string name="settings_premium_status_active">Premium is active</string>
+    <string name="settings_premium_status_free">Free plan</string>
+    <string name="settings_premium_restore_action">Restore purchases</string>
+    <string name="settings_premium_restore_in_progress">Restoring…</string>
+    <string name="settings_premium_restore_success">Premium restored</string>
+    <string name="settings_premium_restore_empty">No previous purchases found</string>
+    <string name="content_desc_premium_locked">Requires Premium</string>
 
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>

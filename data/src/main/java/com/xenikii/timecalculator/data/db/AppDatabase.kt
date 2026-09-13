@@ -122,6 +122,9 @@ interface TasksDao {
 
     @Query("DELETE FROM tasks")
     suspend fun clearTasks()
+
+    @Query("SELECT COUNT(*) FROM tasks")
+    suspend fun countTasks(): Int
 }
 
 @Dao
@@ -235,6 +238,9 @@ interface RoutinesDao {
 
     @Query("DELETE FROM routines")
     suspend fun clearRoutines()
+
+    @Query("SELECT COUNT(*) FROM routines")
+    suspend fun countRoutines(): Int
 }
 
 @Dao

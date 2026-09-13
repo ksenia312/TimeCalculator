@@ -3,6 +3,8 @@ package com.xenikii.timecalculator.features.routineeditor.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.model.RoutineRequest
+import com.xenikii.timecalculator.domain.repository.FREE_ROUTINE_LIMIT
+import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.features.routineeditor.ui.RoutineEditorFormState
 import com.xenikii.timecalculator.features.routineeditor.ui.toRoutineRecurrence
@@ -17,6 +19,7 @@ import kotlinx.coroutines.launch
 
 class CreateRoutineViewModel(
     private val routineRepository: RoutineRepository,
+    private val premiumRepository: PremiumRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(RoutineEditorFormState())
@@ -26,9 +29,15 @@ class CreateRoutineViewModel(
         _viewState.value = newState
     }
 
-    fun saveRoutine(onSaved: (routineId: String) -> Unit) {
+    fun saveRoutine(onSaved: (routineId: String) -> Unit, onPremiumRequired: () -> Unit) {
         val state = _viewState.value
         viewModelScope.launch {
+            val isPremium = premiumRepository.isPremiumNow()
+            if (!isPremium && routineRepository.getRoutineCount() >= FREE_ROUTINE_LIMIT) {
+                onPremiumRequired()
+                return@launch
+            }
+
             val routineId = routineRepository.addRoutine(
                 RoutineRequest(
                     title = state.title,
@@ -38,8 +47,8 @@ class CreateRoutineViewModel(
                     color = RoutineColorPicker.pick().toHexString(),
                 )
             )
+            _viewState.update { it.copy(isVisible = false) }
             onSaved(routineId)
         }
-        _viewState.update { it.copy(isVisible = false) }
     }
 }

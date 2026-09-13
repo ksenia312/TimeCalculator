@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AlternateEmail
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.NotificationsOff
@@ -35,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +46,7 @@ import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewState
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppListItem
+import com.xenikii.timecalculator.shared.components.appListItemColors
 import com.xenikii.timecalculator.shared.extensions.bottomIndent
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
@@ -55,6 +58,8 @@ fun SettingsContent(
     onNotificationsEnabledChange: (Boolean) -> Unit,
     onNotificationModeChange: (NotificationMode) -> Unit,
     onOpenSystemNotificationSettings: () -> Unit,
+    onManagePremiumClick: () -> Unit,
+    onRestorePurchasesClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onTermsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,6 +74,14 @@ fun SettingsContent(
         verticalArrangement = Arrangement.Top,
     ) {
         Spacer(modifier = Modifier.height(24.dp))
+        PremiumSettingsItem(
+            isPremium = viewState.isPremium,
+            isRestoringPurchases = viewState.isRestoringPurchases,
+            onManagePremiumClick = onManagePremiumClick,
+            onRestorePurchasesClick = onRestorePurchasesClick,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
         AppListItem(
             headlineContent = {
                 Text(
@@ -238,7 +251,8 @@ private fun ColumnScope.NotificationSettingsItem(
             selected = viewState.notificationMode == NotificationMode.EVERY_TASK,
             onClick = { onModeChange(NotificationMode.EVERY_TASK) },
             supporting = stringResource(R.string.settings_notifications_mode_every_task_supporting),
-            icon = Icons.Filled.NotificationsActive
+            icon = Icons.Filled.NotificationsActive,
+            locked = !viewState.isPremium,
         )
     }
 }
@@ -249,12 +263,13 @@ private fun NotificationModeOption(
     supporting: String,
     selected: Boolean,
     onClick: () -> Unit,
-    icon: ImageVector
+    icon: ImageVector,
+    locked: Boolean = false,
 ) {
     Box(Modifier.padding(start = 32.dp)) {
         AppListItem(
-            modifier = Modifier
-                .clickable(onClick = onClick),
+            colors = appListItemColors(),
+            modifier = Modifier.clickable(onClick = onClick),
             minHeight = 32.dp,
             isSelected = selected,
             headlineContent = {
@@ -271,10 +286,19 @@ private fun NotificationModeOption(
                 )
             },
             trailingContent = {
-                RadioButton(
-                    selected = selected,
-                    onClick = onClick,
-                )
+                if (locked) {
+                    Icon(
+                        imageVector = Icons.Filled.Lock,
+                        contentDescription = stringResource(R.string.content_desc_premium_locked),
+                        modifier = Modifier.padding(end = 12.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    RadioButton(
+                        selected = selected,
+                        onClick = onClick,
+                    )
+                }
             },
             leadingContent = {
                 Icon(
@@ -284,6 +308,94 @@ private fun NotificationModeOption(
                 )
             }
         )
+    }
+}
+
+@Composable
+private fun PremiumSettingsItem(
+    isPremium: Boolean,
+    isRestoringPurchases: Boolean,
+    onManagePremiumClick: () -> Unit,
+    onRestorePurchasesClick: () -> Unit,
+) {
+    val backgroundColor = if (isPremium) {
+        LocalCustomColorScheme.current.accent
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    val color = if (isPremium) {
+        MaterialTheme.colorScheme.background
+    } else {
+        LocalCustomColorScheme.current.label
+    }
+    AppListItem(
+        colors = appListItemColors().copy(
+            containerColor = backgroundColor,
+            headlineColor = color,
+            leadingIconColor = color,
+            supportingTextColor = color,
+            trailingIconColor = color
+        ),
+        modifier = Modifier.clickable(onClick = onManagePremiumClick),
+        headlineContent = {
+            Text(
+                text = stringResource(R.string.settings_premium_label),
+                style = MaterialTheme.typography.titleMedium,
+                color = if (isPremium) {
+                    MaterialTheme.colorScheme.background
+                } else {
+                    MaterialTheme.colorScheme.primary
+                }
+            )
+        },
+        supportingContent = {
+            Text(
+                text = if (isPremium) {
+                    stringResource(R.string.settings_premium_status_active)
+                } else {
+                    stringResource(R.string.settings_premium_status_free)
+                },
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        },
+        leadingContent = {
+            Icon(
+                painter = painterResource(R.drawable.diamond),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+            )
+        },
+        trailingContent = {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                Modifier.size(24.dp),
+            )
+        },
+    )
+
+    if (!isPremium) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Box(Modifier.padding(start = 32.dp)) {
+            AppListItem(
+                modifier = Modifier
+                    .clickable(
+                        enabled = !isRestoringPurchases,
+                        onClick = onRestorePurchasesClick
+                    ),
+                minHeight = 32.dp,
+                headlineContent = {
+                    Text(
+                        text = if (isRestoringPurchases) {
+                            stringResource(R.string.settings_premium_restore_in_progress)
+                        } else {
+                            stringResource(R.string.settings_premium_restore_action)
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                },
+            )
+        }
     }
 }
 
@@ -336,6 +448,8 @@ private fun SettingsContentPreview() {
             onNotificationsEnabledChange = {},
             onNotificationModeChange = {},
             onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
             onPrivacyPolicyClick = {},
             onTermsClick = {},
         )
@@ -352,6 +466,8 @@ private fun SettingsContentNotificationsBlockedPreview() {
             onNotificationsEnabledChange = {},
             onNotificationModeChange = {},
             onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
             onPrivacyPolicyClick = {},
             onTermsClick = {},
         )
@@ -372,6 +488,30 @@ private fun SettingsContentLoggingOutPreview() {
             onNotificationsEnabledChange = {},
             onNotificationModeChange = {},
             onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsContentPremiumPreview() {
+    PreviewTheme {
+        SettingsContent(
+            viewState = SettingsViewState(
+                isPremium = true,
+                notificationsEnabled = true,
+                notificationMode = NotificationMode.EVERY_TASK
+            ),
+            onLogoutClick = {},
+            onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
+            onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
             onPrivacyPolicyClick = {},
             onTermsClick = {},
         )

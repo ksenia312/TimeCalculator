@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
 import com.xenikii.timecalculator.shared.features.SaveTaskButton
 import com.xenikii.timecalculator.shared.features.TaskNameField
 import com.xenikii.timecalculator.shared.features.selectedIndexAfterRemove
+import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -46,6 +48,14 @@ fun CreateTaskScreen(
     var title by remember { mutableStateOf("") }
     val durations = remember { mutableStateListOf(DurationInput()) }
     val showDuplicateError by viewModel.showDuplicateError.collectAsStateWithLifecycle()
+    val showPaywall by viewModel.showPaywall.collectAsStateWithLifecycle()
+
+    LaunchedEffect(showPaywall) {
+        if (showPaywall) {
+            navigator.navigateTo(AppRoute.Paywall)
+            viewModel.onPaywallShown()
+        }
+    }
 
     var selectedIndex by remember(hasRoutine) {
         mutableStateOf(if (hasRoutine) 0 else null)
@@ -116,17 +126,15 @@ fun CreateTaskScreen(
                     onConfirm = {
                         val durationsRes = durations.mapNotNull { it.totalMinutesOrNull()?.minutes }
                         if (durationsRes.size == durations.size) {
-                            val saved = viewModel.createTask(
+                            viewModel.createTask(
                                 TaskRequest(
                                     title = title,
                                     description = "",
                                     durations = durationsRes
                                 ),
                                 selectedDurationIndex = selectedIndex,
+                                onSaved = navigator::navigateBack,
                             )
-                            if (saved) {
-                                navigator.navigateBack()
-                            }
                         }
                     },
                 )

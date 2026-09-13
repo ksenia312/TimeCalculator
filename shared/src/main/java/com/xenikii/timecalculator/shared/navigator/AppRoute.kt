@@ -47,6 +47,9 @@ sealed interface AppRoute : NavKey {
         val routineId: String,
         val fromRoutineScreen: Boolean = false,
     ) : AppRoute
+
+    @Serializable
+    data object Paywall : AppRoute
 }
 
 /** Destinations that must not be shown without an active session. */

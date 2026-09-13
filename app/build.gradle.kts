@@ -35,6 +35,11 @@ android {
             "SUPABASE_KEY",
             "\"${secrets.getProperty("SUPABASE_KEY", "")}\"",
         )
+        buildConfigField(
+            "String",
+            "REVENUECAT_API_KEY",
+            "\"${secrets.getProperty("REVENUECAT_API_KEY", "")}\"",
+        )
     }
 
     signingConfigs {
@@ -119,6 +124,8 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:paywall"))
+    implementation(libs.revenuecat.purchases)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

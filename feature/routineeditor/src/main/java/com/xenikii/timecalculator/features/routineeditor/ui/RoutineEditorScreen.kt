@@ -68,12 +68,17 @@ fun CreateRoutineScreen(
         viewState = form,
         onStateChange = viewModel::onStateChange,
         onConfirm = {
-            viewModel.saveRoutine { routineId ->
-                navigator.navigateTo(
-                    AppRoute.Routine(routineId = routineId),
-                    backstackBehavior = BackstackBehavior.RemoveCurrent,
-                )
-            }
+            viewModel.saveRoutine(
+                onSaved = { routineId ->
+                    navigator.navigateTo(
+                        AppRoute.Routine(routineId = routineId),
+                        backstackBehavior = BackstackBehavior.RemoveCurrent,
+                    )
+                },
+                onPremiumRequired = {
+                    navigator.navigateTo(AppRoute.Paywall)
+                },
+            )
         },
         onDismiss = navigator::navigateBack,
     )

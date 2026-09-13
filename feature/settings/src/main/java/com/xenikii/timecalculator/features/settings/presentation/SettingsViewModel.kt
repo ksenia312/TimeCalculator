@@ -6,6 +6,7 @@ import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.User
 import com.xenikii.timecalculator.domain.repository.AuthRepository
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
+import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +18,7 @@ class SettingsViewModel(
     private val authRepository: AuthRepository,
     private val notificationSettingsRepository: NotificationSettingsRepository,
     private val refreshNotifications: suspend () -> Unit,
+    private val premiumRepository: PremiumRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
@@ -28,10 +30,14 @@ class SettingsViewModel(
     )
     val viewState: StateFlow<SettingsViewState> = _viewState.asStateFlow()
 
+    private val _showPaywall = MutableStateFlow(false)
+    val showPaywall: StateFlow<Boolean> = _showPaywall.asStateFlow()
+
     init {
         startObservingUser()
         startObservingNotificationSettings()
         startObservingNotificationMode()
+        startObservingPremium()
     }
 
     fun logout() {
@@ -52,8 +58,42 @@ class SettingsViewModel(
     }
 
     fun setNotificationMode(mode: NotificationMode) {
+        if (mode == NotificationMode.EVERY_TASK && !_viewState.value.isPremium) {
+            _showPaywall.value = true
+            return
+        }
         viewModelScope.launch {
             notificationSettingsRepository.setMode(mode)
+        }
+    }
+
+    fun onPaywallShown() {
+        _showPaywall.value = false
+    }
+
+    fun restorePurchases() {
+        if (_viewState.value.isRestoringPurchases) return
+        viewModelScope.launch {
+            _viewState.update { it.copy(isRestoringPurchases = true) }
+            val restoredToPremium = premiumRepository.restore()
+            _viewState.update {
+                it.copy(
+                    isRestoringPurchases = false,
+                    restoreResult = if (restoredToPremium) RestoreResult.Restored else RestoreResult.NothingToRestore,
+                )
+            }
+        }
+    }
+
+    fun onRestoreResultShown() {
+        _viewState.update { it.copy(restoreResult = null) }
+    }
+
+    private fun startObservingPremium() {
+        viewModelScope.launch {
+            premiumRepository.observeIsPremium().collect { isPremium ->
+                _viewState.update { it.copy(isPremium = isPremium) }
+            }
         }
     }
 
@@ -100,7 +140,15 @@ data class SettingsViewState(
     val notificationsEnabled: Boolean = false,
     val notificationMode: NotificationMode = NotificationMode.EVERY_TASK,
     val areSystemNotificationsAllowed: Boolean = true,
+    val isPremium: Boolean = false,
+    val isRestoringPurchases: Boolean = false,
+    val restoreResult: RestoreResult? = null,
 ) {
     val isNotificationsSwitchOn: Boolean
         get() = notificationsEnabled && areSystemNotificationsAllowed
+}
+
+enum class RestoreResult {
+    Restored,
+    NothingToRestore,
 }
