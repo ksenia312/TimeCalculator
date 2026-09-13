@@ -35,6 +35,7 @@ import com.xenikii.timecalculator.features.auth.ui.RegisterScreen
 import com.xenikii.timecalculator.features.auth.ui.WelcomeScreen
 import com.xenikii.timecalculator.features.home.ui.HomeScreen
 import com.xenikii.timecalculator.features.onboarding.ui.OnboardingScreen
+import com.xenikii.timecalculator.features.paywall.ui.ManageSubscriptionScreen
 import com.xenikii.timecalculator.features.paywall.ui.PaywallScreen
 import com.xenikii.timecalculator.features.routine.ui.RoutineScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.CreateRoutineScreen
@@ -182,6 +183,12 @@ fun AppNavigator(
                                 AppRoute.Paywall -> {
                                     NavEntry(key = key) {
                                         PaywallScreen()
+                                    }
+                                }
+
+                                AppRoute.ManageSubscription -> {
+                                    NavEntry(key = key) {
+                                        ManageSubscriptionScreen()
                                     }
                                 }
 

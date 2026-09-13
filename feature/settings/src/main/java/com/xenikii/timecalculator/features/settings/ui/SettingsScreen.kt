@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.domain.model.PremiumSource
 import com.xenikii.timecalculator.features.settings.presentation.RestoreResult
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewModel
 import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
@@ -93,7 +94,14 @@ fun SettingsScreen(
                 }
         },
         onManagePremiumClick = {
-            navigator.navigateTo(AppRoute.Paywall)
+            val premiumStatus = viewState.value.premiumStatus
+            when {
+                !premiumStatus.isActive -> navigator.navigateTo(AppRoute.Paywall)
+                premiumStatus.source == PremiumSource.PURCHASE -> navigator.navigateTo(AppRoute.ManageSubscription)
+                // Granted (gift/founder/promo) premium has no Play subscription to manage; the
+                // tile is non-clickable for this case (see PremiumSettingsItem), so this is unreachable.
+                else -> Unit
+            }
         },
         onRestorePurchasesClick = viewModel::restorePurchases,
         onTermsClick = {

@@ -3,6 +3,7 @@ package com.xenikii.timecalculator.features.settings.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.model.NotificationMode
+import com.xenikii.timecalculator.domain.model.PremiumStatus
 import com.xenikii.timecalculator.domain.model.User
 import com.xenikii.timecalculator.domain.repository.AuthRepository
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
@@ -58,7 +59,7 @@ class SettingsViewModel(
     }
 
     fun setNotificationMode(mode: NotificationMode) {
-        if (mode == NotificationMode.EVERY_TASK && !_viewState.value.isPremium) {
+        if (mode == NotificationMode.EVERY_TASK && !_viewState.value.premiumStatus.isActive) {
             _showPaywall.value = true
             return
         }
@@ -91,8 +92,8 @@ class SettingsViewModel(
 
     private fun startObservingPremium() {
         viewModelScope.launch {
-            premiumRepository.observeIsPremium().collect { isPremium ->
-                _viewState.update { it.copy(isPremium = isPremium) }
+            premiumRepository.observePremiumStatus().collect { premiumStatus ->
+                _viewState.update { it.copy(premiumStatus = premiumStatus) }
             }
         }
     }
@@ -140,7 +141,7 @@ data class SettingsViewState(
     val notificationsEnabled: Boolean = false,
     val notificationMode: NotificationMode = NotificationMode.EVERY_TASK,
     val areSystemNotificationsAllowed: Boolean = true,
-    val isPremium: Boolean = false,
+    val premiumStatus: PremiumStatus = PremiumStatus.None,
     val isRestoringPurchases: Boolean = false,
     val restoreResult: RestoreResult? = null,
 ) {

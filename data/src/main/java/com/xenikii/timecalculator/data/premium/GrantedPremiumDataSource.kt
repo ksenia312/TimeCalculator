@@ -14,18 +14,19 @@ import kotlin.time.Instant
 class GrantedPremiumDataSource(
     private val client: SupabaseClient,
 ) {
-    suspend fun fetchIsGranted(): Boolean =
+    suspend fun fetchGrantedPremium(): GrantedPremiumInfo =
         client.from(PROFILES_TABLE)
             .select()
             .decodeSingleOrNull<RemoteProfile>()
-            ?.isCurrentlyGranted()
-            ?: false
+            ?.toGrantedPremiumInfo()
+            ?: GrantedPremiumInfo.None
 
-    private fun RemoteProfile.isCurrentlyGranted(): Boolean {
-        if (!grantedPremium) return false
-        val until = grantedUntil ?: return true
-        val expiresAt = runCatching { Instant.parse(until) }.getOrNull() ?: return true
-        return expiresAt > Instant.fromEpochMilliseconds(System.currentTimeMillis())
+    private fun RemoteProfile.toGrantedPremiumInfo(): GrantedPremiumInfo {
+        if (!grantedPremium) return GrantedPremiumInfo.None
+        val expiresAt = grantedUntil?.let { runCatching { Instant.parse(it) }.getOrNull() }
+        val hasExpired = expiresAt != null && expiresAt <= Instant.fromEpochMilliseconds(System.currentTimeMillis())
+        if (hasExpired) return GrantedPremiumInfo.None
+        return GrantedPremiumInfo(isGranted = true, grantedUntil = expiresAt, grantReason = grantReason)
     }
 
     private companion object {
@@ -33,8 +34,20 @@ class GrantedPremiumDataSource(
     }
 }
 
+/** Data-layer result of a grant lookup; mapped to the domain-clean `PremiumStatus` in [PremiumRepositoryImpl]. */
+data class GrantedPremiumInfo(
+    val isGranted: Boolean,
+    val grantedUntil: Instant?,
+    val grantReason: String?,
+) {
+    companion object {
+        val None = GrantedPremiumInfo(isGranted = false, grantedUntil = null, grantReason = null)
+    }
+}
+
 @Serializable
 private data class RemoteProfile(
     @SerialName("granted_premium") val grantedPremium: Boolean = false,
     @SerialName("granted_until") val grantedUntil: String? = null,
+    @SerialName("grant_reason") val grantReason: String? = null,
 )

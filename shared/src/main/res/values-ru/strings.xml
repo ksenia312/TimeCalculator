@@ -178,12 +178,19 @@
     <string name="settings_terms_supporting">Прочитайте правила использования приложения</string>
     <string name="settings_terms_url">https://ksenia312.github.io/morning-calculator-docs/terms-and-conditions.html</string>
     <string name="settings_premium_label">Премиум</string>
-    <string name="settings_premium_status_active">Премиум активен</string>
+    <string name="settings_premium_status_active">Активен</string>
     <string name="settings_premium_status_free">Бесплатный план</string>
+    <string name="settings_premium_status_renews">Продлится %1$s</string>
+    <string name="settings_premium_status_trial">Пробный период до %1$s</string>
+    <string name="settings_premium_status_expiring">Активен до %1$s, не продлится</string>
+    <string name="settings_premium_status_lifetime">Доступ навсегда</string>
+    <string name="settings_premium_status_grant">В подарок навсегда</string>
+    <string name="settings_premium_status_grant_until">В подарок до %1$s</string>
     <string name="settings_premium_restore_action">Восстановить покупки</string>
     <string name="settings_premium_restore_in_progress">Восстановление…</string>
     <string name="settings_premium_restore_success">Премиум восстановлен</string>
     <string name="settings_premium_restore_empty">Предыдущие покупки не найдены</string>
+    <string name="paywall_manage_subscription_error">Не удалось открыть управление подпиской</string>
     <string name="content_desc_premium_locked">Требуется Премиум</string>
 
     <string name="top_bar_error">Ошибка</string>

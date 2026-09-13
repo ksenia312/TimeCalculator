@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,13 +44,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.domain.model.NotificationMode
+import com.xenikii.timecalculator.domain.model.PremiumPeriodType
+import com.xenikii.timecalculator.domain.model.PremiumSource
+import com.xenikii.timecalculator.domain.model.PremiumStatus
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewState
 import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppListItem
 import com.xenikii.timecalculator.shared.components.appListItemColors
 import com.xenikii.timecalculator.shared.extensions.bottomIndent
+import com.xenikii.timecalculator.shared.extensions.stringDateTime
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
+import kotlin.time.Instant
 
 @Composable
 fun SettingsContent(
@@ -75,7 +81,7 @@ fun SettingsContent(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
         PremiumSettingsItem(
-            isPremium = viewState.isPremium,
+            premiumStatus = viewState.premiumStatus,
             isRestoringPurchases = viewState.isRestoringPurchases,
             onManagePremiumClick = onManagePremiumClick,
             onRestorePurchasesClick = onRestorePurchasesClick,
@@ -252,7 +258,7 @@ private fun ColumnScope.NotificationSettingsItem(
             onClick = { onModeChange(NotificationMode.EVERY_TASK) },
             supporting = stringResource(R.string.settings_notifications_mode_every_task_supporting),
             icon = Icons.Filled.NotificationsActive,
-            locked = !viewState.isPremium,
+            locked = !viewState.premiumStatus.isActive,
         )
     }
 }
@@ -313,11 +319,16 @@ private fun NotificationModeOption(
 
 @Composable
 private fun PremiumSettingsItem(
-    isPremium: Boolean,
+    premiumStatus: PremiumStatus,
     isRestoringPurchases: Boolean,
     onManagePremiumClick: () -> Unit,
     onRestorePurchasesClick: () -> Unit,
 ) {
+    val isPremium = premiumStatus.isActive
+    // A grant has no underlying Play subscription to manage, so tapping it would only open an
+    // empty/irrelevant Play Store screen - the tile stays informational-only for that source.
+    val isManageable = !isPremium || premiumStatus.source == PremiumSource.PURCHASE
+
     val backgroundColor = if (isPremium) {
         LocalCustomColorScheme.current.accent
     } else {
@@ -336,7 +347,7 @@ private fun PremiumSettingsItem(
             supportingTextColor = color,
             trailingIconColor = color
         ),
-        modifier = Modifier.clickable(onClick = onManagePremiumClick),
+        modifier = if (isManageable) Modifier.clickable(onClick = onManagePremiumClick) else Modifier,
         headlineContent = {
             Text(
                 text = stringResource(R.string.settings_premium_label),
@@ -350,11 +361,7 @@ private fun PremiumSettingsItem(
         },
         supportingContent = {
             Text(
-                text = if (isPremium) {
-                    stringResource(R.string.settings_premium_status_active)
-                } else {
-                    stringResource(R.string.settings_premium_status_free)
-                },
+                text = premiumStatusSupportingText(premiumStatus),
                 style = MaterialTheme.typography.bodyMedium,
             )
         },
@@ -366,11 +373,13 @@ private fun PremiumSettingsItem(
             )
         },
         trailingContent = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                Modifier.size(24.dp),
-            )
+            if (isManageable) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    Modifier.size(24.dp),
+                )
+            }
         },
     )
 
@@ -396,6 +405,43 @@ private fun PremiumSettingsItem(
                 },
             )
         }
+    }
+}
+
+/**
+ * Explains *how* premium is active - trial/renewing/cancelled-but-active/lifetime/gifted - rather
+ * than just "Premium is active", using the same date formatter already used elsewhere in the app
+ * (no new date-formatting code).
+ */
+@Composable
+private fun premiumStatusSupportingText(status: PremiumStatus): String {
+    if (!status.isActive) return stringResource(R.string.settings_premium_status_free)
+
+    val context = LocalContext.current
+    val expirationDate: Instant? = status.expirationDate
+
+    return when {
+        status.source == PremiumSource.GRANT -> {
+            val grantedUntil = status.grantedUntil
+            if (grantedUntil != null) {
+                stringResource(R.string.settings_premium_status_grant_until, grantedUntil.stringDateTime(context))
+            } else {
+                stringResource(R.string.settings_premium_status_grant)
+            }
+        }
+
+        expirationDate == null -> stringResource(R.string.settings_premium_status_lifetime)
+
+        status.periodType == PremiumPeriodType.TRIAL ->
+            stringResource(R.string.settings_premium_status_trial, expirationDate.stringDateTime(context))
+
+        status.willRenew == false ->
+            stringResource(R.string.settings_premium_status_expiring, expirationDate.stringDateTime(context))
+
+        status.willRenew == true ->
+            stringResource(R.string.settings_premium_status_renews, expirationDate.stringDateTime(context))
+
+        else -> stringResource(R.string.settings_premium_status_active)
     }
 }
 
@@ -498,11 +544,17 @@ private fun SettingsContentLoggingOutPreview() {
 
 @Preview
 @Composable
-private fun SettingsContentPremiumPreview() {
+private fun SettingsContentPremiumRenewingPreview() {
     PreviewTheme {
         SettingsContent(
             viewState = SettingsViewState(
-                isPremium = true,
+                premiumStatus = PremiumStatus(
+                    isActive = true,
+                    source = PremiumSource.PURCHASE,
+                    expirationDate = PreviewFutureDate,
+                    willRenew = true,
+                    periodType = PremiumPeriodType.NORMAL,
+                ),
                 notificationsEnabled = true,
                 notificationMode = NotificationMode.EVERY_TASK
             ),
@@ -517,3 +569,107 @@ private fun SettingsContentPremiumPreview() {
         )
     }
 }
+
+@Preview
+@Composable
+private fun SettingsContentPremiumTrialPreview() {
+    PreviewTheme {
+        SettingsContent(
+            viewState = SettingsViewState(
+                premiumStatus = PremiumStatus(
+                    isActive = true,
+                    source = PremiumSource.PURCHASE,
+                    expirationDate = PreviewFutureDate,
+                    willRenew = true,
+                    periodType = PremiumPeriodType.TRIAL,
+                ),
+            ),
+            onLogoutClick = {},
+            onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
+            onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsContentPremiumCancelledPreview() {
+    PreviewTheme {
+        SettingsContent(
+            viewState = SettingsViewState(
+                premiumStatus = PremiumStatus(
+                    isActive = true,
+                    source = PremiumSource.PURCHASE,
+                    expirationDate = PreviewFutureDate,
+                    willRenew = false,
+                    periodType = PremiumPeriodType.NORMAL,
+                ),
+            ),
+            onLogoutClick = {},
+            onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
+            onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsContentPremiumLifetimePreview() {
+    PreviewTheme {
+        SettingsContent(
+            viewState = SettingsViewState(
+                premiumStatus = PremiumStatus(
+                    isActive = true,
+                    source = PremiumSource.PURCHASE,
+                    expirationDate = null,
+                    willRenew = true,
+                ),
+            ),
+            onLogoutClick = {},
+            onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
+            onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsContentPremiumGrantPreview() {
+    PreviewTheme {
+        SettingsContent(
+            viewState = SettingsViewState(
+                premiumStatus = PremiumStatus(
+                    isActive = true,
+                    source = PremiumSource.GRANT,
+                    grantedUntil = PreviewFutureDate,
+                    grantReason = "Founder",
+                ),
+            ),
+            onLogoutClick = {},
+            onNotificationsEnabledChange = {},
+            onNotificationModeChange = {},
+            onOpenSystemNotificationSettings = {},
+            onManagePremiumClick = {},
+            onRestorePurchasesClick = {},
+            onPrivacyPolicyClick = {},
+            onTermsClick = {},
+        )
+    }
+}
+
+private val PreviewFutureDate = Instant.fromEpochMilliseconds(System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000)

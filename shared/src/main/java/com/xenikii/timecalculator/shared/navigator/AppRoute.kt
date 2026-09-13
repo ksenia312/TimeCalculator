@@ -50,6 +50,10 @@ sealed interface AppRoute : NavKey {
 
     @Serializable
     data object Paywall : AppRoute
+
+    /** Trampoline: opens the store's native subscription-management screen, then pops itself. */
+    @Serializable
+    data object ManageSubscription : AppRoute
 }
 
 /** Destinations that must not be shown without an active session. */

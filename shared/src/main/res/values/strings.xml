@@ -177,12 +177,19 @@
     <string name="settings_terms_supporting">Read the rules for using the app</string>
     <string name="settings_terms_url">https://ksenia312.github.io/morning-calculator-docs/terms-and-conditions.html</string>
     <string name="settings_premium_label">Premium</string>
-    <string name="settings_premium_status_active">Premium is active</string>
+    <string name="settings_premium_status_active">Active</string>
     <string name="settings_premium_status_free">Free plan</string>
+    <string name="settings_premium_status_renews">Renews on %1$s</string>
+    <string name="settings_premium_status_trial">Free trial until %1$s</string>
+    <string name="settings_premium_status_expiring">Active until %1$s, won\'t renew</string>
+    <string name="settings_premium_status_lifetime">Lifetime access</string>
+    <string name="settings_premium_status_grant">Gifted forever</string>
+    <string name="settings_premium_status_grant_until">Gifted until %1$s</string>
     <string name="settings_premium_restore_action">Restore purchases</string>
     <string name="settings_premium_restore_in_progress">Restoring…</string>
     <string name="settings_premium_restore_success">Premium restored</string>
     <string name="settings_premium_restore_empty">No previous purchases found</string>
+    <string name="paywall_manage_subscription_error">Couldn\'t open subscription management</string>
     <string name="content_desc_premium_locked">Requires Premium</string>
 
     <string name="top_bar_error">Error</string>

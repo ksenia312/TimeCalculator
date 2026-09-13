@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.domain.repository
 
+import com.xenikii.timecalculator.domain.model.PremiumStatus
 import kotlinx.coroutines.flow.Flow
 
 /** Free-tier gate limits and the RevenueCat entitlement identifier that unlocks them. */
@@ -8,6 +9,10 @@ const val FREE_TASK_LIMIT = 10
 const val PREMIUM_ENTITLEMENT_ID = "premium"
 
 interface PremiumRepository {
+    /** The detailed status (source, expiration, renewal...) behind [observeIsPremium]. */
+    fun observePremiumStatus(): Flow<PremiumStatus>
+
+    /** Derived from [observePremiumStatus]; kept for gates that only care about the boolean. */
     fun observeIsPremium(): Flow<Boolean>
     suspend fun isPremiumNow(): Boolean
     suspend fun restore(): Boolean
