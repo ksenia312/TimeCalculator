@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -63,8 +63,19 @@ class AuthRepositoryImpl(
         client.auth.currentSessionOrNull() != null
 
     override fun currentUser(): User? = client.auth.currentUserOrNull()?.mapToUser()
+
     override fun observeCurrentUser(): Flow<User?> {
-        return client.auth.sessionStatus.map { it.mapToUser() }
+        return client.auth.sessionStatus.transform { status ->
+            when (status) {
+                // Session still valid, a background token refresh is in flight - not a real
+                // login state change, so consumers keep seeing whichever user they saw last.
+                is SessionStatus.Initializing,
+                is SessionStatus.RefreshFailure -> Unit
+
+                is SessionStatus.Authenticated,
+                is SessionStatus.NotAuthenticated -> emit(status.mapToUser())
+            }
+        }
     }
 
     override suspend fun signIn(email: String, password: String): Result<Unit> =

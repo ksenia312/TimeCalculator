@@ -53,6 +53,9 @@ class PremiumRepositoryImpl(
     @Volatile
     private var lastForegroundRefreshAtMillis = 0L
 
+    @Volatile
+    private var cachedIsPremium: Boolean = false
+
     init {
         // RevenueCat already refreshes CustomerInfo on its own when the app returns to the
         // foreground (PurchasesOrchestrator.onAppForegrounded -> shouldRefreshCustomerInfo), but
@@ -98,6 +101,12 @@ class PremiumRepositoryImpl(
             replay = 1,
         )
 
+    init {
+        // Keeps sharedPremiumStatusFlow permanently hot and cachedIsPremium current regardless of
+        // whether any other collector (UI, PremiumIdentityCoordinator) happens to be subscribed.
+        scope.launch { sharedPremiumStatusFlow.collect { cachedIsPremium = it.isActive } }
+    }
+
     override fun observePremiumStatus(): Flow<PremiumStatus> = sharedPremiumStatusFlow
 
     override fun observeIsPremium(): Flow<Boolean> =
@@ -107,6 +116,8 @@ class PremiumRepositoryImpl(
         val customerInfo = runCatching { awaitCustomerInfo() }.getOrNull()
         return toPremiumStatus(customerInfo, grantedPremiumFlow.value).isActive
     }
+
+    override fun isPremiumCached(): Boolean = cachedIsPremium
 
     override suspend fun restore(): Boolean = runCatching {
         Purchases.sharedInstance.awaitRestore().entitlements[PREMIUM_ENTITLEMENT_ID]?.isActive == true

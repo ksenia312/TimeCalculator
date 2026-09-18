@@ -15,6 +15,12 @@ interface PremiumRepository {
     /** Derived from [observePremiumStatus]; kept for gates that only care about the boolean. */
     fun observeIsPremium(): Flow<Boolean>
     suspend fun isPremiumNow(): Boolean
+
+    /**
+     * Last known premium state, readable synchronously (no suspend/network round-trip) for call
+     * sites that can't await a fresh check, e.g. deciding notification content when posting.
+     */
+    fun isPremiumCached(): Boolean
     suspend fun restore(): Boolean
     suspend fun identify(userId: String)
     suspend fun resetIdentity()

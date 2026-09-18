@@ -159,6 +159,7 @@ object AppModule {
             RoutineNotificationPresenter(
                 context = context,
                 notificationSettings = get(),
+                premiumRepository = get(),
             )
         }
         single<RoutineScheduleRepository> {

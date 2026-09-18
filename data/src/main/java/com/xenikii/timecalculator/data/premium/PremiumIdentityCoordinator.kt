@@ -13,9 +13,12 @@ import kotlinx.coroutines.launch
 /**
  * Keeps the RevenueCat identity aligned with the signed-in Supabase user (so entitlements follow
  * the account across devices/logins), and guards against a premium "lapse": EVERY_TASK is a
- * premium-only notification mode, so if entitlement is lost while it's selected, this falls back
- * to START_AND_END and refreshes scheduled notifications to match. Started once from
- * Application.onCreate, mirroring [com.xenikii.timecalculator.data.sync.SyncManager].
+ * premium-only notification mode, so if entitlement is lost while it's selected, this refreshes
+ * currently-scheduled notifications so they stop behaving as EVERY_TASK. The user's saved mode
+ * itself is never overwritten here - RoutineNotificationPresenter enforces the premium gate live
+ * at post time instead, so the stored preference always reflects the user's own choice and simply
+ * resumes automatically if entitlement comes back. Started once from Application.onCreate,
+ * mirroring [com.xenikii.timecalculator.data.sync.SyncManager].
  */
 class PremiumIdentityCoordinator(
     private val authRepository: AuthRepository,
@@ -48,7 +51,6 @@ class PremiumIdentityCoordinator(
                     !isPremium && notificationSettingsRepository.getMode() == NotificationMode.EVERY_TASK
                 }
                 .collect {
-                    notificationSettingsRepository.setMode(NotificationMode.START_AND_END)
                     refreshRoutineNotifications()
                 }
         }
