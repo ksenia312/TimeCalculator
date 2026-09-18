@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.PremiumStatus
+import com.xenikii.timecalculator.domain.model.effectiveNotificationMode
 import com.xenikii.timecalculator.domain.model.User
 import com.xenikii.timecalculator.domain.repository.AuthRepository
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsRepository
@@ -147,6 +148,12 @@ data class SettingsViewState(
 ) {
     val isNotificationsSwitchOn: Boolean
         get() = notificationsEnabled && areSystemNotificationsAllowed
+
+    /** What the UI should show as selected: the saved [notificationMode] downgraded to
+     * START_AND_END while not premium, mirroring what RoutineNotificationPresenter actually does
+     * - so the screen never shows neither option selected. */
+    val effectiveNotificationMode: NotificationMode
+        get() = notificationMode.effectiveNotificationMode(premiumStatus.isActive)
 }
 
 enum class RestoreResult {

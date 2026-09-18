@@ -7,3 +7,5 @@ enum class NotificationMode {
     /** A persistent progress notification plus an alert for every task, on top of start/finish. */
     EVERY_TASK,
 }
+fun NotificationMode.effectiveNotificationMode(isPremium: Boolean): NotificationMode =
+    if (this == NotificationMode.EVERY_TASK && !isPremium) NotificationMode.START_AND_END else this

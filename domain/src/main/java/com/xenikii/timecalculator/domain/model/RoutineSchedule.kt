@@ -53,4 +53,5 @@ enum class RoutineAlarmKind {
 data class ScheduleRecord(
     val signature: String,
     val taskCount: Int,
+    val notificationMode: NotificationMode? = null,
 )

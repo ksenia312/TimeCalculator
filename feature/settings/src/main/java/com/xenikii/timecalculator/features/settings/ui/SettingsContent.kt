@@ -246,7 +246,7 @@ private fun ColumnScope.NotificationSettingsItem(
         Spacer(modifier = Modifier.height(8.dp))
         NotificationModeOption(
             label = stringResource(R.string.settings_notifications_mode_start_and_end),
-            selected = viewState.notificationMode == NotificationMode.START_AND_END,
+            selected = viewState.effectiveNotificationMode == NotificationMode.START_AND_END,
             onClick = { onModeChange(NotificationMode.START_AND_END) },
             supporting = stringResource(R.string.settings_notifications_mode_start_and_end_supporting),
             icon = Icons.Outlined.NotificationsActive
@@ -254,7 +254,7 @@ private fun ColumnScope.NotificationSettingsItem(
         Spacer(modifier = Modifier.height(4.dp))
         NotificationModeOption(
             label = stringResource(R.string.settings_notifications_mode_every_task),
-            selected = viewState.notificationMode == NotificationMode.EVERY_TASK,
+            selected = viewState.effectiveNotificationMode == NotificationMode.EVERY_TASK,
             onClick = { onModeChange(NotificationMode.EVERY_TASK) },
             supporting = stringResource(R.string.settings_notifications_mode_every_task_supporting),
             icon = Icons.Filled.NotificationsActive,

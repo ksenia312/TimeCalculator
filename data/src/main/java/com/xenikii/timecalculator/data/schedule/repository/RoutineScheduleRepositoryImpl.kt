@@ -1,13 +1,16 @@
 package com.xenikii.timecalculator.data.schedule.repository
 
 import com.xenikii.timecalculator.data.schedule.computation.calculateSchedule
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineAlarmKind
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
+import com.xenikii.timecalculator.domain.model.effectiveNotificationMode
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
+import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
@@ -21,6 +24,7 @@ class RoutineScheduleRepositoryImpl(
     private val notificationGateway: RoutineNotificationGateway,
     private val scheduleRecordDataSource: ScheduleRecordDataSource,
     private val notificationSettings: NotificationSettingsLocalDataSource,
+    private val premiumRepository: PremiumRepository,
 ) : RoutineScheduleRepository {
 
     private val mutex = Mutex()
@@ -74,10 +78,33 @@ class RoutineScheduleRepositoryImpl(
         val enabled = notificationSettings.isEnabled()
         val isActive = schedule.phaseAt(now) == RoutineSchedulePhase.ACTIVE
         if (enabled && isActive) {
-            notificationGateway.postProgress(routine, schedule, now, alert = false)
+            val mode = pinNotificationMode(routine.id, schedule)
+            notificationGateway.postProgress(routine, schedule, now, mode = mode, alert = false)
         } else {
             notificationGateway.cancelProgress(routine.id)
         }
+    }
+
+    /** What a routine starting right now should be pinned to: EVERY_TASK downgrades to
+     * START_AND_END while not premium. Only used to establish a new pin - an already-active
+     * routine keeps whatever [pinNotificationMode] gave it when it started. */
+    private fun currentDesiredMode(): NotificationMode =
+        notificationSettings.getMode().effectiveNotificationMode(premiumRepository.isPremiumCached())
+
+    /**
+     * Ensures `routineId`'s schedule record carries a notification mode, without ever changing
+     * one that's already set - that's the pin: whatever mode a routine started under governs it
+     * for its whole run, immune to premium status changing mid-routine. Safe to call repeatedly
+     * (resyncs, drift correction) since it's a no-op once a mode is set.
+     */
+    private fun pinNotificationMode(routineId: String, schedule: RoutineSchedule): NotificationMode {
+        val record = scheduleRecordDataSource.getRecord(routineId)
+        val mode = record?.notificationMode ?: currentDesiredMode()
+        scheduleRecordDataSource.putRecord(
+            routineId,
+            ScheduleRecord(signature = schedule.signature, taskCount = schedule.tasks.size, notificationMode = mode),
+        )
+        return mode
     }
 
     override suspend fun handleAlarm(
@@ -117,19 +144,32 @@ class RoutineScheduleRepositoryImpl(
 
             when (kind) {
                 RoutineAlarmKind.START -> {
-                    // Whichever of these two actually shows something is decided by the current
-                    // notification mode inside the gateway. alertTask pins the alert to the task
-                    // this alarm was armed for (index 0), so a delayed delivery can't relabel it
-                    // with whatever task the wall clock has since moved on to.
-                    notificationGateway.postProgress(routine, schedule, now, alertTask = schedule.tasks.firstOrNull())
-                    notificationGateway.postRoutineStarted(routine)
-                }
-
-                RoutineAlarmKind.TASK -> {
+                    // The routine is starting right now: this is where its notification mode gets
+                    // pinned for its whole run (see pinNotificationMode). Whichever of these two
+                    // actually shows something is decided by that mode inside the gateway.
+                    // alertTask pins the alert to the task this alarm was armed for (index 0), so a
+                    // delayed delivery can't relabel it with whatever task the wall clock has since
+                    // moved on to.
+                    val mode = pinNotificationMode(routine.id, schedule)
                     notificationGateway.postProgress(
                         routine,
                         schedule,
                         now,
+                        mode = mode,
+                        alertTask = schedule.tasks.firstOrNull(),
+                    )
+                    notificationGateway.postRoutineStarted(routine, mode = mode)
+                }
+
+                RoutineAlarmKind.TASK -> {
+                    // Read-only: the routine is already under way, so this reuses whatever mode
+                    // was pinned at RoutineAlarmKind.START rather than re-deciding it.
+                    val mode = scheduleRecordDataSource.getRecord(routine.id)?.notificationMode ?: currentDesiredMode()
+                    notificationGateway.postProgress(
+                        routine,
+                        schedule,
+                        now,
+                        mode = mode,
                         alertTask = schedule.tasks.getOrNull(boundaryIndex),
                     )
                 }
@@ -168,26 +208,26 @@ class RoutineScheduleRepositoryImpl(
             RoutineSchedulePhase.FUTURE -> {
                 alarmGateway.schedule(schedule)
                 notificationGateway.cancelProgress(routine.id)
+                // Not started yet, so no mode to pin - notificationMode stays null until it is.
+                scheduleRecordDataSource.putRecord(
+                    routine.id,
+                    ScheduleRecord(signature = schedule.signature, taskCount = schedule.tasks.size),
+                )
             }
 
             RoutineSchedulePhase.ACTIVE -> {
                 alarmGateway.schedule(schedule)
-                notificationGateway.postProgress(routine, schedule, now)
+                // Reschedule of a routine already under way (edited mid-run, or discovered active
+                // on reconcile) - pinNotificationMode reuses its existing pin rather than
+                // re-deciding it, and also (re)writes signature/taskCount to match.
+                val mode = pinNotificationMode(routine.id, schedule)
+                notificationGateway.postProgress(routine, schedule, now, mode = mode)
             }
 
             RoutineSchedulePhase.FINISHED -> {
                 notificationGateway.cancelRoutineNotifications(routine.id)
                 scheduleRecordDataSource.removeRecord(routine.id)
-                return
             }
         }
-
-        scheduleRecordDataSource.putRecord(
-            routine.id,
-            ScheduleRecord(
-                signature = schedule.signature,
-                taskCount = schedule.tasks.size,
-            ),
-        )
     }
 }

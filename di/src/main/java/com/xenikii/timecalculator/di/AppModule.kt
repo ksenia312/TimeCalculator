@@ -159,7 +159,6 @@ object AppModule {
             RoutineNotificationPresenter(
                 context = context,
                 notificationSettings = get(),
-                premiumRepository = get(),
             )
         }
         single<RoutineScheduleRepository> {
@@ -168,6 +167,7 @@ object AppModule {
                 notificationGateway = get(),
                 scheduleRecordDataSource = get(),
                 notificationSettings = get(),
+                premiumRepository = get(),
             )
         }
         single {
@@ -189,8 +189,6 @@ object AppModule {
             PremiumIdentityCoordinator(
                 authRepository = get(),
                 premiumRepository = get(),
-                notificationSettingsRepository = get(),
-                refreshRoutineNotifications = get(),
                 scope = get(),
             )
         }

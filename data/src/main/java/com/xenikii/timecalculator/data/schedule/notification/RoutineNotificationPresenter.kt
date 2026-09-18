@@ -13,14 +13,12 @@ import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.ScheduledTask
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
-import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import kotlin.time.Instant
 
 class RoutineNotificationPresenter(
     private val context: Context,
     private val notificationSettings: NotificationSettingsLocalDataSource,
-    private val premiumRepository: PremiumRepository,
 ) : RoutineNotificationGateway {
 
     private val notificationManager = NotificationManagerCompat.from(context)
@@ -44,6 +42,7 @@ class RoutineNotificationPresenter(
         routine: Routine,
         plan: RoutineSchedule,
         now: Instant,
+        mode: NotificationMode,
         alert: Boolean,
         alertTask: ScheduledTask?,
     ) {
@@ -51,7 +50,7 @@ class RoutineNotificationPresenter(
         if (!notificationManager.areNotificationsEnabled()) return
         // START_AND_END mode is deliberately silent about individual tasks: no ongoing progress,
         // no per-task alert. postRoutineStarted()/postRoutineFinished() are its only notifications.
-        if (effectiveMode() == NotificationMode.START_AND_END) return
+        if (mode == NotificationMode.START_AND_END) return
         val task = plan.taskAt(now)
         if (task == null) {
             // No task covers `now` (routine ended or fell in a gap): never leave a stale
@@ -93,10 +92,10 @@ class RoutineNotificationPresenter(
         }
     }
 
-    override fun postRoutineStarted(routine: Routine) {
+    override fun postRoutineStarted(routine: Routine, mode: NotificationMode) {
         // In EVERY_TASK mode, postProgress() above already alerts for the first task starting -
         // this would just be a redundant second notification for the same moment.
-        if (effectiveMode() == NotificationMode.EVERY_TASK) return
+        if (mode == NotificationMode.EVERY_TASK) return
         postEvent(
             id = routineStartedNotificationId(routine.id),
             routine = routine,
@@ -219,19 +218,6 @@ class RoutineNotificationPresenter(
 
     private fun groupKey(routineId: String): String {
         return "routine_group_$routineId"
-    }
-
-    /**
-     * The stored mode is always the user's own choice, kept as-is even while they're not premium
-     * (so it comes back automatically if they resubscribe). EVERY_TASK is premium-only, so this is
-     * where that gate is actually enforced, at the moment a notification would be posted.
-     */
-    private fun effectiveMode(): NotificationMode {
-        val mode = notificationSettings.getMode()
-        if (mode == NotificationMode.EVERY_TASK && !premiumRepository.isPremiumCached()) {
-            return NotificationMode.START_AND_END
-        }
-        return mode
     }
 
     companion object {

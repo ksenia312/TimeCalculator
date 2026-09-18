@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.domain.repository
 
+import com.xenikii.timecalculator.domain.model.NotificationMode
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineAlarmKind
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
@@ -46,10 +47,11 @@ interface RoutineNotificationGateway {
         routine: Routine,
         plan: RoutineSchedule,
         now: Instant,
+        mode: NotificationMode,
         alert: Boolean = true,
         alertTask: ScheduledTask? = null,
     )
-    fun postRoutineStarted(routine: Routine)
+    fun postRoutineStarted(routine: Routine, mode: NotificationMode)
     fun postRoutineFinished(routine: Routine)
 }
 

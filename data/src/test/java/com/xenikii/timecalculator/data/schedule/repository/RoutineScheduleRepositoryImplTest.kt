@@ -11,9 +11,11 @@ import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
 import com.xenikii.timecalculator.domain.model.ScheduledTask
+import com.xenikii.timecalculator.domain.model.PremiumStatus
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
+import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
@@ -163,6 +165,7 @@ class RoutineScheduleRepositoryImplTest {
             notificationGateway = notificationGateway,
             scheduleRecordDataSource = records,
             notificationSettings = FakeNotificationSettingsLocalDataSource(),
+            premiumRepository = FakePremiumRepository(),
         )
         val routine = routine(
             scheduledAt = instant(day = 1, hour = 9),
@@ -197,6 +200,7 @@ class RoutineScheduleRepositoryImplTest {
                 notificationGateway = notificationGateway,
                 scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
                 notificationSettings = FakeNotificationSettingsLocalDataSource(),
+                premiumRepository = FakePremiumRepository(),
             )
             val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
             // Inside the routine's single 5-minute task (09:00-09:05), so the routine is ACTIVE.
@@ -226,6 +230,7 @@ class RoutineScheduleRepositoryImplTest {
                 notificationGateway = notificationGateway,
                 scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
                 notificationSettings = FakeNotificationSettingsLocalDataSource(),
+                premiumRepository = FakePremiumRepository(),
             )
             val routine = multiTaskRoutine(scheduledAt = instant(day = 1, hour = 9))
             // Task index 1 ("завтрак") is scheduled 09:05-09:10. Simulate a delayed alarm: the
@@ -259,6 +264,7 @@ class RoutineScheduleRepositoryImplTest {
                 notificationGateway = notificationGateway,
                 scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
                 notificationSettings = FakeNotificationSettingsLocalDataSource(),
+                premiumRepository = FakePremiumRepository(),
             )
             val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
             // After the routine's 09:00-09:05 window, so the routine has already finished.
@@ -364,6 +370,7 @@ class RoutineScheduleRepositoryImplTest {
             notificationGateway = RecordingNotificationGateway(),
             scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
             notificationSettings = FakeNotificationSettingsLocalDataSource(),
+            premiumRepository = FakePremiumRepository(),
         )
 
     private fun routine(
@@ -448,6 +455,7 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
         routine: Routine,
         plan: RoutineSchedule,
         now: Instant,
+        mode: NotificationMode,
         alert: Boolean,
         alertTask: ScheduledTask?,
     ) {
@@ -455,8 +463,18 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
         postProgressAlertTasks += alertTask
     }
 
-    override fun postRoutineStarted(routine: Routine) = Unit
+    override fun postRoutineStarted(routine: Routine, mode: NotificationMode) = Unit
     override fun postRoutineFinished(routine: Routine) = Unit
+}
+
+private class FakePremiumRepository(private val isPremium: Boolean = true) : PremiumRepository {
+    override fun observePremiumStatus(): Flow<PremiumStatus> = MutableStateFlow(PremiumStatus.None)
+    override fun observeIsPremium(): Flow<Boolean> = MutableStateFlow(isPremium)
+    override suspend fun isPremiumNow(): Boolean = isPremium
+    override suspend fun restore(): Boolean = false
+    override suspend fun identify(userId: String) = Unit
+    override suspend fun resetIdentity() = Unit
+    override fun isPremiumCached(): Boolean = isPremium
 }
 
 private class FakeNotificationSettingsLocalDataSource(
