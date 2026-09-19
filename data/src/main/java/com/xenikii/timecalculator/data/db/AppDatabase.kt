@@ -236,6 +236,22 @@ interface RoutinesDao {
     @Query("UPDATE routines SET pendingSync = 0 WHERE id IN (:ids)")
     suspend fun clearRoutinesPending(ids: List<String>)
 
+    /**
+     * Monotonic: never regresses an already-newer value (defends against duplicate/out-of-order
+     * alarm delivery, and against a stale remote merge - see [com.xenikii.timecalculator.data.sync.SyncEngine]).
+     * Deliberately does not touch `modifiedAt` - this is bookkeeping, not a user edit - but does
+     * flag `pendingSync` so it still rides the normal push pipeline to Supabase.
+     */
+    @Query(
+        """
+        UPDATE routines
+        SET lastTriggeredAt = MAX(COALESCE(lastTriggeredAt, 0), :timestamp),
+            pendingSync = 1
+        WHERE id = :routineId
+        """
+    )
+    suspend fun bumpLastTriggeredAt(routineId: String, timestamp: Long)
+
     @Query("DELETE FROM routines")
     suspend fun clearRoutines()
 
@@ -266,7 +282,7 @@ interface SyncDao {
         RoutineItemEntity::class,
         PendingDeletionEntity::class,
     ],
-    version = 4
+    version = 6
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

@@ -1,5 +1,6 @@
 package com.xenikii.timecalculator.domain.repository
 
+import com.xenikii.timecalculator.domain.model.PremiumEntitlementState
 import com.xenikii.timecalculator.domain.model.PremiumStatus
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +16,13 @@ interface PremiumRepository {
     /** Derived from [observePremiumStatus]; kept for gates that only care about the boolean. */
     fun observeIsPremium(): Flow<Boolean>
     suspend fun isPremiumNow(): Boolean
+
+    /**
+     * Like [observePremiumStatus] but starts with [PremiumEntitlementState.UNKNOWN] until
+     * RevenueCat has actually answered at least once, for callers that must not treat "not
+     * loaded yet" as "expired" (e.g. auto-pausing routines on expiry).
+     */
+    fun observeEntitlementState(): Flow<PremiumEntitlementState>
 
     /**
      * Last known premium state, readable synchronously (no suspend/network round-trip) for call

@@ -11,6 +11,7 @@ import com.xenikii.timecalculator.data.model.RoutineEntity
 import com.xenikii.timecalculator.data.model.RoutineItemEntity
 import com.xenikii.timecalculator.data.sync.SyncTrigger
 import com.xenikii.timecalculator.domain.model.Routine
+import com.xenikii.timecalculator.domain.model.RoutinePauseState
 import com.xenikii.timecalculator.domain.model.RoutineRequest
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.shared.extensions.withZeroSeconds
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import kotlin.time.Instant
 
 class RoutineRepositoryImpl(
     private val appDatabase: AppDatabase,
@@ -64,7 +66,8 @@ class RoutineRepositoryImpl(
             recurrenceUnit = request.recurrence.unit.name,
             recurrenceInterval = request.recurrence.interval.coerceAtLeast(1),
             recurrenceDaysOfWeek = request.recurrence.daysOfWeek.encodeRecurrenceDaysOfWeek(),
-            modifiedAt = System.currentTimeMillis()
+            modifiedAt = System.currentTimeMillis(),
+            pauseState = RoutinePauseState.ACTIVE.name,
         )
 
         withContext(Dispatchers.IO) {
@@ -86,7 +89,9 @@ class RoutineRepositoryImpl(
             recurrenceUnit = normalized.recurrence.unit.name,
             recurrenceInterval = normalized.recurrence.interval.coerceAtLeast(1),
             recurrenceDaysOfWeek = normalized.recurrence.daysOfWeek.encodeRecurrenceDaysOfWeek(),
-            modifiedAt = System.currentTimeMillis()
+            modifiedAt = System.currentTimeMillis(),
+            pauseState = normalized.state.name,
+            lastTriggeredAt = normalized.lastTriggeredAt,
         )
 
         val itemsEntities = normalized.data.mapIndexed { index, link ->
@@ -101,6 +106,21 @@ class RoutineRepositoryImpl(
 
         withContext(Dispatchers.IO) {
             routinesDao.updateRoutineWithItems(routineEntity, itemsEntities)
+            syncTrigger.emit()
+        }
+    }
+
+    override suspend fun setPauseState(routineId: String, state: RoutinePauseState) {
+        val current = withContext(Dispatchers.IO) {
+            routinesDao.getRoutinePopulated(routineId)?.toDomain()
+        } ?: return
+        if (current.state == state) return
+        updateRoutine(current.copy(state = state))
+    }
+
+    override suspend fun recordRoutineTriggered(routineId: String, triggeredAt: Instant) {
+        withContext(Dispatchers.IO) {
+            routinesDao.bumpLastTriggeredAt(routineId, triggeredAt.toEpochMilliseconds())
             syncTrigger.emit()
         }
     }

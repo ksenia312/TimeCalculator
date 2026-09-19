@@ -12,6 +12,8 @@ import com.xenikii.timecalculator.data.db.AppDatabase
 import com.xenikii.timecalculator.data.db.MIGRATION_1_2
 import com.xenikii.timecalculator.data.db.MIGRATION_2_3
 import com.xenikii.timecalculator.data.db.MIGRATION_3_4
+import com.xenikii.timecalculator.data.db.MIGRATION_4_5
+import com.xenikii.timecalculator.data.db.MIGRATION_5_6
 import com.xenikii.timecalculator.data.notification.settings.NotificationSettingsRepositoryImpl
 import com.xenikii.timecalculator.data.notification.settings.PreferencesNotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.data.notification.settings.SystemNotificationPermissionChecker
@@ -20,8 +22,10 @@ import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboard
 import com.xenikii.timecalculator.data.premium.GrantedPremiumDataSource
 import com.xenikii.timecalculator.data.premium.PremiumIdentityCoordinator
 import com.xenikii.timecalculator.data.premium.PremiumRepositoryImpl
+import com.xenikii.timecalculator.data.premium.RoutineAutoPauseCoordinator
 import com.xenikii.timecalculator.data.repository.RoutineRepositoryImpl
 import com.xenikii.timecalculator.data.repository.TasksRepositoryImpl
+import com.xenikii.timecalculator.data.schedule.ReconcileRoutinePauseForPremiumUseCase
 import com.xenikii.timecalculator.data.schedule.RefreshRoutineNotificationsUseCase
 import com.xenikii.timecalculator.data.schedule.alarm.AlarmManagerRoutineAlarmGateway
 import com.xenikii.timecalculator.data.schedule.notification.RoutineNotificationPresenter
@@ -76,7 +80,7 @@ object AppModule {
             context = context,
             klass = AppDatabase::class.java,
             name = "morning-db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build()
 
         single { appDatabase.tasksDao() }
         single { appDatabase.routinesDao() }
@@ -168,6 +172,7 @@ object AppModule {
                 scheduleRecordDataSource = get(),
                 notificationSettings = get(),
                 premiumRepository = get(),
+                routineRepository = get(),
             )
         }
         single {
@@ -189,6 +194,15 @@ object AppModule {
             PremiumIdentityCoordinator(
                 authRepository = get(),
                 premiumRepository = get(),
+                scope = get(),
+            )
+        }
+        single { ReconcileRoutinePauseForPremiumUseCase() }
+        single {
+            RoutineAutoPauseCoordinator(
+                routineRepository = get(),
+                premiumRepository = get(),
+                reconcilePauseState = get(),
                 scope = get(),
             )
         }

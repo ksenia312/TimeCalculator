@@ -36,6 +36,23 @@ data class RoutineRecurrence(
     val daysOfWeek: Set<Int> = emptySet(),
 )
 
+/**
+ * Whether a routine is scheduled at all. This is state, not a limits system: pausing never
+ * changes the free-tier routine count check at creation time.
+ */
+@Serializable
+enum class RoutinePauseState {
+    /** Scheduled normally. */
+    ACTIVE,
+
+    /** User paused it themselves (e.g. a vacation) - never touched automatically. */
+    PAUSED_MANUAL,
+
+    /** Auto-paused because premium expired with more than the free limit active - resumed
+     * automatically the moment premium becomes active again. */
+    PAUSED_AUTO,
+}
+
 @Serializable
 data class Routine(
     val id: String,
@@ -47,7 +64,13 @@ data class Routine(
     val modifiedAt: Long,
     val color: String,
     val data: List<RoutineLink>,
-)
+    val state: RoutinePauseState = RoutinePauseState.ACTIVE,
+    /** Epoch millis of the last time this routine's alarm actually fired; null if never. */
+    val lastTriggeredAt: Long? = null,
+) {
+    val isActive: Boolean get() = state == RoutinePauseState.ACTIVE
+    val isPaused: Boolean get() = !isActive
+}
 
 @Serializable
 data class RoutineRequest(

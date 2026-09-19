@@ -13,6 +13,7 @@ import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDat
 import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
+import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
 import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
 import kotlinx.coroutines.sync.Mutex
@@ -25,6 +26,7 @@ class RoutineScheduleRepositoryImpl(
     private val scheduleRecordDataSource: ScheduleRecordDataSource,
     private val notificationSettings: NotificationSettingsLocalDataSource,
     private val premiumRepository: PremiumRepository,
+    private val routineRepository: RoutineRepository,
 ) : RoutineScheduleRepository {
 
     private val mutex = Mutex()
@@ -42,7 +44,12 @@ class RoutineScheduleRepositoryImpl(
         forceReschedule: Boolean,
     ) {
         mutex.withLock {
-            val currentIds = routines.map { it.id }.toSet()
+            // A routine not ACTIVE (paused, manually or automatically) is treated exactly like a
+            // deleted one for scheduling purposes: it drops out of currentIds below, so its
+            // already-armed alarms/notifications get cancelled by the same cleanup that handles
+            // actual deletions, instead of only skipping future (re)scheduling.
+            val activeRoutines = routines.filter { it.isActive }
+            val currentIds = activeRoutines.map { it.id }.toSet()
             val removedIds = scheduleRecordDataSource.trackedRoutineIds().minus(currentIds)
             removedIds.forEach { routineId ->
                 val record = scheduleRecordDataSource.getRecord(routineId)
@@ -51,7 +58,7 @@ class RoutineScheduleRepositoryImpl(
                 scheduleRecordDataSource.removeRecord(routineId)
             }
 
-            routines.forEach { routine ->
+            activeRoutines.forEach { routine ->
                 rescheduleRoutine(routine = routine, now = now, forceReschedule = forceReschedule)
             }
         }
@@ -62,7 +69,7 @@ class RoutineScheduleRepositoryImpl(
         now: Instant,
     ) {
         mutex.withLock {
-            routines.forEach { routine ->
+            routines.filter { it.isActive }.forEach { routine ->
                 syncNotification(routine, computeSchedule(routine, now), now)
             }
         }
@@ -115,6 +122,16 @@ class RoutineScheduleRepositoryImpl(
         now: Instant,
     ) {
         mutex.withLock {
+            // Paused routines never get alarms armed (see reconcile above), but a race between a
+            // pause taking effect and an already in-flight alarm is possible - drop it rather
+            // than reschedule/notify for a routine that shouldn't be running.
+            if (!routine.isActive) return@withLock
+
+            // The routine's alarm is genuinely firing right now, for any kind (START/TASK/END) -
+            // this is the one and only place that counts as "the routine triggered". Bookkeeping,
+            // not a user edit: see recordRoutineTriggered's contract.
+            routineRepository.recordRoutineTriggered(routine.id, now)
+
             val schedule = if (
                 kind == RoutineAlarmKind.END &&
                 routine.recurrence.unit != RoutineRecurrenceUnit.NONE

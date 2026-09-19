@@ -3,6 +3,7 @@ package com.xenikii.timecalculator.data.mapper
 import com.xenikii.timecalculator.data.db.RoutinePopulated
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineLink
+import com.xenikii.timecalculator.domain.model.RoutinePauseState
 import com.xenikii.timecalculator.domain.model.RoutineRecurrence
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
@@ -37,6 +38,9 @@ fun RoutinePopulated.toDomain(): Routine {
     val recurrenceUnit = runCatching {
         RoutineRecurrenceUnit.valueOf(routine.recurrenceUnit)
     }.getOrDefault(RoutineRecurrenceUnit.NONE)
+    val pauseState = runCatching {
+        RoutinePauseState.valueOf(routine.pauseState)
+    }.getOrDefault(RoutinePauseState.ACTIVE)
 
     return Routine(
         id = routine.id,
@@ -50,6 +54,8 @@ fun RoutinePopulated.toDomain(): Routine {
             daysOfWeek = routine.recurrenceDaysOfWeek.decodeRecurrenceDaysOfWeek(),
         ),
         modifiedAt = routine.modifiedAt,
-        data = fullLinks
+        data = fullLinks,
+        state = pauseState,
+        lastTriggeredAt = routine.lastTriggeredAt,
     )
 }

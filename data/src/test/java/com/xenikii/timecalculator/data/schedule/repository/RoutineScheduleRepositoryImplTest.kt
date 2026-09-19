@@ -11,16 +11,21 @@ import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.model.ScheduleRecord
 import com.xenikii.timecalculator.domain.model.ScheduledTask
+import com.xenikii.timecalculator.domain.model.PremiumEntitlementState
 import com.xenikii.timecalculator.domain.model.PremiumStatus
+import com.xenikii.timecalculator.domain.model.RoutinePauseState
+import com.xenikii.timecalculator.domain.model.RoutineRequest
 import com.xenikii.timecalculator.domain.model.SubData
 import com.xenikii.timecalculator.domain.model.Task
 import com.xenikii.timecalculator.domain.repository.NotificationSettingsLocalDataSource
 import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
+import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -166,6 +171,7 @@ class RoutineScheduleRepositoryImplTest {
             scheduleRecordDataSource = records,
             notificationSettings = FakeNotificationSettingsLocalDataSource(),
             premiumRepository = FakePremiumRepository(),
+            routineRepository = FakeRoutineRepository(),
         )
         val routine = routine(
             scheduledAt = instant(day = 1, hour = 9),
@@ -201,6 +207,7 @@ class RoutineScheduleRepositoryImplTest {
                 scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
                 notificationSettings = FakeNotificationSettingsLocalDataSource(),
                 premiumRepository = FakePremiumRepository(),
+                routineRepository = FakeRoutineRepository(),
             )
             val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
             // Inside the routine's single 5-minute task (09:00-09:05), so the routine is ACTIVE.
@@ -231,6 +238,7 @@ class RoutineScheduleRepositoryImplTest {
                 scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
                 notificationSettings = FakeNotificationSettingsLocalDataSource(),
                 premiumRepository = FakePremiumRepository(),
+                routineRepository = FakeRoutineRepository(),
             )
             val routine = multiTaskRoutine(scheduledAt = instant(day = 1, hour = 9))
             // Task index 1 ("завтрак") is scheduled 09:05-09:10. Simulate a delayed alarm: the
@@ -265,6 +273,7 @@ class RoutineScheduleRepositoryImplTest {
                 scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
                 notificationSettings = FakeNotificationSettingsLocalDataSource(),
                 premiumRepository = FakePremiumRepository(),
+                routineRepository = FakeRoutineRepository(),
             )
             val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
             // After the routine's 09:00-09:05 window, so the routine has already finished.
@@ -280,6 +289,64 @@ class RoutineScheduleRepositoryImplTest {
 
             assertTrue(notificationGateway.cancelProgressCalls.contains(routine.id))
             assertTrue(notificationGateway.postProgressCalls.isEmpty())
+        }
+    }
+
+    @Test
+    fun `firing alarm records lastTriggeredAt without touching modifiedAt`() {
+        runBlocking {
+            val routineRepository = FakeRoutineRepository()
+            val repository = RoutineScheduleRepositoryImpl(
+                alarmGateway = RecordingAlarmGateway(),
+                notificationGateway = RecordingNotificationGateway(),
+                scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
+                notificationSettings = FakeNotificationSettingsLocalDataSource(),
+                premiumRepository = FakePremiumRepository(),
+                routineRepository = routineRepository,
+            )
+            val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
+            val now = instant(day = 1, hour = 9)
+
+            repository.handleAlarm(
+                routine = routine,
+                kind = RoutineAlarmKind.START,
+                boundaryIndex = -1,
+                triggerAtMillis = now.toEpochMilliseconds(),
+                now = now,
+            )
+
+            assertEquals(listOf(routine.id to now), routineRepository.triggeredCalls)
+            // The stamp must never go through updateRoutine (which bumps modifiedAt) - it's
+            // bookkeeping, not a user edit, and must not be treated as one for sync purposes.
+            assertTrue(routineRepository.updateRoutineCalls.isEmpty())
+        }
+    }
+
+    @Test
+    fun `paused routine never records a trigger even if an alarm still fires for it`() {
+        runBlocking {
+            val routineRepository = FakeRoutineRepository()
+            val repository = RoutineScheduleRepositoryImpl(
+                alarmGateway = RecordingAlarmGateway(),
+                notificationGateway = RecordingNotificationGateway(),
+                scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
+                notificationSettings = FakeNotificationSettingsLocalDataSource(),
+                premiumRepository = FakePremiumRepository(),
+                routineRepository = routineRepository,
+            )
+            val routine = routine(scheduledAt = instant(day = 1, hour = 9), anchor = RoutineScheduleAnchor.START)
+                .copy(state = RoutinePauseState.PAUSED_MANUAL)
+            val now = instant(day = 1, hour = 9)
+
+            repository.handleAlarm(
+                routine = routine,
+                kind = RoutineAlarmKind.START,
+                boundaryIndex = -1,
+                triggerAtMillis = now.toEpochMilliseconds(),
+                now = now,
+            )
+
+            assertTrue(routineRepository.triggeredCalls.isEmpty())
         }
     }
 
@@ -371,6 +438,7 @@ class RoutineScheduleRepositoryImplTest {
             scheduleRecordDataSource = InMemoryScheduleRecordDataSource(),
             notificationSettings = FakeNotificationSettingsLocalDataSource(),
             premiumRepository = FakePremiumRepository(),
+            routineRepository = FakeRoutineRepository(),
         )
 
     private fun routine(
@@ -470,6 +538,8 @@ private class RecordingNotificationGateway : RoutineNotificationGateway {
 private class FakePremiumRepository(private val isPremium: Boolean = true) : PremiumRepository {
     override fun observePremiumStatus(): Flow<PremiumStatus> = MutableStateFlow(PremiumStatus.None)
     override fun observeIsPremium(): Flow<Boolean> = MutableStateFlow(isPremium)
+    override fun observeEntitlementState(): Flow<PremiumEntitlementState> =
+        MutableStateFlow(if (isPremium) PremiumEntitlementState.ACTIVE else PremiumEntitlementState.EXPIRED)
     override suspend fun isPremiumNow(): Boolean = isPremium
     override suspend fun restore(): Boolean = false
     override suspend fun identify(userId: String) = Unit
@@ -493,6 +563,27 @@ private class FakeNotificationSettingsLocalDataSource(
     override fun getMode(): NotificationMode = modeState.value
     override suspend fun setMode(mode: NotificationMode) {
         modeState.value = mode
+    }
+}
+
+private class FakeRoutineRepository : RoutineRepository {
+    val triggeredCalls = mutableListOf<Pair<String, Instant>>()
+    val updateRoutineCalls = mutableListOf<Routine>()
+    private val state = MutableStateFlow<List<Routine>>(emptyList())
+
+    override val routinesFlow: Flow<List<Routine>> = state
+    override suspend fun getRoutines(): List<Routine> = state.value
+    override suspend fun getRoutineCount(): Int = state.value.size
+    override fun getRoutineFlow(id: String): Flow<Routine?> = state.map { list -> list.firstOrNull { it.id == id } }
+    override suspend fun addRoutine(request: RoutineRequest): String = throw UnsupportedOperationException()
+    override suspend fun updateRoutine(routine: Routine) {
+        updateRoutineCalls += routine
+    }
+
+    override suspend fun deleteRoutine(id: String) = Unit
+    override suspend fun setPauseState(routineId: String, state: RoutinePauseState) = Unit
+    override suspend fun recordRoutineTriggered(routineId: String, triggeredAt: Instant) {
+        triggeredCalls += routineId to triggeredAt
     }
 }
 

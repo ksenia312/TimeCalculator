@@ -35,6 +35,12 @@ data class RemoteRoutine(
     @EncodeDefault
     @SerialName("recurrence_days_of_week") val recurrenceDaysOfWeek: List<Int> = emptyList(),
     val items: List<RemoteRoutineItem> = emptyList(),
+    // Missing/null (older server rows, or a server migration not yet applied) is treated as
+    // ACTIVE by the default here.
+    @EncodeDefault
+    @SerialName("pause_state") val pauseState: String = "ACTIVE",
+    // Missing/null -> never fired on any device yet, per the nullable-default local field.
+    @SerialName("last_triggered_at") val lastTriggeredAt: Long? = null,
     @SerialName("modified_at") val modifiedAt: Long,
     val deleted: Boolean = false,
     @SerialName("updated_at") val updatedAt: String? = null,

@@ -16,4 +16,6 @@ data class RoutineEntity(
     val recurrenceDaysOfWeek: String = "",
     val modifiedAt: Long,
     val pendingSync: Boolean = true,
+    val pauseState: String = "ACTIVE",
+    val lastTriggeredAt: Long? = null,
 )

@@ -10,6 +10,7 @@ import com.xenikii.timecalculator.app.schedule.RoutineExactAlarmPermissionReques
 import com.xenikii.timecalculator.app.schedule.RoutineScheduleInitializer
 import com.xenikii.timecalculator.apphost.BuildConfig
 import com.xenikii.timecalculator.data.premium.PremiumIdentityCoordinator
+import com.xenikii.timecalculator.data.premium.RoutineAutoPauseCoordinator
 import com.xenikii.timecalculator.data.schedule.RefreshRoutineNotificationsUseCase
 import com.xenikii.timecalculator.data.sync.SyncManager
 import com.xenikii.timecalculator.di.AppModule
@@ -46,6 +47,7 @@ class TimeCalculatorApplication : Application() {
         }
         koinApplication.koin.get<SyncManager>().start()
         koinApplication.koin.get<PremiumIdentityCoordinator>().start()
+        koinApplication.koin.get<RoutineAutoPauseCoordinator>().start()
         RoutineScheduleInitializer(
             context = applicationContext,
             routineRepository = koinApplication.koin.get<RoutineRepository>(),

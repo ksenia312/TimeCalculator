@@ -193,7 +193,19 @@ class SyncEngine(
 
             localRoutine == null || remoteRoutine.modifiedAt > localModifiedAt -> {
                 val (routineEntity, routineItemEntities) = remoteRoutine.toEntities()
-                routinesDao.updateRoutineWithItems(routineEntity, routineItemEntities)
+                val merged = mergedLastTriggeredAt(localRoutine?.lastTriggeredAt, remoteRoutine.lastTriggeredAt)
+                routinesDao.updateRoutineWithItems(routineEntity.copy(lastTriggeredAt = merged), routineItemEntities)
+            }
+
+            // The row lost the whole-row LWW check (local is newer/equal), so nothing else about
+            // it is applied - but lastTriggeredAt is a monotonic fact independent of who wins
+            // that check, and must never be lost just because an unrelated edit race elsewhere
+            // happens to have a newer modifiedAt.
+            else -> {
+                val merged = mergedLastTriggeredAt(localRoutine?.lastTriggeredAt, remoteRoutine.lastTriggeredAt)
+                if (localRoutine != null && merged != localRoutine.lastTriggeredAt) {
+                    routinesDao.bumpLastTriggeredAt(remoteRoutine.id, merged ?: return)
+                }
             }
         }
     }
@@ -210,4 +222,16 @@ class SyncEngine(
         const val TYPE_TASK = "task"
         const val TYPE_ROUTINE = "routine"
     }
+}
+
+/**
+ * `lastTriggeredAt` is a monotonic fact, not subject to the whole-row last-write-wins check: the
+ * more recent of two values always wins, regardless of which side's `modifiedAt` is newer, so a
+ * firing recorded on one device can never be lost or regressed by an unrelated edit race on
+ * another.
+ */
+internal fun mergedLastTriggeredAt(local: Long?, remote: Long?): Long? = when {
+    local == null -> remote
+    remote == null -> local
+    else -> maxOf(local, remote)
 }

@@ -46,6 +46,8 @@ fun RoutinePopulated.toRemote(): RemoteRoutine =
         recurrenceUnit = routine.recurrenceUnit,
         recurrenceInterval = routine.recurrenceInterval,
         recurrenceDaysOfWeek = routine.recurrenceDaysOfWeek.decodeRecurrenceDaysOfWeek().sorted(),
+        pauseState = routine.pauseState,
+        lastTriggeredAt = routine.lastTriggeredAt,
         items = items.sortedBy { it.item.orderIndex }.map { item ->
             RemoteRoutineItem(
                 id = item.item.id,
@@ -70,6 +72,8 @@ fun RemoteRoutine.toEntities(): Pair<RoutineEntity, List<RoutineItemEntity>> =
         recurrenceDaysOfWeek = recurrenceDaysOfWeek.sanitizeRecurrenceDaysOfWeek().encodeRecurrenceDaysOfWeek(),
         modifiedAt = modifiedAt,
         pendingSync = false,
+        pauseState = pauseState,
+        lastTriggeredAt = lastTriggeredAt,
     ) to items.map { item ->
         RoutineItemEntity(
             id = item.id,

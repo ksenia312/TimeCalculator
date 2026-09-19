@@ -14,6 +14,7 @@ import com.revenuecat.purchases.awaitRestore
 import com.revenuecat.purchases.interfaces.LogInCallback
 import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
+import com.xenikii.timecalculator.domain.model.PremiumEntitlementState
 import com.xenikii.timecalculator.domain.model.PremiumPeriodType
 import com.xenikii.timecalculator.domain.model.PremiumSource
 import com.xenikii.timecalculator.domain.model.PremiumStatus
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -111,6 +113,12 @@ class PremiumRepositoryImpl(
 
     override fun observeIsPremium(): Flow<Boolean> =
         sharedPremiumStatusFlow.map { it.isActive }.distinctUntilChanged()
+
+    override fun observeEntitlementState(): Flow<PremiumEntitlementState> =
+        sharedPremiumStatusFlow
+            .map { status -> if (status.isActive) PremiumEntitlementState.ACTIVE else PremiumEntitlementState.EXPIRED }
+            .onStart { emit(PremiumEntitlementState.UNKNOWN) }
+            .distinctUntilChanged()
 
     override suspend fun isPremiumNow(): Boolean {
         val customerInfo = runCatching { awaitCustomerInfo() }.getOrNull()
