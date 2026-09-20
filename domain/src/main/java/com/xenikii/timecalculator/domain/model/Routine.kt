@@ -39,17 +39,28 @@ data class RoutineRecurrence(
 /**
  * Whether a routine is scheduled at all. This is state, not a limits system: pausing never
  * changes the free-tier routine count check at creation time.
+ *
+ * No pause state is ever woken automatically - not [PAUSED_MANUAL], not [PAUSED_AUTO]. The only
+ * automatic transition in this app is the one-way premium-expiry safety net: too many
+ * non-manually-paused routines active at once -> the excess get set to [PAUSED_AUTO]. Everything
+ * asleep stays asleep until the user wakes it themselves (from the routine list). The
+ * [PAUSED_AUTO]/[PAUSED_MANUAL] distinction exists ONLY so
+ * `ReconcileRoutinePauseForPremiumUseCase.hasUnresolvedLimitConflict` can tell a deliberate
+ * vacation apart from a system-imposed limit, and so the routine-limit-resolution screen doesn't
+ * pop up for someone who paused routines themselves. Do not read [PAUSED_AUTO] as "auto-managed
+ * in both directions" and reintroduce auto-waking - that behavior was deliberately removed.
  */
 @Serializable
 enum class RoutinePauseState {
     /** Scheduled normally. */
     ACTIVE,
 
-    /** User paused it themselves (e.g. a vacation) - never touched automatically. */
+    /** User paused it themselves (e.g. a vacation). Never touched automatically, in either
+     * direction. */
     PAUSED_MANUAL,
 
-    /** Auto-paused because premium expired with more than the free limit active - resumed
-     * automatically the moment premium becomes active again. */
+    /** Auto-paused by the premium-expiry safety net because more than the free limit was
+     * active. Never woken automatically - the user wakes it themselves. */
     PAUSED_AUTO,
 }
 

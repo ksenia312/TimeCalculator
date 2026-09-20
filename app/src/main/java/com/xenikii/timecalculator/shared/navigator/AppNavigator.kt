@@ -40,6 +40,7 @@ import com.xenikii.timecalculator.features.paywall.ui.PaywallScreen
 import com.xenikii.timecalculator.features.routine.ui.RoutineScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.CreateRoutineScreen
 import com.xenikii.timecalculator.features.routineeditor.ui.EditRoutineScreen
+import com.xenikii.timecalculator.features.routinelimitresolution.ui.RoutineLimitResolutionScreen
 import com.xenikii.timecalculator.features.taskeditor.ui.CreateTaskScreen
 import com.xenikii.timecalculator.features.taskeditor.ui.EditTaskScreen
 import com.xenikii.timecalculator.shared.animation.LocalCardAnimatedContentScope
@@ -102,6 +103,21 @@ fun AppNavigator(
                     }
                     PendingDeepLink.route.value = null
                 }
+            }
+        }
+
+        LaunchedEffect(mainState.authViewState, mainState.routineLimitResolutionNeeded) {
+            val isShowing = backStack.lastOrNull() == AppRoute.RoutineLimitResolution
+            when {
+                mainState.authViewState == AuthViewState.LoggedIn &&
+                    mainState.routineLimitResolutionNeeded &&
+                    !isShowing -> backStack.add(AppRoute.RoutineLimitResolution)
+
+                // The conflict resolved on its own while the screen was open (saved, or premium
+                // came back) - pop it. AppNavigator owns both the push and the pop so there's a
+                // single source of truth for this screen's presence, instead of the screen itself
+                // also carrying a navigate-away signal.
+                !mainState.routineLimitResolutionNeeded && isShowing -> backStack.removeLastOrNull()
             }
         }
 
@@ -189,6 +205,12 @@ fun AppNavigator(
                                 AppRoute.ManageSubscription -> {
                                     NavEntry(key = key) {
                                         ManageSubscriptionScreen()
+                                    }
+                                }
+
+                                AppRoute.RoutineLimitResolution -> {
+                                    NavEntry(key = key) {
+                                        RoutineLimitResolutionScreen()
                                     }
                                 }
 

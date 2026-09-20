@@ -6,10 +6,14 @@ import com.xenikii.timecalculator.domain.model.RoutinePauseState
 import com.xenikii.timecalculator.domain.repository.FREE_ROUTINE_LIMIT
 
 /**
- * Pure policy for reconciling routine pause state against premium entitlement - no Android/Room
- * dependency, so [RoutineAutoPauseCoordinator][com.xenikii.timecalculator.data.premium.RoutineAutoPauseCoordinator]
- * (stage 1) and any later worker/receiver/preselection-screen reusing this same rule apply
- * identical behavior.
+ * Pure policy for the premium-expiry safety net - no Android/Room dependency, so
+ * [RoutineAutoPauseCoordinator][com.xenikii.timecalculator.data.premium.RoutineAutoPauseCoordinator]
+ * and the routine-limit-resolution screen apply identical rules.
+ *
+ * This is one-way: it only ever pauses excess routines on confirmed expiry. Nothing here (or
+ * anywhere else in the app) wakes a paused routine automatically, regardless of pause reason -
+ * see [RoutinePauseState]'s doc for why that was deliberately removed. Waking a routine is a
+ * user action (routine list).
  *
  * Which routines stay active is decided by [activePriorityComparator], keyed on
  * [Routine.lastTriggeredAt] - the real "this routine's alarm actually fired" signal, stamped in
@@ -23,15 +27,7 @@ class ReconcileRoutinePauseForPremiumUseCase {
 
     operator fun invoke(routines: List<Routine>, entitlement: PremiumEntitlementState): List<Routine> =
         when (entitlement) {
-            PremiumEntitlementState.UNKNOWN -> routines
-
-            PremiumEntitlementState.ACTIVE -> routines.map { routine ->
-                if (routine.state == RoutinePauseState.PAUSED_AUTO) {
-                    routine.copy(state = RoutinePauseState.ACTIVE)
-                } else {
-                    routine
-                }
-            }
+            PremiumEntitlementState.UNKNOWN, PremiumEntitlementState.ACTIVE -> routines
 
             PremiumEntitlementState.EXPIRED -> {
                 val active = routines.filter { it.state == RoutinePauseState.ACTIVE }
@@ -67,5 +63,16 @@ class ReconcileRoutinePauseForPremiumUseCase {
          */
         val activePriorityComparator: Comparator<Routine> =
             compareByDescending<Routine> { it.lastTriggeredAt ?: Long.MIN_VALUE }.thenBy { it.id }
+
+        /**
+         * True when premium is confirmed expired and the user has more routines than the free
+         * limit that aren't a deliberate manual pause - i.e. there's something for the
+         * routine-limit-resolution screen to resolve. This is the ONLY place that counts the
+         * "too many routines" conflict; navigation/ViewModel code must call this rather than
+         * inspecting pause states itself.
+         */
+        fun hasUnresolvedLimitConflict(routines: List<Routine>, entitlement: PremiumEntitlementState): Boolean =
+            entitlement == PremiumEntitlementState.EXPIRED &&
+                routines.count { it.state != RoutinePauseState.PAUSED_MANUAL } > FREE_ROUTINE_LIMIT
     }
 }

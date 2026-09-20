@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":feature:taskslist"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:routinelimitresolution"))
     implementation(libs.koin.core)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.lifecycle.runtime)

@@ -12,17 +12,20 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Auto-pauses/resumes routines as premium entitlement changes. Reacts to both
+ * Pauses excess routines as premium expires - the one-way safety net. Reacts to both
  * [RoutineRepository.routinesFlow] and [PremiumRepository.observeEntitlementState], so a premium
  * change is picked up the moment RevenueCat's listener delivers it rather than waiting on the
  * periodic reconcile watchdog. Started once from Application.onCreate, before any
  * boot/watchdog-triggered component can run in the same process, mirroring
  * [PremiumIdentityCoordinator].
  *
- * Skips [PremiumEntitlementState.UNKNOWN] entirely - auto-pause must only ever act on a confirmed
- * expiry, never on RevenueCat not having answered yet. Writes are diffed against the current
- * routines so a no-op reconciliation (the common case) never touches Room, which also keeps this
- * from looping against its own writes through routinesFlow.
+ * Only acts on [PremiumEntitlementState.EXPIRED] - never [PremiumEntitlementState.UNKNOWN] (must
+ * not act before RevenueCat has actually answered), and never
+ * [PremiumEntitlementState.ACTIVE] either: nothing in this app wakes a paused routine
+ * automatically (see [RoutinePauseState][com.xenikii.timecalculator.domain.model.RoutinePauseState]'s
+ * doc), so premium returning is simply not this coordinator's concern. Writes are diffed against
+ * the current routines so a no-op reconciliation (the common case) never touches Room, which also
+ * keeps this from looping against its own writes through routinesFlow.
  */
 class RoutineAutoPauseCoordinator(
     private val routineRepository: RoutineRepository,
@@ -44,7 +47,7 @@ class RoutineAutoPauseCoordinator(
             ) { routines, entitlement -> routines to entitlement }
                 .debounce(DEBOUNCE_MILLIS.milliseconds)
                 .collect { (routines, entitlement) ->
-                    if (entitlement == PremiumEntitlementState.UNKNOWN) return@collect
+                    if (entitlement != PremiumEntitlementState.EXPIRED) return@collect
 
                     val reconciled = reconcilePauseState(routines, entitlement)
                     routines.zip(reconciled).forEach { (before, after) ->

@@ -192,6 +192,14 @@
     <string name="paywall_manage_subscription_error">Couldn\'t open subscription management</string>
     <string name="content_desc_premium_locked">Requires Premium</string>
 
+    <string name="routine_limit_resolution_title">Choose active routines</string>
+    <string name="routine_limit_resolution_subtitle">Choose which routines to keep active on the free plan (up to %1$d).</string>
+    <string name="routine_limit_resolution_selected_count">Selected %1$d of %2$d</string>
+    <string name="routine_limit_resolution_never_triggered">Not run yet</string>
+    <string name="routine_limit_resolution_last_triggered">Last run: %1$s</string>
+    <string name="routine_limit_resolution_buy_premium_action">Get Premium</string>
+    <string name="routine_limit_resolution_save_error">Couldn\'t save. Please try again.</string>
+
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>
     <string name="routine_not_found">Routine not found</string>

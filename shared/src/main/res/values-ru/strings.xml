@@ -193,6 +193,14 @@
     <string name="paywall_manage_subscription_error">Не удалось открыть управление подпиской</string>
     <string name="content_desc_premium_locked">Требуется Премиум</string>
 
+    <string name="routine_limit_resolution_title">Выберите активные рутины</string>
+    <string name="routine_limit_resolution_subtitle">Выбери, какие рутины оставить активными на бесплатном плане (до %1$d).</string>
+    <string name="routine_limit_resolution_selected_count">Выбрано %1$d из %2$d</string>
+    <string name="routine_limit_resolution_never_triggered">Ещё не запускалась</string>
+    <string name="routine_limit_resolution_last_triggered">Последний запуск: %1$s</string>
+    <string name="routine_limit_resolution_buy_premium_action">Купить Премиум</string>
+    <string name="routine_limit_resolution_save_error">Не удалось сохранить. Попробуйте ещё раз.</string>
+
     <string name="top_bar_error">Ошибка</string>
     <string name="top_bar_loading">Загрузка</string>
     <string name="routine_not_found">Рутина не найдена</string>

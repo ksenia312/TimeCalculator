@@ -6,7 +6,15 @@ import com.xenikii.timecalculator.domain.repository.SyncStateProvider
 import org.koin.dsl.module
 
 val appModule = module {
-    single { MainViewModel(authRepository = get(), onboardingRepository = get()) }
+    single {
+        MainViewModel(
+            authRepository = get(),
+            onboardingRepository = get(),
+            routineRepository = get(),
+            premiumRepository = get(),
+            routineLimitResolutionRepository = get(),
+        )
+    }
     single { SyncManager(syncEngine = get(), syncTrigger = get(), authRepository = get()) }
     single<SyncStateProvider> { get<SyncManager>() }
 }

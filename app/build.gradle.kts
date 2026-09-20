@@ -125,6 +125,7 @@ dependencies {
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:paywall"))
+    implementation(project(":feature:routinelimitresolution"))
     implementation(libs.revenuecat.purchases)
 
     testImplementation(libs.junit)

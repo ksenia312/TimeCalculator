@@ -108,7 +108,7 @@ class ReconcileRoutinePauseForPremiumUseCaseTest {
     }
 
     @Test
-    fun `active premium wakes only auto-paused routines`() {
+    fun `active premium never changes anything - nothing wakes automatically`() {
         val routines = listOf(
             routine(id = "r1", lastTriggeredAt = 1L, state = RoutinePauseState.PAUSED_AUTO),
             routine(id = "r2", lastTriggeredAt = 2L, state = RoutinePauseState.PAUSED_MANUAL),
@@ -117,9 +117,7 @@ class ReconcileRoutinePauseForPremiumUseCaseTest {
 
         val result = useCase(routines, PremiumEntitlementState.ACTIVE)
 
-        assertEquals(RoutinePauseState.ACTIVE, result.single { it.id == "r1" }.state)
-        assertEquals(RoutinePauseState.PAUSED_MANUAL, result.single { it.id == "r2" }.state)
-        assertEquals(RoutinePauseState.ACTIVE, result.single { it.id == "r3" }.state)
+        assertEquals(routines, result)
     }
 
     @Test

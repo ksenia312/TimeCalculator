@@ -54,6 +54,11 @@ sealed interface AppRoute : NavKey {
     /** Trampoline: opens the store's native subscription-management screen, then pops itself. */
     @Serializable
     data object ManageSubscription : AppRoute
+
+    /** Shown when premium is confirmed expired and the user has more non-manually-paused
+     * routines than the free-tier limit, so they can choose which stay active. */
+    @Serializable
+    data object RoutineLimitResolution : AppRoute
 }
 
 /** Destinations that must not be shown without an active session. */

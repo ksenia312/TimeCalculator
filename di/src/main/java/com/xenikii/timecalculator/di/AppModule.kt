@@ -20,6 +20,7 @@ import com.xenikii.timecalculator.data.notification.settings.SystemNotificationP
 import com.xenikii.timecalculator.data.onboarding.OnboardingRepositoryImpl
 import com.xenikii.timecalculator.data.onboarding.persistence.PreferencesOnboardingLocalDataSource
 import com.xenikii.timecalculator.data.premium.GrantedPremiumDataSource
+import com.xenikii.timecalculator.data.premium.PreferencesRoutineLimitResolutionRepository
 import com.xenikii.timecalculator.data.premium.PremiumIdentityCoordinator
 import com.xenikii.timecalculator.data.premium.PremiumRepositoryImpl
 import com.xenikii.timecalculator.data.premium.RoutineAutoPauseCoordinator
@@ -44,6 +45,7 @@ import com.xenikii.timecalculator.domain.repository.OnboardingLocalDataSource
 import com.xenikii.timecalculator.domain.repository.OnboardingRepository
 import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineAlarmGateway
+import com.xenikii.timecalculator.domain.repository.RoutineLimitResolutionRepository
 import com.xenikii.timecalculator.domain.repository.RoutineNotificationGateway
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
@@ -58,6 +60,7 @@ import com.xenikii.timecalculator.features.onboarding.presentation.OnboardingVie
 import com.xenikii.timecalculator.features.routine.presentation.RoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRoutineViewModel
 import com.xenikii.timecalculator.features.routineeditor.presentation.EditRoutineViewModel
+import com.xenikii.timecalculator.features.routinelimitresolution.presentation.RoutineLimitResolutionViewModel
 import com.xenikii.timecalculator.features.routineslist.presentation.RoutinesListViewModel
 import com.xenikii.timecalculator.features.settings.presentation.SettingsViewModel
 import com.xenikii.timecalculator.features.taskeditor.presentation.CreateTaskViewModel
@@ -204,6 +207,15 @@ object AppModule {
                 premiumRepository = get(),
                 reconcilePauseState = get(),
                 scope = get(),
+            )
+        }
+        single<RoutineLimitResolutionRepository> { PreferencesRoutineLimitResolutionRepository(context) }
+        factory {
+            RoutineLimitResolutionViewModel(
+                routineRepository = get(),
+                premiumRepository = get(),
+                routineLimitResolutionRepository = get(),
+                priorityComparator = ReconcileRoutinePauseForPremiumUseCase.activePriorityComparator,
             )
         }
 
