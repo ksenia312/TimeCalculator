@@ -186,9 +186,21 @@ class PremiumRepositoryImpl(
         grantedPremiumFlow.value = GrantedPremiumInfo.None
     }
 
+    // On failure, deliberately leaves grantedPremiumFlow untouched instead of defaulting to
+    // GrantedPremiumInfo.None - a fetch error (network blip, token-refresh race, RLS not ready
+    // yet) is not the same signal as "checked, no grant", and collapsing it to None was
+    // downgrading legitimately-granted users to EXPIRED until the next app restart. Mirrors
+    // customerInfoFlow's onError, which likewise never emits a negative result on failure.
     private suspend fun refreshGrantedPremium() {
-        grantedPremiumFlow.value =
-            runCatching { grantedPremiumDataSource.fetchGrantedPremium() }.getOrDefault(GrantedPremiumInfo.None)
+        runCatching { grantedPremiumDataSource.fetchGrantedPremium() }
+            .onSuccess { grantedPremiumFlow.value = it }
+            .onFailure { error ->
+                android.util.Log.d(
+                    "PREMIUM_DEBUG",
+                    "refreshGrantedPremium: fetch failed, keeping last known grantedPremiumFlow=${grantedPremiumFlow.value} @ ${System.currentTimeMillis()}",
+                    error,
+                )
+            }
     }
 
     private fun toPremiumStatus(customerInfo: CustomerInfo?, grantedInfo: GrantedPremiumInfo): PremiumStatus {
