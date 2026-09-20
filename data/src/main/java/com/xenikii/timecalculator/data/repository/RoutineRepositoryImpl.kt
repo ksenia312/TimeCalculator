@@ -78,6 +78,35 @@ class RoutineRepositoryImpl(
     }
 
     override suspend fun updateRoutine(routine: Routine) {
+        withContext(Dispatchers.IO) {
+            writeRoutineEntity(routine)
+            syncTrigger.emit()
+        }
+    }
+
+    override suspend fun setPauseState(routineId: String, state: RoutinePauseState) {
+        val current = withContext(Dispatchers.IO) {
+            routinesDao.getRoutinePopulated(routineId)?.toDomain()
+        } ?: return
+        if (current.state == state) return
+        updateRoutine(current.copy(state = state))
+    }
+
+    override suspend fun setPauseStates(changes: Map<String, RoutinePauseState>) {
+        if (changes.isEmpty()) return
+        withContext(Dispatchers.IO) {
+            appDatabase.withTransaction {
+                changes.forEach { (routineId, state) ->
+                    val current = routinesDao.getRoutinePopulated(routineId)?.toDomain() ?: return@forEach
+                    if (current.state == state) return@forEach
+                    writeRoutineEntity(current.copy(state = state))
+                }
+            }
+            syncTrigger.emit()
+        }
+    }
+
+    private suspend fun writeRoutineEntity(routine: Routine) {
         val normalized = routine.copy(scheduledAt = routine.scheduledAt.withZeroSeconds())
 
         val routineEntity = RoutineEntity(
@@ -104,18 +133,7 @@ class RoutineRepositoryImpl(
             )
         }
 
-        withContext(Dispatchers.IO) {
-            routinesDao.updateRoutineWithItems(routineEntity, itemsEntities)
-            syncTrigger.emit()
-        }
-    }
-
-    override suspend fun setPauseState(routineId: String, state: RoutinePauseState) {
-        val current = withContext(Dispatchers.IO) {
-            routinesDao.getRoutinePopulated(routineId)?.toDomain()
-        } ?: return
-        if (current.state == state) return
-        updateRoutine(current.copy(state = state))
+        routinesDao.updateRoutineWithItems(routineEntity, itemsEntities)
     }
 
     override suspend fun recordRoutineTriggered(routineId: String, triggeredAt: Instant) {

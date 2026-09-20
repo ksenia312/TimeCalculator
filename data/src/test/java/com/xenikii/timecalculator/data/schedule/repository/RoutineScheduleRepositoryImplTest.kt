@@ -582,6 +582,7 @@ private class FakeRoutineRepository : RoutineRepository {
 
     override suspend fun deleteRoutine(id: String) = Unit
     override suspend fun setPauseState(routineId: String, state: RoutinePauseState) = Unit
+    override suspend fun setPauseStates(changes: Map<String, RoutinePauseState>) = Unit
     override suspend fun recordRoutineTriggered(routineId: String, triggeredAt: Instant) {
         triggeredCalls += routineId to triggeredAt
     }

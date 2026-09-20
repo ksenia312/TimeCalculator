@@ -55,23 +55,24 @@ class RoutineAutoPauseCoordinator(
                     }
 
                     val reconciled = reconcilePauseState(routines, entitlement)
-                    var pausedAny = false
-                    routines.zip(reconciled).forEach { (before, after) ->
-                        if (before.state != after.state) {
-                            pausedAny = true
-                            android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: setPauseState(${after.id}, ${after.state}) - was ${before.state} @ ${System.currentTimeMillis()}")
-                            routineRepository.setPauseState(after.id, after.state)
+                    val changes = routines.zip(reconciled)
+                        .filter { (before, after) -> before.state != after.state }
+                        .associate { (before, after) ->
+                            android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: ${after.id} ${before.state} -> ${after.state} @ ${System.currentTimeMillis()}")
+                            after.id to after.state
                         }
-                    }
-                    if (!pausedAny) {
+                    if (changes.isEmpty()) {
                         android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: EXPIRED but nothing to reconcile (already <= limit) @ ${System.currentTimeMillis()}")
+                    } else {
+                        routineRepository.setPauseStates(changes)
                     }
                 }
         }
     }
 
     private companion object {
-        // Defense-in-depth only; the real guard is ActivateRoutineUseCase's limit check.
-        const val DEBOUNCE_MILLIS = 1_000L
+        // Coalesces rapid-fire startup emissions (entitlement + routinesFlow both settling); not
+        // a correctness guard - setPauseStates is atomic per reconciliation regardless.
+        const val DEBOUNCE_MILLIS = 300L
     }
 }

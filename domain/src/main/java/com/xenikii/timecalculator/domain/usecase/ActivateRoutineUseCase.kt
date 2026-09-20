@@ -49,7 +49,9 @@ class ActivateRoutineUseCase(
         }
 
         // EXPIRED or still unresolved - both enforce the limit rather than silently letting it slide.
-        val routines = routineRepository.routinesFlow.first()
+        // getRoutines() (not routinesFlow.first()): a direct query, immune to the shared Flow's
+        // replay cache lagging behind a write that just landed a moment ago.
+        val routines = routineRepository.getRoutines()
         val activeCount = routines.count { it.state == RoutinePauseState.ACTIVE }
         android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): activeCount=$activeCount (limit=$FREE_ROUTINE_LIMIT), active=${routines.filter { it.state == RoutinePauseState.ACTIVE }.map { it.id }} @ ${System.currentTimeMillis()}")
         if (activeCount >= FREE_ROUTINE_LIMIT) {

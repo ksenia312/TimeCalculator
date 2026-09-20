@@ -24,6 +24,10 @@ interface RoutineRepository {
     /** No-op if `routineId` is already in `state`. */
     suspend fun setPauseState(routineId: String, state: RoutinePauseState)
 
+    /** Same as [setPauseState] for multiple routines, in one transaction - so observers of
+     * [routinesFlow] never see an intermediate state mid-batch. */
+    suspend fun setPauseStates(changes: Map<String, RoutinePauseState>)
+
     /**
      * Records that `routineId`'s alarm actually fired at [triggeredAt]. This is bookkeeping, not
      * a user edit: it must never be treated the same as [updateRoutine] for conflict-resolution

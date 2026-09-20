@@ -6,23 +6,20 @@ import com.xenikii.timecalculator.data.schedule.ReconcileRoutinePauseForPremiumU
 import com.xenikii.timecalculator.domain.model.AuthSessionState
 import com.xenikii.timecalculator.domain.model.PremiumEntitlementState
 import com.xenikii.timecalculator.domain.repository.AuthRepository
+import com.xenikii.timecalculator.domain.repository.FREE_ROUTINE_LIMIT
 import com.xenikii.timecalculator.domain.repository.OnboardingRepository
 import com.xenikii.timecalculator.domain.repository.PremiumRepository
 import com.xenikii.timecalculator.domain.repository.RoutineLimitResolutionRepository
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(FlowPreview::class)
 class MainViewModel(
     authRepository: AuthRepository,
     private val onboardingRepository: OnboardingRepository,
@@ -44,12 +41,13 @@ class MainViewModel(
             premiumRepository.observeEntitlementState(),
             routineLimitResolutionRepository.observeAcknowledged(),
         ) { routines, entitlement, acknowledged ->
-            val nonManualCount = routines.count { it.state != com.xenikii.timecalculator.domain.model.RoutinePauseState.PAUSED_MANUAL }
             val exists = ReconcileRoutinePauseForPremiumUseCase.hasUnresolvedLimitConflict(routines, entitlement)
-            android.util.Log.d("LIMIT_DEBUG", "MainViewModel: entitlement=$entitlement, nonManualCount=$nonManualCount, acknowledged=$acknowledged, exists=$exists @ ${System.currentTimeMillis()}")
-            RoutineLimitConflict(exists = exists, acknowledged = acknowledged)
+            // Reset trigger, deliberately NOT nonManualCount: total routine count and entitlement
+            // only change on real create/delete/premium events, never on a pause-state shuffle.
+            val resolvedDurably = entitlement == PremiumEntitlementState.ACTIVE || routines.size <= FREE_ROUTINE_LIMIT
+            android.util.Log.d("LIMIT_DEBUG", "MainViewModel: entitlement=$entitlement, totalRoutines=${routines.size}, acknowledged=$acknowledged, exists=$exists, resolvedDurably=$resolvedDurably @ ${System.currentTimeMillis()}")
+            RoutineLimitConflict(exists = exists, resolvedDurably = resolvedDurably, acknowledged = acknowledged)
         }
-            .debounce(CONFLICT_DEBOUNCE_MILLIS.milliseconds)
             .distinctUntilChanged()
             .onEach(::handleRoutineLimitConflict)
             .launchIn(viewModelScope)
@@ -70,8 +68,7 @@ class MainViewModel(
     }
 
     private suspend fun handleRoutineLimitConflict(conflict: RoutineLimitConflict) {
-        // Resets the acknowledgment so a later recurrence prompts fresh again.
-        if (!conflict.exists && conflict.acknowledged) {
+        if (conflict.resolvedDurably && conflict.acknowledged) {
             routineLimitResolutionRepository.setAcknowledged(false)
         }
 
@@ -82,10 +79,7 @@ class MainViewModel(
 
     private data class RoutineLimitConflict(
         val exists: Boolean,
+        val resolvedDurably: Boolean,
         val acknowledged: Boolean,
     )
-
-    private companion object {
-        const val CONFLICT_DEBOUNCE_MILLIS = 500L
-    }
 }
