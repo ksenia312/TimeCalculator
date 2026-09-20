@@ -47,9 +47,10 @@ class RoutineAutoPauseCoordinator(
             ) { routines, entitlement -> routines to entitlement }
                 .debounce(DEBOUNCE_MILLIS.milliseconds)
                 .collect { (routines, entitlement) ->
-                    android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: received entitlement=$entitlement, activeCount=${routines.count { it.state == com.xenikii.timecalculator.domain.model.RoutinePauseState.ACTIVE }}, totalRoutines=${routines.size} @ ${System.currentTimeMillis()}")
+                    val activeIds = routines.filter { it.state == com.xenikii.timecalculator.domain.model.RoutinePauseState.ACTIVE }.map { it.id }
+                    android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: fired, entitlement=$entitlement, activeCount=${activeIds.size}, active=$activeIds @ ${System.currentTimeMillis()}")
                     if (entitlement != PremiumEntitlementState.EXPIRED) {
-                        android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: entitlement != EXPIRED, no-op @ ${System.currentTimeMillis()}")
+                        android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: entitlement != EXPIRED, no-op @ ${System.currentTimeMillis()}")
                         return@collect
                     }
 
@@ -58,18 +59,19 @@ class RoutineAutoPauseCoordinator(
                     routines.zip(reconciled).forEach { (before, after) ->
                         if (before.state != after.state) {
                             pausedAny = true
-                            android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: setPauseState(${after.id}, ${after.state}) - was ${before.state} @ ${System.currentTimeMillis()}")
+                            android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: setPauseState(${after.id}, ${after.state}) - was ${before.state} @ ${System.currentTimeMillis()}")
                             routineRepository.setPauseState(after.id, after.state)
                         }
                     }
                     if (!pausedAny) {
-                        android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: EXPIRED but nothing to reconcile (already <= limit) @ ${System.currentTimeMillis()}")
+                        android.util.Log.d("LIMIT_DEBUG", "RoutineAutoPauseCoordinator: EXPIRED but nothing to reconcile (already <= limit) @ ${System.currentTimeMillis()}")
                     }
                 }
         }
     }
 
     private companion object {
-        const val DEBOUNCE_MILLIS = 300L
+        // Defense-in-depth only; the real guard is ActivateRoutineUseCase's limit check.
+        const val DEBOUNCE_MILLIS = 1_000L
     }
 }

@@ -8,6 +8,7 @@ import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * The single place that enforces the free-tier "[FREE_ROUTINE_LIMIT] routines active at once"
@@ -34,17 +35,30 @@ class ActivateRoutineUseCase(
     private val mutex = Mutex()
 
     suspend operator fun invoke(routineId: String): Result = mutex.withLock {
-        // Only a confirmed EXPIRED enforces the limit - UNKNOWN must not be treated as free.
-        if (premiumRepository.observeEntitlementState().first() != PremiumEntitlementState.EXPIRED) {
+        android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): acquired lock @ ${System.currentTimeMillis()}")
+        // .first() alone would always grab onStart's UNKNOWN placeholder - wait for a real answer.
+        val entitlement = withTimeoutOrNull(ENTITLEMENT_RESOLUTION_TIMEOUT_MILLIS) {
+            premiumRepository.observeEntitlementState().first { it != PremiumEntitlementState.UNKNOWN }
+        }
+        android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): entitlement=$entitlement @ ${System.currentTimeMillis()}")
+
+        if (entitlement == PremiumEntitlementState.ACTIVE) {
             routineRepository.setPauseState(routineId, RoutinePauseState.ACTIVE)
+            android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): ACTIVE -> ACTIVATED unconditionally @ ${System.currentTimeMillis()}")
             return@withLock Result.ACTIVATED
         }
 
-        val activeCount = routineRepository.routinesFlow.first().count { it.state == RoutinePauseState.ACTIVE }
+        // EXPIRED or still unresolved - both enforce the limit rather than silently letting it slide.
+        val routines = routineRepository.routinesFlow.first()
+        val activeCount = routines.count { it.state == RoutinePauseState.ACTIVE }
+        android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): activeCount=$activeCount (limit=$FREE_ROUTINE_LIMIT), active=${routines.filter { it.state == RoutinePauseState.ACTIVE }.map { it.id }} @ ${System.currentTimeMillis()}")
         if (activeCount >= FREE_ROUTINE_LIMIT) {
+            android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): BLOCKED_BY_LIMIT, no write @ ${System.currentTimeMillis()}")
             Result.BLOCKED_BY_LIMIT
         } else {
+            android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): under limit, calling setPauseState(ACTIVE) @ ${System.currentTimeMillis()}")
             routineRepository.setPauseState(routineId, RoutinePauseState.ACTIVE)
+            android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): setPauseState(ACTIVE) done -> ACTIVATED @ ${System.currentTimeMillis()}")
             Result.ACTIVATED
         }
     }
@@ -52,5 +66,9 @@ class ActivateRoutineUseCase(
     enum class Result {
         ACTIVATED,
         BLOCKED_BY_LIMIT,
+    }
+
+    private companion object {
+        const val ENTITLEMENT_RESOLUTION_TIMEOUT_MILLIS = 4_000L
     }
 }
