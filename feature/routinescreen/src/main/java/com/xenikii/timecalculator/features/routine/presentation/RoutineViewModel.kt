@@ -4,17 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.model.Routine
 import com.xenikii.timecalculator.domain.model.RoutineLink
+import com.xenikii.timecalculator.domain.model.RoutinePauseState
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.Task
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
 import com.xenikii.timecalculator.domain.repository.TasksRepository
+import com.xenikii.timecalculator.domain.usecase.ActivateRoutineUseCase
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 import com.xenikii.timecalculator.shared.viewitem.toViewItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.map
@@ -30,6 +33,7 @@ class RoutineViewModel(
     val tasksRepository: TasksRepository,
     val routineRepository: RoutineRepository,
     private val routineScheduleRepository: RoutineScheduleRepository,
+    private val activateRoutine: ActivateRoutineUseCase,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<RoutineViewState>(RoutineViewState.Loading)
@@ -37,9 +41,11 @@ class RoutineViewModel(
     private val _now = MutableStateFlow(Instant.fromEpochMilliseconds(System.currentTimeMillis()))
     private val _draftOrder = MutableStateFlow<List<String>?>(null)
     private val _selectedIds = MutableStateFlow<Set<String>>(emptySet())
+    private val _showLimitDialog = MutableStateFlow(false)
 
     val viewState: StateFlow<RoutineViewState> = _viewState
     val selectedIds: StateFlow<Set<String>> = _selectedIds
+    val showLimitDialog: StateFlow<Boolean> = _showLimitDialog.asStateFlow()
     val tasks: StateFlow<List<Task>> = combine(
         _tasksState, _viewState
     ) { tasks, _ ->
@@ -161,6 +167,23 @@ class RoutineViewModel(
         viewModelScope.launch {
             routineRepository.updateRoutine(routine)
         }
+    }
+
+    /** Pausing is unconditional; activating goes through [ActivateRoutineUseCase] and may be
+     * blocked by the free-tier limit. */
+    fun togglePause() {
+        val routine = (_viewState.value as? RoutineViewState.Success)?.routine ?: return
+        viewModelScope.launch {
+            if (routine.isActive) {
+                routineRepository.setPauseState(routine.id, RoutinePauseState.PAUSED_MANUAL)
+            } else if (activateRoutine(routine.id) == ActivateRoutineUseCase.Result.BLOCKED_BY_LIMIT) {
+                _showLimitDialog.value = true
+            }
+        }
+    }
+
+    fun dismissLimitDialog() {
+        _showLimitDialog.value = false
     }
 
     fun loadRoutine() {

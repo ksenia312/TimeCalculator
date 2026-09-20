@@ -267,6 +267,7 @@ object AppModule {
                 tasksRepository = get(),
                 routineRepository = get(),
                 routineScheduleRepository = get(),
+                activateRoutine = get(),
             )
         }
 

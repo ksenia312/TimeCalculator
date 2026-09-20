@@ -16,6 +16,7 @@ fun RoutineTopBar(
     selectedCount: Int = 0,
     onExitEditMode: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
+    onTogglePause: () -> Unit = {},
 ) {
     when (viewState) {
         is RoutineViewState.Success -> {
@@ -28,6 +29,7 @@ fun RoutineTopBar(
                 selectedCount = selectedCount,
                 onExitEditMode = onExitEditMode,
                 onDeleteClick = onDeleteClick,
+                onTogglePause = onTogglePause,
             )
         }
 

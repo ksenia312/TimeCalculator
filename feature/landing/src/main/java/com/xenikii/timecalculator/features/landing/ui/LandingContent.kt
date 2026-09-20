@@ -24,7 +24,6 @@ import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewConstants
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
-import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,16 +49,27 @@ fun LandingContent(
             is LandingState.Success -> {
                 val routineStates = viewState.routineStates
                 if (routineStates.isEmpty()) {
-                    HomeEmptyState(
-                        title = stringResource(R.string.landing_empty_title),
-                        subtitle = stringResource(R.string.landing_empty_subtitle),
-                        actionText = stringResource(R.string.landing_empty_action),
-                        onActionClick = onCreateRoutineClick,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .bottomIndent()
-                            .padding(horizontal = 24.dp),
-                    )
+                    if (viewState.hasAnyRoutines) {
+                        HomeEmptyState(
+                            title = stringResource(R.string.landing_all_paused_title),
+                            subtitle = stringResource(R.string.landing_all_paused_subtitle),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .bottomIndent()
+                                .padding(horizontal = 24.dp),
+                        )
+                    } else {
+                        HomeEmptyState(
+                            title = stringResource(R.string.landing_empty_title),
+                            subtitle = stringResource(R.string.landing_empty_subtitle),
+                            actionText = stringResource(R.string.landing_empty_action),
+                            onActionClick = onCreateRoutineClick,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .bottomIndent()
+                                .padding(horizontal = 24.dp),
+                        )
+                    }
                 } else {
                     LandingCardPager(
                         modifier = Modifier.fillMaxSize(),
@@ -84,7 +94,6 @@ fun LandingContent(
 @PreviewAll
 @Composable
 fun LandingContentPreview() {
-    val now = Instant.fromEpochMilliseconds(System.currentTimeMillis())
     PreviewTheme {
         LandingContent(
             viewState = LandingState.Success(

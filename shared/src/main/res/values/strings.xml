@@ -120,6 +120,8 @@
     <string name="landing_empty_title">No routines yet</string>
     <string name="landing_empty_subtitle">This app helps you plan your day with routines. A routine is made of tasks: first create a routine, then add tasks to it.</string>
     <string name="landing_empty_action">Create first routine</string>
+    <string name="landing_all_paused_title">All routines are paused</string>
+    <string name="landing_all_paused_subtitle">Resume a routine from the routines list to see it here.</string>
     <string name="landing_show_all_tasks">Show all tasks</string>
     <string name="landing_hide_all_tasks">Hide tasks</string>
     <string name="routines_empty_title">No routines yet</string>

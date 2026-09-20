@@ -20,8 +20,10 @@ import com.xenikii.timecalculator.R
 fun RoutineCardStatusRow(
     isOngoing: Boolean,
     isCompleted: Boolean,
+    isPaused: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    val alpha = if (isPaused) 0.6f else 0.92f
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -29,17 +31,21 @@ fun RoutineCardStatusRow(
         Box(
             Modifier
                 .size(12.dp)
-                .background(routineStatusDotColor(isOngoing), CircleShape)
+                .background(
+                    if (isPaused) MaterialTheme.colorScheme.surface.copy(alpha = alpha) else routineStatusDotColor(isOngoing),
+                    CircleShape,
+                )
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = when {
+                isPaused -> stringResource(R.string.routine_paused_label)
                 isOngoing -> stringResource(R.string.routine_status_running)
                 isCompleted -> stringResource(R.string.routine_status_completed)
                 else -> stringResource(R.string.routine_status_planned)
             },
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+            color = MaterialTheme.colorScheme.surface.copy(alpha = alpha)
         )
     }
 }

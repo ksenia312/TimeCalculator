@@ -26,6 +26,7 @@ fun RoutineCard(
     viewItem: RoutineCardViewItem,
     modifier: Modifier = Modifier,
     collapseFraction: Float = 0f,
+    isPaused: Boolean = false,
 ) {
     val fraction = collapseFraction.coerceIn(0f, 1f)
     Row(
@@ -58,7 +59,8 @@ fun RoutineCard(
 
                 RoutineCardStatusRow(
                     isOngoing = viewItem.isOngoing,
-                    isCompleted = viewItem.isCompleted
+                    isCompleted = viewItem.isCompleted,
+                    isPaused = isPaused,
                 )
             }
         }

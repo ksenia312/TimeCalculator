@@ -121,6 +121,8 @@
     <string name="landing_empty_title">Ещё нет рутин</string>
     <string name="landing_empty_subtitle">Приложение помогает планировать день с помощью рутин. Рутина состоит из задач: сначала создайте рутину, затем добавьте в неё задачи.</string>
     <string name="landing_empty_action">Создать первую рутину</string>
+    <string name="landing_all_paused_title">Все рутины на паузе</string>
+    <string name="landing_all_paused_subtitle">Возобновите рутину в списке рутин, чтобы увидеть её здесь.</string>
     <string name="landing_show_all_tasks">Показать все задачи</string>
     <string name="landing_hide_all_tasks">Скрыть задачи</string>
     <string name="routines_empty_title">Ещё нет рутин</string>

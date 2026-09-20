@@ -39,6 +39,7 @@ fun RoutineSuccessTopAppBar(
     selectedCount: Int = 0,
     onExitEditMode: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
+    onTogglePause: () -> Unit = {},
 ) {
     val fraction = collapseFraction.coerceIn(0f, 1f)
     val viewItem = viewState.cardViewItem
@@ -81,6 +82,8 @@ fun RoutineSuccessTopAppBar(
             selectedCount = selectedCount,
             onExitEditMode = onExitEditMode,
             onDeleteClick = onDeleteClick,
+            isPaused = viewState.routine.isPaused,
+            onTogglePause = onTogglePause,
         )
 
         Spacer(Modifier.height(lerp(16.dp, 0.dp, fraction)))
@@ -88,6 +91,7 @@ fun RoutineSuccessTopAppBar(
         RoutineCard(
             viewItem = viewItem,
             collapseFraction = fraction,
+            isPaused = viewState.routine.isPaused,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .graphicsLayer { alpha = 1f - cardFade }

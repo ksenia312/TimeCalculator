@@ -51,7 +51,7 @@ class LandingViewModel(
         now: Instant,
     ): LandingState {
         val sorted = sortRoutines(
-            routines = routines,
+            routines = routines.filter { it.isActive },
             now = now,
             routineScheduleRepository = routineScheduleRepository,
             sort = RoutinesListState.Sort(
@@ -86,7 +86,7 @@ class LandingViewModel(
                 hasHiddenTasks = taskDistribution.hasHiddenTasks,
             )
         }
-        return LandingState.Success(routineStates = routineStates)
+        return LandingState.Success(routineStates = routineStates, hasAnyRoutines = routines.isNotEmpty())
     }
 }
 
@@ -126,7 +126,8 @@ private fun distributeTasks(
 sealed interface LandingState {
     object Loading : LandingState
     data class Success(
-        val routineStates: List<LandingRoutineState>
+        val routineStates: List<LandingRoutineState>,
+        val hasAnyRoutines: Boolean = routineStates.isNotEmpty(),
     ) : LandingState
 
     data class Error(val error: String) : LandingState

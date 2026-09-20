@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PauseCircleFilled
+import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +51,8 @@ fun RoutineCollapsingHeader(
     selectedCount: Int = 0,
     onExitEditMode: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
+    isPaused: Boolean = false,
+    onTogglePause: () -> Unit = {},
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -97,6 +101,15 @@ fun RoutineCollapsingHeader(
                 }
             }
         } else {
+            IconButton(onClick = onTogglePause) {
+                Icon(
+                    imageVector = if (isPaused) Icons.Default.PlayCircleFilled else Icons.Default.PauseCircleFilled,
+                    contentDescription = stringResource(
+                        if (isPaused) R.string.content_desc_resume_routine else R.string.content_desc_pause_routine
+                    ),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     imageVector = Icons.Default.Settings,

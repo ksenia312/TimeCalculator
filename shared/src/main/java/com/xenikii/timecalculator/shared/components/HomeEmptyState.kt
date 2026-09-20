@@ -20,9 +20,9 @@ import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
 fun HomeEmptyState(
     title: String,
     subtitle: String,
-    actionText: String,
-    onActionClick: () -> Unit,
     modifier: Modifier = Modifier,
+    actionText: String? = null,
+    onActionClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -40,14 +40,16 @@ fun HomeEmptyState(
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
-        Spacer(Modifier.height(24.dp))
-        AppButtonExpressive(
-            onClick = onActionClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = LocalCustomColorScheme.current.accent,
-            )
-        ) {
-            Text(text = actionText)
+        if (actionText != null) {
+            Spacer(Modifier.height(24.dp))
+            AppButtonExpressive(
+                onClick = onActionClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LocalCustomColorScheme.current.accent,
+                )
+            ) {
+                Text(text = actionText)
+            }
         }
     }
 }

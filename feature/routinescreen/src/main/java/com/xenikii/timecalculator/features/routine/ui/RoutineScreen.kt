@@ -27,6 +27,7 @@ import com.xenikii.timecalculator.features.routine.ui.components.TasksListView
 import com.xenikii.timecalculator.features.routine.ui.components.topbar.RoutineTopBar
 import com.xenikii.timecalculator.features.routine.ui.components.topbar.rememberCollapsingTopBarState
 import com.xenikii.timecalculator.shared.components.AppScaffold
+import com.xenikii.timecalculator.shared.components.RoutineActiveLimitDialog
 import com.xenikii.timecalculator.shared.navigator.AppRoute
 import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -43,6 +44,7 @@ fun RoutineScreen(
     val navigator = LocalNavigator.current
     val viewState by viewModel.viewState.collectAsState()
     val selectedIds by viewModel.selectedIds.collectAsState()
+    val showLimitDialog by viewModel.showLimitDialog.collectAsState()
     val isEditMode = selectedIds.isNotEmpty()
     val collapsingTopBar = rememberCollapsingTopBarState()
     var showDeleteConfirmation by remember { mutableStateOf(false) }
@@ -68,6 +70,7 @@ fun RoutineScreen(
                     selectedCount = selectedIds.size,
                     onExitEditMode = viewModel::clearSelection,
                     onDeleteClick = { showDeleteConfirmation = true },
+                    onTogglePause = viewModel::togglePause,
                 )
             },
             floatingActionButton = {
@@ -113,6 +116,10 @@ fun RoutineScreen(
                 onConfirm = viewModel::deleteSelected,
                 onDismiss = { showDeleteConfirmation = false },
             )
+        }
+
+        if (showLimitDialog) {
+            RoutineActiveLimitDialog(onDismiss = viewModel::dismissLimitDialog)
         }
     }
 }

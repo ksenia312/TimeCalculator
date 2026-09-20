@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * The single place that enforces the free-tier "[FREE_ROUTINE_LIMIT] routines active at once"
@@ -37,7 +38,7 @@ class ActivateRoutineUseCase(
     suspend operator fun invoke(routineId: String): Result = mutex.withLock {
         android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): acquired lock @ ${System.currentTimeMillis()}")
         // .first() alone would always grab onStart's UNKNOWN placeholder - wait for a real answer.
-        val entitlement = withTimeoutOrNull(ENTITLEMENT_RESOLUTION_TIMEOUT_MILLIS) {
+        val entitlement = withTimeoutOrNull(ENTITLEMENT_RESOLUTION_TIMEOUT_MILLIS.milliseconds) {
             premiumRepository.observeEntitlementState().first { it != PremiumEntitlementState.UNKNOWN }
         }
         android.util.Log.d("LIMIT_DEBUG", "ActivateRoutineUseCase($routineId): entitlement=$entitlement @ ${System.currentTimeMillis()}")
