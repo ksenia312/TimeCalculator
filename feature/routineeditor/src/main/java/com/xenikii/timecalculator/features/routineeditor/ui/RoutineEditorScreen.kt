@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.xenikii.timecalculator.R
+import com.xenikii.timecalculator.domain.model.RoutinePauseState
 import com.xenikii.timecalculator.domain.model.RoutineRecurrenceUnit
 import com.xenikii.timecalculator.domain.model.RoutineScheduleAnchor
 import com.xenikii.timecalculator.features.routineeditor.presentation.CreateRoutineViewModel
@@ -47,6 +48,7 @@ import com.xenikii.timecalculator.shared.components.AppButtonMedium
 import com.xenikii.timecalculator.shared.components.AppTextField
 import com.xenikii.timecalculator.shared.components.DatePickerField
 import com.xenikii.timecalculator.shared.components.DeleteConfirmationDialog
+import com.xenikii.timecalculator.shared.components.RoutineActiveLimitDialog
 import com.xenikii.timecalculator.shared.components.SmallIconButton
 import com.xenikii.timecalculator.shared.components.TimePickerField
 import com.xenikii.timecalculator.shared.features.EditorScreenScaffold
@@ -94,6 +96,8 @@ fun EditRoutineScreen(
 ) {
     val navigator = LocalNavigator.current
     val state by viewModel.viewState.collectAsStateWithLifecycle()
+    val showLimitDialog by viewModel.showLimitDialog.collectAsStateWithLifecycle()
+
     when (val viewState = state) {
         EditRoutineViewState.Loading -> CircularProgressIndicator()
         EditRoutineViewState.Error -> {
@@ -131,8 +135,14 @@ fun EditRoutineScreen(
                         navigator.navigateBack()
                     }
                 },
+                pauseState = viewState.pauseState,
+                onTogglePause = viewModel::togglePause,
             )
         }
+    }
+
+    if (showLimitDialog) {
+        RoutineActiveLimitDialog(onDismiss = viewModel::dismissLimitDialog)
     }
 }
 
@@ -145,6 +155,8 @@ private fun RoutineEditorScreen(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     onDelete: (() -> Unit)? = null,
+    pauseState: RoutinePauseState? = null,
+    onTogglePause: (() -> Unit)? = null,
 ) {
     val resolvedTitle = viewState.title
     val resolvedAnchor = viewState.anchor
@@ -204,6 +216,33 @@ private fun RoutineEditorScreen(
                         imeAction = ImeAction.Next,
                     ),
                 )
+
+                if (pauseState != null && onTogglePause != null) {
+                    Spacer(Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.extraLarge)
+                            .background(
+                                color = MaterialTheme.colorScheme.surface,
+                                shape = MaterialTheme.shapes.extraLarge
+                            )
+                            .clickable { onTogglePause() }
+                            .padding(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.routine_paused_label),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Switch(
+                            checked = pauseState != RoutinePauseState.ACTIVE,
+                            onCheckedChange = { onTogglePause() },
+                        )
+                    }
+                }
 
                 Spacer(Modifier.height(12.dp))
 

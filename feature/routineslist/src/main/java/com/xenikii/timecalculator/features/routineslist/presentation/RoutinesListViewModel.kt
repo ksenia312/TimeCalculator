@@ -3,15 +3,19 @@ package com.xenikii.timecalculator.features.routineslist.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xenikii.timecalculator.domain.model.Routine
+import com.xenikii.timecalculator.domain.model.RoutinePauseState
 import com.xenikii.timecalculator.domain.model.RoutineSchedule
 import com.xenikii.timecalculator.domain.model.RoutineSchedulePhase
 import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
+import com.xenikii.timecalculator.domain.usecase.ActivateRoutineUseCase
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 import com.xenikii.timecalculator.shared.viewitem.toViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
@@ -22,6 +26,7 @@ import kotlin.time.Instant
 class RoutinesListViewModel(
     val routineRepository: RoutineRepository,
     private val routineScheduleRepository: RoutineScheduleRepository,
+    private val activateRoutine: ActivateRoutineUseCase,
 ) : ViewModel() {
 
     val viewState: StateFlow<RoutinesListState> = routineRepository.routinesFlow
@@ -54,6 +59,9 @@ class RoutinesListViewModel(
     private val _selectedIds = MutableStateFlow<Set<String>>(emptySet())
     val selectedIds: StateFlow<Set<String>> = _selectedIds
 
+    private val _showLimitDialog = MutableStateFlow(false)
+    val showLimitDialog: StateFlow<Boolean> = _showLimitDialog.asStateFlow()
+
     fun toggleSelection(id: String) {
         _selectedIds.update { current ->
             if (id in current) current - id else current + id
@@ -71,6 +79,23 @@ class RoutinesListViewModel(
             }
             _selectedIds.value = emptySet()
         }
+    }
+
+    /** Pausing is unconditional (available to everyone); activating goes through
+     * [ActivateRoutineUseCase] and may be blocked by the free-tier limit. */
+    fun togglePause(routineId: String) {
+        viewModelScope.launch {
+            val routine = routineRepository.getRoutineFlow(routineId).first() ?: return@launch
+            if (routine.isActive) {
+                routineRepository.setPauseState(routineId, RoutinePauseState.PAUSED_MANUAL)
+            } else if (activateRoutine(routineId) == ActivateRoutineUseCase.Result.BLOCKED_BY_LIMIT) {
+                _showLimitDialog.value = true
+            }
+        }
+    }
+
+    fun dismissLimitDialog() {
+        _showLimitDialog.value = false
     }
 }
 

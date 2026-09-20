@@ -5,11 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EditCalendar
+import androidx.compose.material.icons.filled.PauseCircleFilled
+import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -43,6 +47,7 @@ fun RoutineListItem(
     isSelected: Boolean = false,
     onLongPress: () -> Unit = {},
     onToggleSelect: () -> Unit = {},
+    onTogglePause: () -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
 
@@ -52,6 +57,7 @@ fun RoutineListItem(
         isSelected = isSelected,
         onLongPress = onLongPress,
         onToggleSelect = onToggleSelect,
+        onTogglePause = onTogglePause,
         onNavigate = {
             navigator.navigateTo(AppRoute.Routine(routineId = item.routine.id))
         },
@@ -74,11 +80,13 @@ private fun RoutineListItem(
     isSelected: Boolean,
     onLongPress: () -> Unit,
     onToggleSelect: () -> Unit,
+    onTogglePause: () -> Unit,
     onNavigate: () -> Unit,
     onEditClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val routine = item.routine
+    val isPaused = routine.isPaused
     val isCompleted = item.cardViewItem.isCompleted
     val isOngoing = item.cardViewItem.isOngoing
 
@@ -100,14 +108,16 @@ private fun RoutineListItem(
     }
 
     AppListItem(
-        modifier = Modifier.combinedClickable(
-            onClick = {
-                if (isSelectionMode) onToggleSelect() else onNavigate()
-            },
-            onLongClick = {
-                if (!isSelectionMode) onLongPress() else onToggleSelect()
-            },
-        ),
+        modifier = Modifier
+            .alpha(if (isPaused) 0.6f else 1f)
+            .combinedClickable(
+                onClick = {
+                    if (isSelectionMode) onToggleSelect() else onNavigate()
+                },
+                onLongClick = {
+                    if (!isSelectionMode) onLongPress() else onToggleSelect()
+                },
+            ),
         isSelected = isSelected,
         leadingContent = {
             Box(
@@ -139,29 +149,47 @@ private fun RoutineListItem(
                 RoutineRecurrenceBadge(
                     recurrence = item.cardViewItem.recurrence,
                 )
-                Text(
-                    text = buildAnnotatedString {
-                        append(statusPrefix)
-                        append(" ")
-                        pushStyle(
-                            style = SpanStyle(fontWeight = FontWeight.Bold)
-                        )
-                        append(statusText)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = color
-                )
+                if (isPaused) {
+                    Text(
+                        text = stringResource(R.string.routine_paused_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(statusPrefix)
+                            append(" ")
+                            pushStyle(
+                                style = SpanStyle(fontWeight = FontWeight.Bold)
+                            )
+                            append(statusText)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = color
+                    )
+                }
             }
         },
         trailingContent = {
             if (!isSelectionMode) {
-                IconButton(
-                    onClick = onEditClick,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.EditCalendar,
-                        contentDescription = null,
-                    )
+                Row {
+                    IconButton(onClick = onTogglePause) {
+                        Icon(
+                            imageVector = if (isPaused) Icons.Filled.PlayCircleFilled else Icons.Filled.PauseCircleFilled,
+                            contentDescription = stringResource(
+                                if (isPaused) R.string.content_desc_resume_routine else R.string.content_desc_pause_routine
+                            ),
+                        )
+                    }
+                    IconButton(
+                        onClick = onEditClick,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.EditCalendar,
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         },
@@ -208,6 +236,7 @@ fun RoutineListItemPreview() {
             isSelected = false,
             onLongPress = {},
             onToggleSelect = {},
+            onTogglePause = {},
             onNavigate = {},
             onEditClick = {}
         )

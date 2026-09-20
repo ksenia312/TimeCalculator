@@ -200,6 +200,12 @@
     <string name="routine_limit_resolution_buy_premium_action">Get Premium</string>
     <string name="routine_limit_resolution_save_error">Couldn\'t save. Please try again.</string>
 
+    <string name="routine_active_limit_dialog_title">Free plan limit reached</string>
+    <string name="routine_active_limit_dialog_message">Up to %1$d routines can be active at once on the free plan. Pause another routine, or get Premium to activate this one too.</string>
+    <string name="routine_paused_label">Paused</string>
+    <string name="content_desc_pause_routine">Pause routine</string>
+    <string name="content_desc_resume_routine">Resume routine</string>
+
     <string name="top_bar_error">Error</string>
     <string name="top_bar_loading">Loading</string>
     <string name="routine_not_found">Routine not found</string>

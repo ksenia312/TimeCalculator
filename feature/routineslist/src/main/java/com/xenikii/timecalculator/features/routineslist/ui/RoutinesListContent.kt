@@ -27,6 +27,7 @@ fun RoutinesListContent(
     selectedIds: Set<String>,
     onLongPress: (String) -> Unit,
     onToggleSelect: (String) -> Unit,
+    onTogglePause: (String) -> Unit = {},
     onCreateRoutineClick: () -> Unit = {},
 ) {
     Box(
@@ -60,6 +61,7 @@ fun RoutinesListContent(
                         selectedIds = selectedIds,
                         onLongPress = onLongPress,
                         onToggleSelect = onToggleSelect,
+                        onTogglePause = onTogglePause,
                     )
                 }
             }

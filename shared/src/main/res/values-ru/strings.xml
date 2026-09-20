@@ -201,6 +201,12 @@
     <string name="routine_limit_resolution_buy_premium_action">Купить Премиум</string>
     <string name="routine_limit_resolution_save_error">Не удалось сохранить. Попробуйте ещё раз.</string>
 
+    <string name="routine_active_limit_dialog_title">Лимит бесплатного плана</string>
+    <string name="routine_active_limit_dialog_message">На бесплатном плане одновременно активны не больше %1$d рутин. Поставьте другую на паузу, либо оформите Премиум, чтобы включить и эту.</string>
+    <string name="routine_paused_label">На паузе</string>
+    <string name="content_desc_pause_routine">Поставить на паузу</string>
+    <string name="content_desc_resume_routine">Возобновить рутину</string>
+
     <string name="top_bar_error">Ошибка</string>
     <string name="top_bar_loading">Загрузка</string>
     <string name="routine_not_found">Рутина не найдена</string>

@@ -18,6 +18,7 @@ fun RoutinesLazyList(
     selectedIds: Set<String>,
     onLongPress: (String) -> Unit,
     onToggleSelect: (String) -> Unit,
+    onTogglePause: (String) -> Unit,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -34,6 +35,7 @@ fun RoutinesLazyList(
                     isSelected = isSelected,
                     onLongPress = { onLongPress(routineItem.routine.id) },
                     onToggleSelect = { onToggleSelect(routineItem.routine.id) },
+                    onTogglePause = { onTogglePause(routineItem.routine.id) },
                 )
             }
         }

@@ -51,6 +51,7 @@ import com.xenikii.timecalculator.domain.repository.RoutineRepository
 import com.xenikii.timecalculator.domain.repository.RoutineScheduleRepository
 import com.xenikii.timecalculator.domain.repository.ScheduleRecordDataSource
 import com.xenikii.timecalculator.domain.repository.TasksRepository
+import com.xenikii.timecalculator.domain.usecase.ActivateRoutineUseCase
 import com.xenikii.timecalculator.features.auth.presentation.LoginViewModel
 import com.xenikii.timecalculator.features.auth.presentation.RegisterViewModel
 import com.xenikii.timecalculator.features.auth.presentation.WelcomeViewModel
@@ -210,6 +211,10 @@ object AppModule {
             )
         }
         single<RoutineLimitResolutionRepository> { PreferencesRoutineLimitResolutionRepository(context) }
+        // single, not factory: its Mutex must be shared across every screen that can activate a
+        // routine, so two near-simultaneous activations from different screens still serialize
+        // against the free-tier limit check instead of each getting its own independent lock.
+        single { ActivateRoutineUseCase(routineRepository = get(), premiumRepository = get()) }
         factory {
             RoutineLimitResolutionViewModel(
                 routineRepository = get(),
@@ -246,6 +251,7 @@ object AppModule {
             RoutinesListViewModel(
                 routineRepository = get(),
                 routineScheduleRepository = get(),
+                activateRoutine = get(),
             )
         }
 
@@ -292,6 +298,7 @@ object AppModule {
             EditRoutineViewModel(
                 routineId = routineId,
                 routineRepository = get(),
+                activateRoutine = get(),
             )
         }
     }
