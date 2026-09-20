@@ -28,11 +28,14 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Instant
 
 /**
@@ -47,16 +50,14 @@ class PremiumRepositoryImpl(
     private val grantedPremiumDataSource: GrantedPremiumDataSource,
 ) : PremiumRepository {
 
-    // Manually-granted premium (gifts/founder/promo) is read once per login/session start (see
-    // identify()) and refreshed on app foreground (see init below) - it's admin-set and changes
-    // rarely, so there's no need to hit Supabase on every isPremiumNow()/observeIsPremium() check.
-    private val grantedPremiumFlow = MutableStateFlow(GrantedPremiumInfo.None)
+    // null = not checked yet (distinct from GrantedPremiumInfo.None = checked, no grant).
+    private val grantedPremiumFlow = MutableStateFlow<GrantedPremiumInfo?>(null)
 
     @Volatile
     private var lastForegroundRefreshAtMillis = 0L
 
     @Volatile
-    private var cachedIsPremium: Boolean = false
+    private var cachedEntitlementState: PremiumEntitlementState = PremiumEntitlementState.UNKNOWN
 
     init {
         // RevenueCat already refreshes CustomerInfo on its own when the app returns to the
@@ -77,14 +78,20 @@ class PremiumRepositoryImpl(
     }
 
     private val customerInfoFlow: Flow<CustomerInfo> = callbackFlow {
-        val listener = UpdatedCustomerInfoListener { info -> trySend(info) }
+        android.util.Log.d("PREMIUM_DEBUG", "customerInfoFlow: registering listener + firing getCustomerInfo() @ ${System.currentTimeMillis()}")
+        val listener = UpdatedCustomerInfoListener { info ->
+            android.util.Log.d("PREMIUM_DEBUG", "customerInfoFlow: updatedCustomerInfoListener fired, appUserID=${info.originalAppUserId}, hasPremiumEntitlement=${info.entitlements[PREMIUM_ENTITLEMENT_ID]?.isActive} @ ${System.currentTimeMillis()}")
+            trySend(info)
+        }
         Purchases.sharedInstance.updatedCustomerInfoListener = listener
         Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
+                android.util.Log.d("PREMIUM_DEBUG", "customerInfoFlow: getCustomerInfo() onReceived, appUserID=${customerInfo.originalAppUserId}, hasPremiumEntitlement=${customerInfo.entitlements[PREMIUM_ENTITLEMENT_ID]?.isActive} @ ${System.currentTimeMillis()}")
                 trySend(customerInfo)
             }
 
             override fun onError(error: PurchasesError) {
+                android.util.Log.d("PREMIUM_DEBUG", "customerInfoFlow: getCustomerInfo() onError=$error @ ${System.currentTimeMillis()}")
                 // No emission on failure; the listener above still delivers updates once
                 // customer info becomes available (e.g. once connectivity returns).
             }
@@ -92,10 +99,12 @@ class PremiumRepositoryImpl(
         awaitClose { Purchases.sharedInstance.updatedCustomerInfoListener = null }
     }
 
-    private val sharedPremiumStatusFlow: Flow<PremiumStatus> = combine(
+    // Single shared subscription to customerInfoFlow; keeps the raw nullable grant state so
+    // observeEntitlementState() can tell "not checked" apart from "checked, none".
+    private val sharedRawStateFlow: Flow<Pair<CustomerInfo, GrantedPremiumInfo?>> = combine(
         customerInfoFlow,
         grantedPremiumFlow,
-    ) { customerInfo, grantedInfo -> toPremiumStatus(customerInfo, grantedInfo) }
+    ) { customerInfo, grantedInfo -> customerInfo to grantedInfo }
         .distinctUntilChanged()
         .shareIn(
             scope = scope,
@@ -103,10 +112,14 @@ class PremiumRepositoryImpl(
             replay = 1,
         )
 
+    private val sharedPremiumStatusFlow: Flow<PremiumStatus> = sharedRawStateFlow
+        .map { (customerInfo, grantedInfo) -> toPremiumStatus(customerInfo, grantedInfo ?: GrantedPremiumInfo.None) }
+        .distinctUntilChanged()
+
     init {
-        // Keeps sharedPremiumStatusFlow permanently hot and cachedIsPremium current regardless of
-        // whether any other collector (UI, PremiumIdentityCoordinator) happens to be subscribed.
-        scope.launch { sharedPremiumStatusFlow.collect { cachedIsPremium = it.isActive } }
+        // Keeps sharedRawStateFlow permanently hot and cachedEntitlementState current regardless
+        // of whether any other collector happens to be subscribed.
+        scope.launch { observeEntitlementState().collect { cachedEntitlementState = it } }
     }
 
     override fun observePremiumStatus(): Flow<PremiumStatus> = sharedPremiumStatusFlow
@@ -115,29 +128,61 @@ class PremiumRepositoryImpl(
         sharedPremiumStatusFlow.map { it.isActive }.distinctUntilChanged()
 
     override fun observeEntitlementState(): Flow<PremiumEntitlementState> =
-        sharedPremiumStatusFlow
-            .map { status -> if (status.isActive) PremiumEntitlementState.ACTIVE else PremiumEntitlementState.EXPIRED }
-            .onStart { emit(PremiumEntitlementState.UNKNOWN) }
+        sharedRawStateFlow
+            .map { (customerInfo, grantedInfo) ->
+                val hasActiveRcEntitlement = customerInfo.entitlements[PREMIUM_ENTITLEMENT_ID]?.isActive == true
+                val state = when {
+                    hasActiveRcEntitlement -> PremiumEntitlementState.ACTIVE
+                    grantedInfo == null -> PremiumEntitlementState.UNKNOWN // grant not checked yet
+                    grantedInfo.isGranted -> PremiumEntitlementState.ACTIVE
+                    else -> PremiumEntitlementState.EXPIRED
+                }
+                android.util.Log.d("PREMIUM_DEBUG", "observeEntitlementState: hasActiveRcEntitlement=$hasActiveRcEntitlement, grantedInfo=$grantedInfo -> $state @ ${System.currentTimeMillis()}")
+                state
+            }
+            .onStart {
+                android.util.Log.d("PREMIUM_DEBUG", "observeEntitlementState: onStart emitting UNKNOWN @ ${System.currentTimeMillis()}")
+                emit(PremiumEntitlementState.UNKNOWN)
+            }
             .distinctUntilChanged()
+            .onEach { android.util.Log.d("PREMIUM_DEBUG", "observeEntitlementState: downstream sees $it @ ${System.currentTimeMillis()}") }
 
     override suspend fun isPremiumNow(): Boolean {
         val customerInfo = runCatching { awaitCustomerInfo() }.getOrNull()
-        return toPremiumStatus(customerInfo, grantedPremiumFlow.value).isActive
+        if (customerInfo?.entitlements?.get(PREMIUM_ENTITLEMENT_ID)?.isActive == true) return true
+
+        // Grant may not have been checked yet (e.g. right after cold start) - wait for a real
+        // answer instead of treating "not checked" as "no grant", bounded so a fully offline
+        // fetch (which resolves to None via refreshGrantedPremium's own getOrDefault) can't hang
+        // this forever.
+        val grantedInfo = withTimeoutOrNull(GRANT_CHECK_TIMEOUT_MILLIS) {
+            grantedPremiumFlow.first { it != null }
+        }
+        return toPremiumStatus(customerInfo, grantedInfo ?: GrantedPremiumInfo.None).isActive
     }
 
-    override fun isPremiumCached(): Boolean = cachedIsPremium
+    override fun isPremiumCached(): Boolean? = when (cachedEntitlementState) {
+        PremiumEntitlementState.ACTIVE -> true
+        PremiumEntitlementState.EXPIRED -> false
+        PremiumEntitlementState.UNKNOWN -> null
+    }
 
     override suspend fun restore(): Boolean = runCatching {
         Purchases.sharedInstance.awaitRestore().entitlements[PREMIUM_ENTITLEMENT_ID]?.isActive == true
     }.getOrDefault(false)
 
     override suspend fun identify(userId: String) {
+        android.util.Log.d("PREMIUM_DEBUG", "identify($userId): start @ ${System.currentTimeMillis()}")
         runCatching { awaitLogIn(userId) }
+        android.util.Log.d("PREMIUM_DEBUG", "identify($userId): awaitLogIn done, calling refreshGrantedPremium @ ${System.currentTimeMillis()}")
         refreshGrantedPremium()
+        android.util.Log.d("PREMIUM_DEBUG", "identify($userId): refreshGrantedPremium done, grantedPremiumFlow.value=${grantedPremiumFlow.value} @ ${System.currentTimeMillis()}")
     }
 
     override suspend fun resetIdentity() {
+        android.util.Log.d("LOGOUT_DEBUG", "PremiumRepositoryImpl.resetIdentity(): calling awaitLogOut() @ ${System.currentTimeMillis()}")
         runCatching { awaitLogOut() }
+        android.util.Log.d("LOGOUT_DEBUG", "PremiumRepositoryImpl.resetIdentity(): awaitLogOut() done @ ${System.currentTimeMillis()}")
         grantedPremiumFlow.value = GrantedPremiumInfo.None
     }
 
@@ -220,6 +265,7 @@ class PremiumRepositoryImpl(
 
     private companion object {
         const val FOREGROUND_REFRESH_THROTTLE_MILLIS = 60_000L
+        const val GRANT_CHECK_TIMEOUT_MILLIS = 5_000L
     }
 }
 

@@ -31,11 +31,13 @@ class PremiumIdentityCoordinator(
             authRepository.observeCurrentUser()
                 .distinctUntilChanged { previous, current -> previous?.id == current?.id }
                 .collect { user ->
+                    android.util.Log.d("LOGOUT_DEBUG", "PremiumIdentityCoordinator: user=${user?.id} @ ${System.currentTimeMillis()}")
                     if (user != null) {
                         premiumRepository.identify(user.id)
                     } else {
                         premiumRepository.resetIdentity()
                     }
+                    android.util.Log.d("LOGOUT_DEBUG", "PremiumIdentityCoordinator: identify/resetIdentity done for user=${user?.id} @ ${System.currentTimeMillis()}")
                 }
         }
     }

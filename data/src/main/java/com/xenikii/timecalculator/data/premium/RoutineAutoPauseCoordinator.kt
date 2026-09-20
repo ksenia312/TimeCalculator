@@ -47,13 +47,23 @@ class RoutineAutoPauseCoordinator(
             ) { routines, entitlement -> routines to entitlement }
                 .debounce(DEBOUNCE_MILLIS.milliseconds)
                 .collect { (routines, entitlement) ->
-                    if (entitlement != PremiumEntitlementState.EXPIRED) return@collect
+                    android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: received entitlement=$entitlement, activeCount=${routines.count { it.state == com.xenikii.timecalculator.domain.model.RoutinePauseState.ACTIVE }}, totalRoutines=${routines.size} @ ${System.currentTimeMillis()}")
+                    if (entitlement != PremiumEntitlementState.EXPIRED) {
+                        android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: entitlement != EXPIRED, no-op @ ${System.currentTimeMillis()}")
+                        return@collect
+                    }
 
                     val reconciled = reconcilePauseState(routines, entitlement)
+                    var pausedAny = false
                     routines.zip(reconciled).forEach { (before, after) ->
                         if (before.state != after.state) {
+                            pausedAny = true
+                            android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: setPauseState(${after.id}, ${after.state}) - was ${before.state} @ ${System.currentTimeMillis()}")
                             routineRepository.setPauseState(after.id, after.state)
                         }
+                    }
+                    if (!pausedAny) {
+                        android.util.Log.d("PREMIUM_DEBUG", "RoutineAutoPauseCoordinator: EXPIRED but nothing to reconcile (already <= limit) @ ${System.currentTimeMillis()}")
                     }
                 }
         }

@@ -127,11 +127,9 @@ fun RoutineLimitResolutionContent(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
-            HorizontalDivider()
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
 
-            AppButtonExpressive(
+            AppButtonMedium(
                 onClick = onBuyPremiumClick,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(

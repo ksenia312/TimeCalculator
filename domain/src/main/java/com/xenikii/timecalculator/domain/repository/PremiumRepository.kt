@@ -27,8 +27,10 @@ interface PremiumRepository {
     /**
      * Last known premium state, readable synchronously (no suspend/network round-trip) for call
      * sites that can't await a fresh check, e.g. deciding notification content when posting.
+     * `null` means not confirmed yet (neither RevenueCat nor the grant has answered) - callers
+     * must not treat that the same as confirmed-false.
      */
-    fun isPremiumCached(): Boolean
+    fun isPremiumCached(): Boolean?
     suspend fun restore(): Boolean
     suspend fun identify(userId: String)
     suspend fun resetIdentity()

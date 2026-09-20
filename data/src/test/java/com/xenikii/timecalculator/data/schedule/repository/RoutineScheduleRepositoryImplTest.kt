@@ -544,7 +544,7 @@ private class FakePremiumRepository(private val isPremium: Boolean = true) : Pre
     override suspend fun restore(): Boolean = false
     override suspend fun identify(userId: String) = Unit
     override suspend fun resetIdentity() = Unit
-    override fun isPremiumCached(): Boolean = isPremium
+    override fun isPremiumCached(): Boolean? = isPremium
 }
 
 private class FakeNotificationSettingsLocalDataSource(

@@ -9,12 +9,18 @@ class LogoutUseCase(
     private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(): Result<Unit> {
+        android.util.Log.d("LOGOUT_DEBUG", "LogoutUseCase: calling syncEngine.sync() @ ${System.currentTimeMillis()}")
         val syncResult = runCatching {
             withTimeout(5_000.milliseconds) {
                 syncEngine.sync().getOrThrow()
             }
         }
+        android.util.Log.d("LOGOUT_DEBUG", "LogoutUseCase: sync step done, isFailure=${syncResult.isFailure} @ ${System.currentTimeMillis()}")
         if (syncResult.isFailure) return Result.failure(syncResult.exceptionOrNull()!!)
-        return authRepository.logout()
+
+        android.util.Log.d("LOGOUT_DEBUG", "LogoutUseCase: calling authRepository.logout() @ ${System.currentTimeMillis()}")
+        val result = authRepository.logout()
+        android.util.Log.d("LOGOUT_DEBUG", "LogoutUseCase: authRepository.logout() returned $result @ ${System.currentTimeMillis()}")
+        return result
     }
 }

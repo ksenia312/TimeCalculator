@@ -44,9 +44,11 @@ class SettingsViewModel(
 
     fun logout() {
         if (_viewState.value.isLoggingOut) return
+        android.util.Log.d("LOGOUT_DEBUG", "SettingsViewModel.logout(): start @ ${System.currentTimeMillis()}")
         viewModelScope.launch {
             _viewState.update { it.copy(isLoggingOut = true) }
             val result = logoutUseCase()
+            android.util.Log.d("LOGOUT_DEBUG", "SettingsViewModel.logout(): logoutUseCase() returned $result @ ${System.currentTimeMillis()}")
             if (result.isFailure) {
                 _viewState.update { it.copy(isLoggingOut = false) }
             }

@@ -94,9 +94,10 @@ class RoutineScheduleRepositoryImpl(
 
     /** What a routine starting right now should be pinned to: EVERY_TASK downgrades to
      * START_AND_END while not premium. Only used to establish a new pin - an already-active
-     * routine keeps whatever [pinNotificationMode] gave it when it started. */
+     * routine keeps whatever [pinNotificationMode] gave it when it started. `?: true`: premium
+     * not confirmed yet reads as "don't downgrade", not as free. */
     private fun currentDesiredMode(): NotificationMode =
-        notificationSettings.getMode().effectiveNotificationMode(premiumRepository.isPremiumCached())
+        notificationSettings.getMode().effectiveNotificationMode(premiumRepository.isPremiumCached() ?: true)
 
     /**
      * Ensures `routineId`'s schedule record carries a notification mode, without ever changing

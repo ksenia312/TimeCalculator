@@ -96,9 +96,13 @@ class AuthRepositoryImpl(
 
     override suspend fun logout(): Result<Unit> =
         withContext(NonCancellable) {
+            android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): calling client.auth.signOut() @ ${System.currentTimeMillis()}")
             val result = runAuth { client.auth.signOut() }
+            android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): signOut() done, result=$result @ ${System.currentTimeMillis()}")
             clearLocalUserDataManager()
+            android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): clearLocalUserDataManager() done @ ${System.currentTimeMillis()}")
             userPreferences.setLastUserId(null)
+            android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): setLastUserId(null) done @ ${System.currentTimeMillis()}")
             result
         }
 

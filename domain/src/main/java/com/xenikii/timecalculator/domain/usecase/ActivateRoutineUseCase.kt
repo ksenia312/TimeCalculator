@@ -34,7 +34,8 @@ class ActivateRoutineUseCase(
     private val mutex = Mutex()
 
     suspend operator fun invoke(routineId: String): Result = mutex.withLock {
-        if (premiumRepository.observeEntitlementState().first() == PremiumEntitlementState.ACTIVE) {
+        // Only a confirmed EXPIRED enforces the limit - UNKNOWN must not be treated as free.
+        if (premiumRepository.observeEntitlementState().first() != PremiumEntitlementState.EXPIRED) {
             routineRepository.setPauseState(routineId, RoutinePauseState.ACTIVE)
             return@withLock Result.ACTIVATED
         }
