@@ -39,6 +39,7 @@ fun RoutinesLazyList(
                 )
             }
         }
+        item { Box(Modifier.height(120.dp)) }
         item { Box(Modifier.bottomIndent()) }
     }
 }

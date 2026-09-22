@@ -10,11 +10,16 @@ fun Routine.toViewItem(
     schedule: RoutineSchedule,
     now: Instant,
 ): RoutineCardViewItem {
-    val isOngoing = schedule.phaseAt(now) == RoutineSchedulePhase.ACTIVE
-    val isCompleted = schedule.phaseAt(now) == RoutineSchedulePhase.FINISHED
+    val phase = schedule.phaseAt(now)
+    val isOngoing = phase == RoutineSchedulePhase.ACTIVE
+    val isCompleted = phase == RoutineSchedulePhase.FINISHED
     return RoutineCardViewItem(
-        isOngoing = isOngoing,
-        isCompleted = isCompleted,
+        status = when {
+            isPaused -> RoutineCardStatus.PAUSED
+            isOngoing -> RoutineCardStatus.ONGOING
+            isCompleted -> RoutineCardStatus.COMPLETED
+            else -> RoutineCardStatus.PLANNED
+        },
         startLabelRes = if (isOngoing || isCompleted) {
             R.string.routine_card_started_at
         } else {

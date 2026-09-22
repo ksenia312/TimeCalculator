@@ -5,16 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.xenikii.timecalculator.shared.theme.LocalCustomColorScheme
+import com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus
 
 @Composable
-fun routineCardBackground(
-    isOngoing: Boolean,
-    isCompleted: Boolean,
-): Brush {
-    val baseGradient = when {
-        isCompleted -> LocalCustomColorScheme.current.label
-        isOngoing -> LocalCustomColorScheme.current.accentDark
-        else -> MaterialTheme.colorScheme.onBackground
+fun routineCardBackground(status: RoutineCardStatus): Brush {
+    val baseGradient = when (status) {
+        RoutineCardStatus.COMPLETED -> LocalCustomColorScheme.current.label
+        RoutineCardStatus.ONGOING -> LocalCustomColorScheme.current.accentDark
+        RoutineCardStatus.PLANNED, RoutineCardStatus.PAUSED -> MaterialTheme.colorScheme.onBackground
     }
 
     return Brush.linearGradient(

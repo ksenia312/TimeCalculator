@@ -11,6 +11,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.shared.components.CustomTopBar
 import com.xenikii.timecalculator.shared.features.routineCardBackground
+import com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,10 +25,7 @@ fun NonSuccessTopAppBar(
             .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
             .background(MaterialTheme.colorScheme.surface)
             .background(
-                routineCardBackground(
-                    isOngoing = false,
-                    isCompleted = false
-                )
+                routineCardBackground(RoutineCardStatus.PLANNED)
             )
     ) {
         if (title != null) {

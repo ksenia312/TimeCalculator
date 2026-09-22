@@ -26,6 +26,7 @@ import com.xenikii.timecalculator.shared.animation.routineCardSharedKey
 import com.xenikii.timecalculator.shared.features.routineCard
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
+import com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +92,6 @@ fun RoutineSuccessTopAppBar(
         RoutineCard(
             viewItem = viewItem,
             collapseFraction = fraction,
-            isPaused = viewState.routine.isPaused,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .graphicsLayer { alpha = 1f - cardFade }
@@ -126,8 +126,7 @@ fun RoutineSuccessTopAppBarPreview() {
             signature = "",
         ),
         cardViewItem = RoutineCardViewItem(
-            isOngoing = false,
-            isCompleted = false,
+            status = RoutineCardStatus.PLANNED,
             startLabelRes = R.string.routine_card_will_start,
             endLabelRes = R.string.routine_card_will_end,
             startInstant = routine.scheduledAt,

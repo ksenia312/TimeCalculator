@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.extensions.stringDateTime
 import com.xenikii.timecalculator.shared.extensions.stringValue
+import com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 
 @Composable
@@ -32,7 +33,8 @@ fun RoutineCardTimeInfo(
         modifier = modifier,
         horizontalAlignment = Alignment.End
     ) {
-        val alphaModifier = Modifier.alpha(if (viewItem.isCompleted) 0f else 1f)
+        val showsCountdown = viewItem.status == RoutineCardStatus.PLANNED || viewItem.status == RoutineCardStatus.ONGOING
+        val alphaModifier = Modifier.alpha(if (showsCountdown) 1f else 0f)
         Text(
             text = stringResource(
                 if (viewItem.isOngoing) {

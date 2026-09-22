@@ -97,8 +97,7 @@ fun RoutineListContentPreview() {
                             signature = "",
                         ),
                         cardViewItem = com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem(
-                            isOngoing = false,
-                            isCompleted = false,
+                            status = com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus.PLANNED,
                             startLabelRes = R.string.routine_card_will_start,
                             endLabelRes = R.string.routine_card_will_end,
                             startInstant = it.scheduledAt,

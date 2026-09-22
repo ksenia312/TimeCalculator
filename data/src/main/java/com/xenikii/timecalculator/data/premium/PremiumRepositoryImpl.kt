@@ -173,6 +173,13 @@ class PremiumRepositoryImpl(
 
     override suspend fun identify(userId: String) {
         android.util.Log.d("PREMIUM_DEBUG", "identify($userId): start @ ${System.currentTimeMillis()}")
+        // Any grant state held right now belongs to the previous identity (typically None from
+        // resetIdentity() while logged out). Keeping it would pair the new user's RevenueCat info
+        // (emitted by logIn below) with a stale "checked, no grant" and briefly report EXPIRED
+        // for a Supabase-granted user - flashing the routine-limit-resolution screen and letting
+        // RoutineAutoPauseCoordinator pause routines. Back to "not checked" = UNKNOWN until the
+        // grant is actually fetched for this user; a failed fetch keeps it UNKNOWN, never EXPIRED.
+        grantedPremiumFlow.value = null
         runCatching { awaitLogIn(userId) }
         android.util.Log.d("PREMIUM_DEBUG", "identify($userId): awaitLogIn done, calling refreshGrantedPremium @ ${System.currentTimeMillis()}")
         refreshGrantedPremium()

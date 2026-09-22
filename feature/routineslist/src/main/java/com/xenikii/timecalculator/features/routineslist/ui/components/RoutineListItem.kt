@@ -86,7 +86,7 @@ private fun RoutineListItem(
 ) {
     val context = LocalContext.current
     val routine = item.routine
-    val isPaused = routine.isPaused
+    val isPaused = item.cardViewItem.isPaused
     val isCompleted = item.cardViewItem.isCompleted
     val isOngoing = item.cardViewItem.isOngoing
 
@@ -220,8 +220,7 @@ fun RoutineListItemPreview() {
                 signature = "",
             ),
             cardViewItem = com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem(
-                isOngoing = false,
-                isCompleted = false,
+                status = com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus.PLANNED,
                 startLabelRes = R.string.routine_card_will_start,
                 endLabelRes = R.string.routine_card_will_end,
                 startInstant = routine.scheduledAt,

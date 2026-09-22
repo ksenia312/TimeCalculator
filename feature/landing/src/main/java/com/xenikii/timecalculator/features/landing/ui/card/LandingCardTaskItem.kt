@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.shared.extensions.stringTime
 import com.xenikii.timecalculator.shared.extensions.stringValue
 import com.xenikii.timecalculator.shared.features.routineCardBackground
+import com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -47,8 +48,11 @@ fun LandingCardTaskItem(
     val header = stringResource(headerRes, remaining.stringValue(context))
 
     val cardBackground = routineCardBackground(
-        isOngoing = routineIsOngoing,
-        isCompleted = isCompleted,
+        when {
+            isCompleted -> RoutineCardStatus.COMPLETED
+            routineIsOngoing -> RoutineCardStatus.ONGOING
+            else -> RoutineCardStatus.PLANNED
+        }
     )
     val lightenOverlay = if (isOngoing) {
         Color.Transparent

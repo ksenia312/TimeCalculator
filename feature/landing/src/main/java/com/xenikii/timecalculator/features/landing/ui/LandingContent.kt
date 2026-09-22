@@ -23,6 +23,7 @@ import com.xenikii.timecalculator.shared.navigator.LocalNavigator
 import com.xenikii.timecalculator.shared.preview.PreviewAll
 import com.xenikii.timecalculator.shared.preview.PreviewConstants
 import com.xenikii.timecalculator.shared.preview.PreviewTheme
+import com.xenikii.timecalculator.shared.viewitem.RoutineCardStatus
 import com.xenikii.timecalculator.shared.viewitem.RoutineCardViewItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,8 +111,7 @@ fun LandingContentPreview() {
                     LandingRoutineState(
                         routineId = routine.id,
                         cardViewItem = RoutineCardViewItem(
-                            isOngoing = false,
-                            isCompleted = false,
+                            status = RoutineCardStatus.PLANNED,
                             startLabelRes = R.string.routine_card_will_start,
                             endLabelRes = R.string.routine_card_will_end,
                             startInstant = schedule.effectiveStart,

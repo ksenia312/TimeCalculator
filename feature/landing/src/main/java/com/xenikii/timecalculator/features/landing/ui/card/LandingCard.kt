@@ -84,10 +84,7 @@ fun LandingCard(
                         )
                     }
                     Spacer(Modifier.height(4.dp))
-                    RoutineCardStatusRow(
-                        isOngoing = viewItem.isOngoing,
-                        isCompleted = viewItem.isCompleted,
-                    )
+                    RoutineCardStatusRow(status = viewItem.status)
                 }
                 Spacer(Modifier.width(16.dp))
                 RoutineCardTimeInfo(viewItem, modifier = Modifier.weight(1f))

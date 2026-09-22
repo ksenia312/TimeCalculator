@@ -61,10 +61,7 @@ fun Modifier.routineCard(
         .clip(shape)
         .background(MaterialTheme.colorScheme.surface)
         .background(
-            routineCardBackground(
-                isOngoing = viewItem.isOngoing,
-                isCompleted = viewItem.isCompleted
-            )
+            routineCardBackground(viewItem.status)
         )
         .then(
             if (onClick != null) {

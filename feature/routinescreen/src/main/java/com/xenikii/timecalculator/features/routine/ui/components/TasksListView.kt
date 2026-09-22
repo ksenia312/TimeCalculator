@@ -100,7 +100,7 @@ fun BoxScope.TasksListView(
                 schedule = schedule,
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,
-                isCurrent = currentTaskIndex == index,
+                isCurrent = !routine.isPaused && currentTaskIndex == index,
                 isCompleted = currentTaskIndex != null && index < currentTaskIndex,
                 isEditMode = isEditMode,
                 isSelected = link.id in selectedIds,
