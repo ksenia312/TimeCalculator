@@ -19,7 +19,13 @@ class GrantedPremiumDataSource(
             .select()
             .decodeSingleOrNull<RemoteProfile>()
             ?.toGrantedPremiumInfo()
-            ?: GrantedPremiumInfo.None
+            // No row visible yet (RLS/replication lag right after login, or the profile row not
+            // created yet) is NOT the same signal as "checked, row says no grant" - a real grant
+            // still lives server-side and just hasn't shown up. Throwing routes this through
+            // PremiumRepositoryImpl.refreshGrantedPremium()'s existing failure path, which leaves
+            // grantedPremiumFlow untouched instead of collapsing it to None/EXPIRED - see that
+            // function's doc for why a false EXPIRED here is dangerous (auto-pauses routines).
+            ?: throw ProfileNotFoundException()
 
     private fun RemoteProfile.toGrantedPremiumInfo(): GrantedPremiumInfo {
         if (!grantedPremium) return GrantedPremiumInfo.None
@@ -33,6 +39,9 @@ class GrantedPremiumDataSource(
         const val PROFILES_TABLE = "profiles"
     }
 }
+
+/** Thrown when the `profiles` row isn't visible yet - see [GrantedPremiumDataSource.fetchGrantedPremium]. */
+class ProfileNotFoundException : Exception("No profiles row visible for the current user yet")
 
 /** Data-layer result of a grant lookup; mapped to the domain-clean `PremiumStatus` in [PremiumRepositoryImpl]. */
 data class GrantedPremiumInfo(
