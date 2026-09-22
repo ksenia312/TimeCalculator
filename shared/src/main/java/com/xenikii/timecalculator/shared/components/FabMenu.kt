@@ -2,7 +2,9 @@ package com.xenikii.timecalculator.shared.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -10,6 +12,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
@@ -30,6 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.xenikii.timecalculator.R
 import com.xenikii.timecalculator.shared.theme.TimeCalculatorTheme
 
@@ -102,6 +106,38 @@ fun FabMenu(
     }
 }
 
+
+/**
+ * Single-action FAB sized, shaped and padded like [FabMenu]'s collapsed toggle, so the two can swap
+ * in place. The padding mirrors FloatingActionButtonMenu's private 16dp horizontal / 16dp bottom
+ * spacing around its button.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun FabActionButton(
+    imageVector: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = containerColor,
+        contentColor = contentColor,
+        shape = RoundedCornerShape(ToggleFloatingActionButtonDefaults.containerCornerRadiusLarge()(0f)),
+        modifier = modifier
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .size(ToggleFloatingActionButtonDefaults.containerSizeLarge()(0f)),
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(FloatingActionButtonDefaults.LargeIconSize),
+        )
+    }
+}
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

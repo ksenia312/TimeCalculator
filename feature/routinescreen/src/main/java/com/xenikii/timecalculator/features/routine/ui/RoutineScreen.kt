@@ -75,7 +75,7 @@ fun RoutineScreen(
             },
             floatingActionButton = {
                 val routine = (viewState as? RoutineViewState.Success)?.routine
-                if (routine != null) EditRoutineFloatingButton(routine, viewModel)
+                if (routine != null) EditRoutineFloatingButton(routine, viewModel, isEditMode)
             }) {
 
             Box(

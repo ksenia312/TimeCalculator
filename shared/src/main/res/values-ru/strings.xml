@@ -42,6 +42,7 @@
     <string name="content_desc_close">Закрыть</string>
     <string name="content_desc_open_menu">Открыть меню</string>
     <string name="content_desc_close_menu">Закрыть меню</string>
+    <string name="content_desc_finish_editing">Завершить редактирование</string>
     <string name="content_desc_show_password">Показать пароль</string>
     <string name="content_desc_hide_password">Скрыть пароль</string>
 
