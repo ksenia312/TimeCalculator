@@ -101,7 +101,7 @@ fun BoxScope.TasksListView(
                 draggingIndex = draggingIndex,
                 dragOffsetY = dragOffsetY,
                 isCurrent = !routine.isPaused && currentTaskIndex == index,
-                isCompleted = currentTaskIndex != null && index < currentTaskIndex,
+                isCompleted = !routine.isPaused && currentTaskIndex != null && index < currentTaskIndex,
                 isEditMode = isEditMode,
                 isSelected = link.id in selectedIds,
                 onToggleSelect = { viewModel.toggleSelection(link.id) },
