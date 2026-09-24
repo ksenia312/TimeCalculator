@@ -15,8 +15,8 @@ class LogoutUseCase(
                 syncEngine.sync().getOrThrow()
             }
         }
+        // Best-effort: a failed or slow sync must not block the user from logging out
         android.util.Log.d("LOGOUT_DEBUG", "LogoutUseCase: sync step done, isFailure=${syncResult.isFailure} @ ${System.currentTimeMillis()}")
-        if (syncResult.isFailure) return Result.failure(syncResult.exceptionOrNull()!!)
 
         android.util.Log.d("LOGOUT_DEBUG", "LogoutUseCase: calling authRepository.logout() @ ${System.currentTimeMillis()}")
         val result = authRepository.logout()

@@ -99,11 +99,13 @@ class AuthRepositoryImpl(
             android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): calling client.auth.signOut() @ ${System.currentTimeMillis()}")
             val result = runAuth { client.auth.signOut() }
             android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): signOut() done, result=$result @ ${System.currentTimeMillis()}")
+            // signOut() keeps the local session on network errors, so drop it locally
+            if (result.isFailure) runCatching { client.auth.clearSession() }
             clearLocalUserDataManager()
             android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): clearLocalUserDataManager() done @ ${System.currentTimeMillis()}")
             userPreferences.setLastUserId(null)
             android.util.Log.d("LOGOUT_DEBUG", "AuthRepositoryImpl.logout(): setLastUserId(null) done @ ${System.currentTimeMillis()}")
-            result
+            Result.success(Unit)
         }
 
     /**

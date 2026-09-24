@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "966622425137",
+    "project_id": "time-calculator-df3b3",
+    "storage_bucket": "time-calculator-df3b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966622425137:android:90abdba4027974ea36e510",
+        "android_client_info": {
+          "package_name": "com.xenikii.timecalculator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbVisjY33F1yXUOI6T-CLo9HZrIV1R-8k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
