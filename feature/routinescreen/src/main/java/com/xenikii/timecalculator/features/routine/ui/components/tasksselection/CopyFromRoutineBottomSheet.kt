@@ -67,7 +67,7 @@ fun CopyFromRoutineBottomSheet(
         sheetState = sheetState,
         modifier = Modifier.padding(top = 32.dp),
         properties = ModalBottomSheetProperties(
-            securePolicy = SecureFlagPolicy.SecureOn,
+            securePolicy = SecureFlagPolicy.Inherit,
             shouldDismissOnBackPress = true,
         )
     ) {

@@ -21,8 +21,8 @@ android {
         applicationId = "com.xenikii.timecalculator"
         minSdk = 30
         targetSdk = 36
-        versionCode = 39
-        versionName = "4.20"
+        versionCode = 41
+        versionName = "4.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
